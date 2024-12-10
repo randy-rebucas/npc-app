@@ -10,6 +10,8 @@ const SignIn = ({ onSignIn }: Props) => {
             onClick={() => {
                 onSignIn();
             }}
+            className="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 
+                transition duration-200 text-lg font-medium"
         >
             Sign In
         </button>
