@@ -8,7 +8,7 @@ export default async function Dashboard() {
         <>
             {/* User Data Section */}
             {(claims) && (
-                <section className="pt-32 px-6 pb-20">
+                <section className="pt-32 px-6">
                     <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-8">
                         <h2 className="font-semibold mb-6 p-4 text-2xl text-gray-900">Your Profile Data</h2>
                         <div className="overflow-x-auto">
