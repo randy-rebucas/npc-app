@@ -3,6 +3,8 @@ import SignIn from "../components/sign-in";
 import { logtoConfig } from "./logto";
 
 export default async function Home() {
+
+  
   const { isAuthenticated } = await getLogtoContext(logtoConfig);
 
   return (

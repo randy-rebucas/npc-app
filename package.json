@@ -11,9 +11,13 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@logto/next": "^4.1.0",
+    "clsx": "^2.1.1",
+    "mongoose": "^8.8.4",
     "next": "15.0.4",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "sharetribe-flex-sdk": "^1.21.1",
+    "use-debounce": "^10.0.4"
   },
   "devDependencies": {
     "@types/node": "^20",
