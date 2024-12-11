@@ -4,6 +4,8 @@ const nextConfig: NextConfig = {
   /* config options here */
   env: {
     MONGODB_URI: process.env.MONGODB_URI,
+    SHARETRIBE_CLIENT_ID: process.env.SHARETRIBE_CLIENT_ID,
+    SHARETRIBE_CLIENT_SECRET: process.env.SHARETRIBE_CLIENT_SECRET,
   },
   images: {
     remotePatterns: [

@@ -1,13 +1,9 @@
 "use server";
 
-import SharetribeSdk from "sharetribe-flex-sdk";
+import { sdk } from "@/lib/sharetribe";
 
 export async function syncMembers(id: string) {
   try {
-    const sdk = new SharetribeSdk({
-      clientId: process.env.SHARETRIBE_CLIENT_ID!,
-      clientSecret: process.env.SHARETRIBE_CLIENT_SECRET!,
-    });
     console.log("Syncing member:", id);
     // Example user data - adjust according to your needs
     const userData = {
