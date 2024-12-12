@@ -1,20 +1,21 @@
 "use server";
 
+import mongoose from "mongoose";
 // import { sdk } from "@/lib/sharetribe";
 import Member from "../models/Member";
+import connect from "@/lib/db";
 
 export async function syncMembers(id: string) {
   try {
-    console.log("Syncing member:", id);
+    connect();
 
-    const member = await Member.findById(id).exec();
+    const member = await Member.findById(new mongoose.Types.ObjectId(id)).exec();
 
     if (!member) {
       return;
     }
-
-    console.log("Member found:", member);
-    return;
+    console.log(member);
+    return member;
     // // Example user data - adjust according to your needs
     // const userData = {
     //   email: "user@example.com",

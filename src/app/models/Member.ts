@@ -5,6 +5,7 @@ export interface IMember {
   _id: string;
   event: string;
   payload: object;
+  accountSynced: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -14,6 +15,7 @@ const memberSchema = new Schema<IMember>({
   _id: String,
   event: String,
   payload: Object,
+  accountSynced: Boolean,
   createdAt: Date,
   updatedAt: Date,
 });

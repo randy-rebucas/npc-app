@@ -1,8 +1,6 @@
 import { unstable_noStore as noStore } from "next/cache";
 import Member from "@/app/models/Member";
 import connect from "@/lib/db";
-import mongoose from "mongoose";
-import User from "@/app/models/User";
 
 const ITEMS_PER_PAGE = 6;
 
@@ -16,7 +14,8 @@ export async function getMembers() {
       return {
         _id: member._id.toString(),
         event: member.event,
-        email: member.payload.email,
+        email: member.payload.auth.email,
+        accountSynced: member.accountSynced,
         createdAt: member.createdAt,
         updatedAt: member.updatedAt,
       };
@@ -39,17 +38,16 @@ export async function fetchFilteredMembers(
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
   try {
-    const member = await User.findById(new mongoose.Types.ObjectId('6756df2278d7d8a2d5b93400')).exec()
-    console.log(member);
 
     const members = await Member.find({
-      email: { $regex: query, $options: 'i' }
+      'payload.auth.email': { $regex: query, $options: 'i' }
     }).skip(offset).limit(ITEMS_PER_PAGE).exec();
 
     const transformData = members.map((member) => ({
       _id: member._id.toString(),
       event: member.event,
-      email: member.payload.email,
+      email: member.payload.auth.email,
+      accountSynced: member.accountSynced,
       createdAt: member.createdAt,
       updatedAt: member.updatedAt,
     }));
