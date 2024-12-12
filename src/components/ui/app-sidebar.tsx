@@ -1,4 +1,4 @@
-import { ChevronUp, Home, Settings, User, Users } from "lucide-react"
+import { ChevronUp, GalleryVerticalEnd, Home, Settings, User, Users } from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -45,10 +45,26 @@ export async function AppSidebar() {
 
     return (
         <Sidebar>
-            <SidebarHeader />
+            <SidebarHeader>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton size="lg" asChild>
+                            <a href="#">
+                                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                                    <GalleryVerticalEnd className="size-4" />
+                                </div>
+                                <div className="flex flex-col gap-0.5 leading-none">
+                                    <span className="font-semibold">{process.env.APP_NAME}</span>
+                                    <span className="">v{process.env.APP_VERSION}</span>
+                                </div>
+                            </a>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
+            </SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Application</SidebarGroupLabel>
+                    <SidebarGroupLabel>Navigation</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {items.map((item) => (
