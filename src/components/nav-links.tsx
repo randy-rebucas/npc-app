@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 
 export default function NavLinks() {
     const pathname = usePathname();
-    console.log(pathname);
+
     const links = [
         { label: 'Dashboard', href: '/dashboard' },
         { label: 'Members', href: '/dashboard/members' },

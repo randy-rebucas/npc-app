@@ -1,6 +1,7 @@
 import { getLogtoContext } from "@logto/next/server-actions";
 import { logtoConfig } from "../logto";
 
+
 export default async function Dashboard() {
     const { claims } = await getLogtoContext(logtoConfig);
 
@@ -20,7 +21,7 @@ export default async function Dashboard() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200">
-                                    {Object.entries(claims).map(([key, value]) => (
+                                    {Object.entries({ ...claims }).map(([key, value]) => (
                                         <tr key={key} className="hover:bg-gray-50">
                                             <td className="px-6 py-4 text-sm font-medium text-gray-900">{key}</td>
                                             <td className="px-6 py-4 text-sm text-gray-500">{String(value)}</td>
