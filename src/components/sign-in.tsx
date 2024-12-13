@@ -1,14 +1,13 @@
 'use client';
 
-type Props = {
-    onSignIn: () => Promise<void>;
-};
+import { useRouter } from 'next/navigation';
 
-const SignIn = ({ onSignIn }: Props) => {
+const SignIn = () => {
+    const router = useRouter();
     return (
         <button
             onClick={() => {
-                onSignIn();
+                router.push('/auth/signin');
             }}
             className="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 
                 transition duration-200 text-lg font-medium"

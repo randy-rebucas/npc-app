@@ -18,12 +18,14 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { signOut } from "@logto/next/server-actions";
-import { logtoConfig } from "@/app/logto";
-import { getLogtoContext } from "@logto/next/server-actions";
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { SignOut } from "../signout"
 
 export async function AppSidebar() {
-    const { claims } = await getLogtoContext(logtoConfig);
+
+    const session = await getServerSession(authOptions);
+
     // Menu items.
     const items = [
         {
@@ -87,7 +89,7 @@ export async function AppSidebar() {
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <SidebarMenuButton>
-                                    <User /> {claims?.name || claims?.sub}
+                                    <User /> {session?.user.name}
                                     <ChevronUp className="ml-auto" />
                                 </SidebarMenuButton>
                             </DropdownMenuTrigger>
@@ -98,11 +100,8 @@ export async function AppSidebar() {
                                 <DropdownMenuItem>
                                     <span>Account</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem asChild onClick={async () => {
-                                    'use server';
-                                    await signOut(logtoConfig);
-                                }}>
-                                    <span>Sign Out</span>
+                                <DropdownMenuItem>
+                                    <SignOut /> 
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
