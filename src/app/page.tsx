@@ -1,12 +1,12 @@
-import { getLogtoContext, signIn } from "@logto/next/server-actions";
+
 import SignIn from "../components/sign-in";
-import { logtoConfig } from "./logto";
 import { sdk } from "@/lib/sharetribe";
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 
 export default async function Home() {
-
-  
-  const { isAuthenticated } = await getLogtoContext(logtoConfig);
+  const session = await getServerSession(authOptions);
+  const isAuthenticated = !!session;
 
   // Add Sharetribe listings fetch
   const listings = await sdk.listings.query({
@@ -26,16 +26,10 @@ export default async function Home() {
             Experience the future of web applications with our cutting-edge platform.
             Simple, secure, and powerful.
           </p>
-          {!isAuthenticated && <SignIn
-            onSignIn={async () => {
-              'use server';
-
-              await signIn(logtoConfig);
-            }}
-          />}
+          <SignIn/>
         </div>
       </section>}
-      
+
       {/* Add Listings Section */}
       {isAuthenticated && (
         <section className="py-12 px-6">
