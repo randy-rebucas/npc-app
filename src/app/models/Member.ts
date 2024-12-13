@@ -2,22 +2,25 @@ import mongoose, { Schema } from "mongoose";
 
 // 1. Create an interface representing a document in MongoDB.
 export interface IMember {
-  _id: string;
   event: string;
   payload: object;
+  reason: Array<string>;
+  timestamp: Date;
   accountSynced: boolean;
   createdAt: Date;
   updatedAt: Date;
+  _id?: mongoose.Schema.Types.ObjectId;
 }
 
 // 2. Create an Schema corresponding to the document interface.
 const memberSchema = new Schema<IMember>({
-  _id: String,
-  event: String,
-  payload: Object,
-  accountSynced: Boolean,
-  createdAt: Date,
-  updatedAt: Date,
+  event: {type: String, required: true},
+  payload: {type: Object, required: true},
+  reason: [{type: String}],
+  timestamp: {type: Date, default: Date.now},
+  accountSynced: {type: Boolean, default: false},
+  createdAt: {type: Date, default: Date.now},
+  updatedAt: {type: Date, default: Date.now},
 });
 
 // 3. Create a Model.
