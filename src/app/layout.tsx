@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { MemberstackProvider } from '@memberstack/nextjs/client';
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -26,9 +27,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`} >
+        <MemberstackProvider config={{
+          publicKey: process.env.NEXT_PUBLIC_MEMBERSTACK_PUBLIC_KEY as string
+        }}>
+          {children}
+        </MemberstackProvider>
       </body>
     </html>
   );
