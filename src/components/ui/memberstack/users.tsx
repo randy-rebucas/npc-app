@@ -13,7 +13,7 @@ interface User {
     };
 }
 
-export function Memberstack() {
+export default function Users() {
     const [users, setUsers] = useState<User[]>([]);
 
     useEffect(() => {

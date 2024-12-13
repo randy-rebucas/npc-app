@@ -56,8 +56,8 @@ export async function AppSidebar() {
                                     <GalleryVerticalEnd className="size-4" />
                                 </div>
                                 <div className="flex flex-col gap-0.5 leading-none">
-                                    <span className="font-semibold">{process.env.APP_NAME}</span>
-                                    <span className="">v{process.env.APP_VERSION}</span>
+                                    <span className="font-semibold">{process.env.NEXT_PUBLIC_APP_NAME}</span>
+                                    <span className="">v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
                                 </div>
                             </a>
                         </SidebarMenuButton>
