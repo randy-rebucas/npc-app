@@ -1,6 +1,7 @@
 import { Separator } from "@radix-ui/react-separator";
 import Breadcrumbs from "./breadcrumbs";
 import { SidebarTrigger } from "./ui/sidebar";
+import { SignOut } from "./signout";
 
 interface Breadcrumb {
   label: string;
@@ -14,6 +15,10 @@ export default function Header({ breadcrumbs }: { breadcrumbs: Breadcrumb[] }) {
       <SidebarTrigger className="-ml-1" />
       <Separator orientation="vertical" className="mr-2 h-4" />
       <Breadcrumbs breadcrumbs={breadcrumbs} />
+
+      <div className="flex-1 flex justify-end">
+        <SignOut />
+      </div>
     </header>
   );
 }

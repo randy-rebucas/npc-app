@@ -1,4 +1,4 @@
-import { ChevronUp, GalleryVerticalEnd, Home, Settings, User, Users } from "lucide-react"
+import { ChevronUp, GalleryVerticalEnd, HelpCircle, Home, Key, Settings, User, Users } from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -34,9 +34,24 @@ export async function AppSidebar() {
             icon: Home,
         },
         {
+            title: "Profile",
+            url: "/dashboard/profile",
+            icon: User,
+        },
+        {
+            title: "Credentials",
+            url: "/dashboard/credentials",
+            icon: Key,
+        },
+        {
             title: "Members",
             url: "/dashboard/members",
             icon: Users,
+        },
+        {
+            title: "Help",
+            url: "/dashboard/help",
+            icon: HelpCircle,
         },
         {
             title: "Settings",
@@ -101,7 +116,7 @@ export async function AppSidebar() {
                                     <span>Account</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
-                                    <SignOut /> 
+                                    <SignOut />
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
