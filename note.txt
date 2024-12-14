@@ -1,2 +1,26 @@
 jdoe@example.com
 mErAymUW
+
+signup
+    sign-up/physician-onboarding-step-1
+        first name
+        last name 
+        degree type
+            D.O
+            M.D
+        NPI number
+    
+    sign-up/physician-onboarding-step-1-2
+    sign-up/physician-onboarding-step-2
+    sign-up/physician-onboarding-step-3
+        Monthly base collaboration rate
+            help: What is your standard monthly rate for collaboration with a nurse practitioner?
+        Additional State Fee (per state)?
+            help: How much extra do you charge (per State) if the nurse practitioner needs collaboration in additional states?
+        Additional Nurse Practitioner Fee? (multi-NP practices)
+            help: Some physician's charge a discounted fee per additional NP collaboration in the same clinic.
+        *Optional* Controlled substances prescribing monthly fee? *Optional*
+            help: Some physician's charge an additional fee (per month) for NPs who prescribe controlled substances.
+    sign-up/physician-onboarding-step-4
+    sign-up/physician-onboarding-step-5
+    
