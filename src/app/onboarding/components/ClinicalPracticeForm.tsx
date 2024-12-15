@@ -33,9 +33,10 @@ const formSchema = z.object({
 interface ClinicalPracticeFormProps {
   data: OnboardingFormData;
   updateData: (data: Partial<OnboardingFormData>) => void;
+  currentStep: number;
 }
 
-export default function ClinicalPracticeForm({ data, updateData }: ClinicalPracticeFormProps) {
+export default function ClinicalPracticeForm({ data, updateData, currentStep }: ClinicalPracticeFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -44,7 +45,14 @@ export default function ClinicalPracticeForm({ data, updateData }: ClinicalPract
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    updateData(values);
+    fetch(`/api/onboarding/${currentStep}`, {
+      method: 'POST',
+      body: JSON.stringify(values),
+    }).then(response => {
+      console.log(response);
+      updateData(values);
+      return response.json();
+    }).catch(error => console.error(error));
   };
 
   return (

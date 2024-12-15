@@ -23,11 +23,13 @@ const formSchema = z.object({
 interface GovernmentIdFormProps {
   data: OnboardingFormData;
   updateData: (data: Partial<OnboardingFormData>) => void;
+  currentStep: number;
 }
 
 export default function GovernmentIdForm({
   data,
   updateData,
+  currentStep,
 }: GovernmentIdFormProps) {
   const [fileName, setFileName] = useState<string>('');
 
@@ -45,8 +47,15 @@ export default function GovernmentIdForm({
       // For now, we'll just store the file name
       setFileName(file.name);
       const url = URL.createObjectURL(file);
-      form.setValue('governmentIdUrl', url);
-      updateData({ governmentIdUrl: url });
+      fetch(`/api/onboarding/${currentStep}`, {
+        method: 'POST',
+        body: JSON.stringify({ governmentIdUrl: url }),
+      }).then(response => {
+        console.log(response);
+        form.setValue('governmentIdUrl', url);
+        updateData({ governmentIdUrl: url });
+        return response.json();
+      }).catch(error => console.error(error));
     }
   };
 

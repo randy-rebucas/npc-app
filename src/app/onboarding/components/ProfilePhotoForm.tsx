@@ -24,11 +24,13 @@ const formSchema = z.object({
 interface ProfilePhotoFormProps {
   data: OnboardingFormData;
   updateData: (data: Partial<OnboardingFormData>) => void;
+  currentStep: number;
 }
 
 export default function ProfilePhotoForm({
   data,
   updateData,
+  currentStep,
 }: ProfilePhotoFormProps) {
   const [previewUrl, setPreviewUrl] = useState<string>(data.profilePhotoUrl || '');
 
@@ -45,9 +47,17 @@ export default function ProfilePhotoForm({
       // Here you would typically upload the file to your storage service
       // For now, we'll just create a local URL
       const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-      form.setValue('profilePhotoUrl', url);
-      updateData({ profilePhotoUrl: url });
+
+      fetch(`/api/onboarding/${currentStep}`, {
+        method: 'POST',
+        body: JSON.stringify({ profilePhotoUrl: url }),
+      }).then(response => {
+        console.log(response);
+        setPreviewUrl(url);
+        form.setValue('profilePhotoUrl', url);
+        updateData({ profilePhotoUrl: url });
+        return response.json();
+      }).catch(error => console.error(error));
     }
   };
 

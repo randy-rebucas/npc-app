@@ -33,9 +33,10 @@ const formSchema = z.object({
 interface LicenseInformationFormProps {
   data: OnboardingFormData;
   updateData: (data: Partial<OnboardingFormData>) => void;
+  currentStep: number;
 }
 
-export default function LicenseInformationForm({ data, updateData }: LicenseInformationFormProps) {
+export default function LicenseInformationForm({ data, updateData, currentStep }: LicenseInformationFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -45,7 +46,14 @@ export default function LicenseInformationForm({ data, updateData }: LicenseInfo
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    updateData(values);
+
+    fetch(`/api/onboarding/${currentStep}`, {
+      method: 'POST',
+      body: JSON.stringify(values),
+    }).then(response => {
+      updateData(values);
+      return response.json();
+    }).catch(error => console.error(error));
   };
 
   return (

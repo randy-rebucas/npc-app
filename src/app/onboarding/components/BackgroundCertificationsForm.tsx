@@ -27,11 +27,13 @@ const formSchema = z.object({
 interface BackgroundCertificationsFormProps {
   data: OnboardingFormData;
   updateData: (data: Partial<OnboardingFormData>) => void;
+  currentStep: number;
 }
 
 export default function BackgroundCertificationsForm({
   data,
   updateData,
+  currentStep,
 }: BackgroundCertificationsFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,7 +46,14 @@ export default function BackgroundCertificationsForm({
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    updateData(values);
+    fetch(`/api/onboarding/${currentStep}`, {
+      method: 'POST',
+      body: JSON.stringify(values),
+    }).then(response => {
+      console.log(response);
+      updateData(values);
+      return response.json();
+    }).catch(error => console.error(error));
   };
 
   return (

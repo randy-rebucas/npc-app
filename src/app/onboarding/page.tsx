@@ -63,19 +63,19 @@ export default function OnboardingPage() {
     const renderStep = () => {
         switch (currentStep) {
             case 0:
-                return <UserInformationForm data={formData} updateData={updateFormData} />;
+                return <UserInformationForm data={formData} updateData={updateFormData} currentStep={currentStep} />;
             case 1:
-                return <LicenseInformationForm data={formData} updateData={updateFormData} />;
+                return <LicenseInformationForm data={formData} updateData={updateFormData} currentStep={currentStep} />;
             case 2:
-                return <ClinicalPracticeForm data={formData} updateData={updateFormData} />;
+                return <ClinicalPracticeForm data={formData} updateData={updateFormData} currentStep={currentStep} />;
             case 3:
-                return <RateMatrixForm data={formData} updateData={updateFormData} />;
+                return <RateMatrixForm data={formData} updateData={updateFormData} currentStep={currentStep} />;
             case 4:
-                return <BackgroundCertificationsForm data={formData} updateData={updateFormData} />;
+                return <BackgroundCertificationsForm data={formData} updateData={updateFormData} currentStep={currentStep} />;
             case 5:
-                return <ProfilePhotoForm data={formData} updateData={updateFormData} />;
+                return <ProfilePhotoForm data={formData} updateData={updateFormData} currentStep={currentStep} />;
             case 6:
-                return <GovernmentIdForm data={formData} updateData={updateFormData} />;
+                return <GovernmentIdForm data={formData} updateData={updateFormData} currentStep={currentStep} />;
             default:
                 return null;
         }

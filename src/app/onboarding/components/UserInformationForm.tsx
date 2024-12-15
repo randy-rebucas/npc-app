@@ -24,9 +24,10 @@ const formSchema = z.object({
 interface UserInformationFormProps {
   data: OnboardingFormData;
   updateData: (data: Partial<OnboardingFormData>) => void;
+  currentStep: number;
 }
 
-export default function UserInformationForm({ data, updateData }: UserInformationFormProps) {
+export default function UserInformationForm({ data, updateData, currentStep }: UserInformationFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -37,7 +38,15 @@ export default function UserInformationForm({ data, updateData }: UserInformatio
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    updateData(values);
+    
+    fetch(`/api/onboarding/${currentStep}`, {
+      method: 'POST',
+      body: JSON.stringify(values),
+    }).then(response => {
+      console.log(response);
+      updateData(values);
+      return response.json();
+    }).catch(error => console.error(error));
   };
 
   return (

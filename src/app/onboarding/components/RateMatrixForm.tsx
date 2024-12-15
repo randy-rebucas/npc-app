@@ -26,9 +26,10 @@ const formSchema = z.object({
 interface RateMatrixFormProps {
   data: OnboardingFormData;
   updateData: (data: Partial<OnboardingFormData>) => void;
+  currentStep: number;
 }
 
-export default function RateMatrixForm({ data, updateData }: RateMatrixFormProps) {
+export default function RateMatrixForm({ data, updateData, currentStep }: RateMatrixFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -41,7 +42,14 @@ export default function RateMatrixForm({ data, updateData }: RateMatrixFormProps
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    updateData(values);
+    fetch(`/api/onboarding/${currentStep}`, {
+      method: 'POST',
+      body: JSON.stringify(values),
+    }).then(response => {
+      console.log(response);
+      updateData(values);
+      return response.json();
+    }).catch(error => console.error(error));
   };
 
   return (
