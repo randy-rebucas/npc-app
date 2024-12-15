@@ -86,7 +86,7 @@ export default function OnboardingPage() {
             <Card className="p-6">
                 <CardHeader>
                     <CardTitle>
-                        {steps[currentStep]} {currentStep + 1} out of {steps.length}
+                        {steps[currentStep]} <span className="text-sm text-muted-foreground">({currentStep + 1} out of {steps.length})</span>
                     </CardTitle>
                     <CardDescription>
                         {steps[currentStep]}
