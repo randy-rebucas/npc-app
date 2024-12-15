@@ -1,11 +1,25 @@
 import Header from "@/components/header";
 import Listings from "@/components/ui/sharetribe/listings";
 import { SidebarInset } from "@/components/ui/sidebar";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
+import { getUserByEmail } from "../actions/members";
 
 
 export default async function Dashboard() {
+    const session = await getServerSession(authOptions);
 
+    if (!session) {
+        return redirect("/auth/signin");
+    }
 
+    const user = await getUserByEmail(session.user.email);
+
+    if (!user) {
+        return redirect("/onboarding");
+    }
+    
     return (
         <SidebarInset>
             <Header breadcrumbs={[
