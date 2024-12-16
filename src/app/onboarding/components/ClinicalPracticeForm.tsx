@@ -30,13 +30,14 @@ const formSchema = z.object({
   practiceTypes: z.array(z.string()).min(1, 'Select at least one practice type'),
 });
 
-interface ClinicalPracticeFormProps {
+interface FormStepProps {
   data: OnboardingFormData;
-  updateData: (data: Partial<OnboardingFormData>) => void;
+  updateData: (data: Partial<OnboardingFormData>, isValid?: boolean) => void;
   currentStep: number;
+  setIsValid: (isValid: boolean) => void;
 }
 
-export default function ClinicalPracticeForm({ data, updateData, currentStep }: ClinicalPracticeFormProps) {
+export default function ClinicalPracticeForm({ data, updateData, currentStep }: FormStepProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {

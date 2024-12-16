@@ -21,17 +21,18 @@ const formSchema = z.object({
   profilePhotoUrl: z.string().min(1, 'Profile photo is required'),
 });
 
-interface ProfilePhotoFormProps {
+interface FormStepProps {
   data: OnboardingFormData;
-  updateData: (data: Partial<OnboardingFormData>) => void;
+  updateData: (data: Partial<OnboardingFormData>, isValid?: boolean) => void;
   currentStep: number;
+  setIsValid: (isValid: boolean) => void;
 }
 
 export default function ProfilePhotoForm({
   data,
   updateData,
   currentStep,
-}: ProfilePhotoFormProps) {
+}: FormStepProps) {
   const [previewUrl, setPreviewUrl] = useState<string>(data.profilePhotoUrl || '');
 
   const form = useForm<z.infer<typeof formSchema>>({

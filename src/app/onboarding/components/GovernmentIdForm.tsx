@@ -20,17 +20,18 @@ const formSchema = z.object({
   governmentIdUrl: z.string().min(1, 'Government ID is required'),
 });
 
-interface GovernmentIdFormProps {
+interface FormStepProps {
   data: OnboardingFormData;
-  updateData: (data: Partial<OnboardingFormData>) => void;
+  updateData: (data: Partial<OnboardingFormData>, isValid?: boolean) => void;
   currentStep: number;
+  setIsValid: (isValid: boolean) => void;
 }
 
 export default function GovernmentIdForm({
   data,
   updateData,
   currentStep,
-}: GovernmentIdFormProps) {
+}: FormStepProps) {
   const [fileName, setFileName] = useState<string>('');
 
   const form = useForm<z.infer<typeof formSchema>>({

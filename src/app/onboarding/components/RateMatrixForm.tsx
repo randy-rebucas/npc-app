@@ -23,13 +23,14 @@ const formSchema = z.object({
   controlledSubstancesPerPrescriptionFee: z.number().min(0),
 });
 
-interface RateMatrixFormProps {
+interface FormStepProps {
   data: OnboardingFormData;
-  updateData: (data: Partial<OnboardingFormData>) => void;
+  updateData: (data: Partial<OnboardingFormData>, isValid?: boolean) => void;
   currentStep: number;
+  setIsValid: (isValid: boolean) => void;
 }
 
-export default function RateMatrixForm({ data, updateData, currentStep }: RateMatrixFormProps) {
+export default function RateMatrixForm({ data, updateData, currentStep }: FormStepProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {

@@ -1,4 +1,3 @@
-// src/app/onboarding/components/UserInformationForm.tsx
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,6 +13,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { OnboardingFormData } from '@/lib/types/onboarding';
+import { useEffect } from 'react';
 
 const formSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
@@ -21,13 +21,14 @@ const formSchema = z.object({
   email: z.string().email('Invalid email address'),
 });
 
-interface UserInformationFormProps {
+interface FormStepProps {
   data: OnboardingFormData;
-  updateData: (data: Partial<OnboardingFormData>) => void;
+  updateData: (data: Partial<OnboardingFormData>, isValid?: boolean) => void;
   currentStep: number;
+  setIsValid: (isValid: boolean) => void;
 }
 
-export default function UserInformationForm({ data, updateData, currentStep }: UserInformationFormProps) {
+export default function UserInformationForm({ data, updateData, currentStep, setIsValid }: FormStepProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -37,9 +38,14 @@ export default function UserInformationForm({ data, updateData, currentStep }: U
     },
   });
 
+  useEffect(() => {
+    const isValid = data.firstName && data.lastName && data.email;
+    setIsValid(!!isValid);
+  }, [data, setIsValid]);
+
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    
-    fetch(`/api/onboarding/${currentStep}`, {
+
+    fetch(`http://localhost:3000/api/onboarding/${currentStep}`, {
       method: 'POST',
       body: JSON.stringify(values),
     }).then(response => {

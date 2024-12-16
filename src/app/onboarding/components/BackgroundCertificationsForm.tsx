@@ -24,17 +24,18 @@ const formSchema = z.object({
   linkedinProfile: z.string().url('Must be a valid LinkedIn URL'),
 });
 
-interface BackgroundCertificationsFormProps {
+interface FormStepProps {
   data: OnboardingFormData;
-  updateData: (data: Partial<OnboardingFormData>) => void;
+  updateData: (data: Partial<OnboardingFormData>, isValid?: boolean) => void;
   currentStep: number;
+  setIsValid: (isValid: boolean) => void;
 }
 
 export default function BackgroundCertificationsForm({
   data,
   updateData,
   currentStep,
-}: BackgroundCertificationsFormProps) {
+}: FormStepProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {

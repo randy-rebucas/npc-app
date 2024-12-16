@@ -30,13 +30,14 @@ const formSchema = z.object({
   deaLicenseStates: z.array(z.string()).min(1, 'Select at least one state'),
 });
 
-interface LicenseInformationFormProps {
+interface FormStepProps {
   data: OnboardingFormData;
-  updateData: (data: Partial<OnboardingFormData>) => void;
+  updateData: (data: Partial<OnboardingFormData>, isValid?: boolean) => void;
   currentStep: number;
+  setIsValid: (isValid: boolean) => void;
 }
 
-export default function LicenseInformationForm({ data, updateData, currentStep }: LicenseInformationFormProps) {
+export default function LicenseInformationForm({ data, updateData, currentStep }: FormStepProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
