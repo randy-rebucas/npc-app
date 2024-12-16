@@ -1,12 +1,21 @@
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import Image from "next/image";
 import Link from "next/link";
-export default function Header() {
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+
+export default async function Header() {
+    const session = await getServerSession(authOptions);
+    if (session) {
+        return redirect("/dashboard");
+    }
+
     return (
         <header className="px-6 py-4">
             <div className="container mx-auto max-w-7xl px-4 flex justify-between items-center ">
                 {/* Logo */}
                 <div className="logo">
-                    <Image src="/logo-black.png" alt="NP Collaborator Logo" width={0} height={0} sizes="100vw" className="w-auto h-auto"/>
+                    <Image src="/logo-black.png" alt="NP Collaborator Logo" width={0} height={0} sizes="100vw" className="w-auto h-auto" />
                 </div>
 
                 {/* Navigation */}

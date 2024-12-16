@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -17,7 +17,7 @@ import { useOnBoardingStore } from '@/lib/store/onBoardingStore';
 export default function OnboardingPage() {
 
     const onBoarding = useOnBoardingStore(state => state.onBoarding);
-
+    console.log(onBoarding);
     type OnboardingStep = {
         id: string;
         title: string;
@@ -133,27 +133,62 @@ export default function OnboardingPage() {
                 governmentIdUrl: onBoarding.governmentIdUrl ?? '',
             },
         },
-    ];
+    ] as const;
 
     console.log(onBoarding);
+
     const [currentStep, setCurrentStep] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // const isFirstStep = currentStep === 0;
+    // const isStepValid = formData.isValid[currentStep];
+
+    // First, create a union type of all possible schemas
+    type FormSchema = z.infer<(typeof ONBOARDING_STEPS)[number]['formSchema']>;
+
+    const form = useForm<FormSchema>({
+        resolver: zodResolver(ONBOARDING_STEPS[currentStep].formSchema),
+        defaultValues: ONBOARDING_STEPS[currentStep].defaultValues,
+        mode: 'onChange',
+    });
+
+    // Add useEffect to update form when onBoarding state changes
+    useEffect(() => {
+        // Reset form with new values from onBoarding state
+        const currentStepDefaults = {
+            ...ONBOARDING_STEPS[currentStep].defaultValues,
+            ...onBoarding // Merge with current onBoarding state
+        };
+        form.reset(currentStepDefaults);
+    }, [onBoarding, currentStep, form]);
+
+    const CurrentStepComponent = ONBOARDING_STEPS[currentStep].component;
+    const progress = ((currentStep + 1) / ONBOARDING_STEPS.length) * 100;
+    const isLastStep = currentStep === ONBOARDING_STEPS.length - 1;
+
     const onSubmit = async () => {
+        const currentFormData = form.getValues();
+
+        // Update the store with the current step's data
+        useOnBoardingStore.getState().updateFields({
+            ...onBoarding,
+            ...currentFormData
+        });
 
         if (!isLastStep) {
-            return setCurrentStep(prev => {
-                if (prev >= ONBOARDING_STEPS.length - 1) return prev;
-                return prev + 1;
-            });
+            setCurrentStep(prev => prev + 1);
+            form.reset(ONBOARDING_STEPS[currentStep + 1].defaultValues);
+            return;
         }
 
         try {
             setIsSubmitting(true);
+            const finalData = useOnBoardingStore.getState()
+
             const response = await fetch('/api/onboarding', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(onBoarding),
+                body: JSON.stringify(finalData),
             });
 
             if (!response.ok) throw new Error('Submission failed');
@@ -174,21 +209,6 @@ export default function OnboardingPage() {
         }
     };
 
-    const CurrentStepComponent = ONBOARDING_STEPS[currentStep].component;
-    const progress = ((currentStep + 1) / ONBOARDING_STEPS.length) * 100;
-    const isLastStep = currentStep === ONBOARDING_STEPS.length - 1;
-
-    // const isFirstStep = currentStep === 0;
-    // const isStepValid = formData.isValid[currentStep];
-
-    const form = useForm<OnboardingFormData>({
-        resolver: async (values, context, options) => {
-            const currentSchema = ONBOARDING_STEPS[currentStep].formSchema;
-            return zodResolver(currentSchema)(values, context, options);
-        },
-        defaultValues: ONBOARDING_STEPS[currentStep].defaultValues as Partial<OnboardingFormData>,
-        mode: 'onChange', // Add this to validate on change
-    });
 
     return (
         <div className="container mx-auto py-10">
