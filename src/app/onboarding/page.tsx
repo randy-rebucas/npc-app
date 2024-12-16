@@ -17,7 +17,7 @@ import { useOnBoardingStore } from '@/lib/store/onBoardingStore';
 export default function OnboardingPage() {
 
     const onBoarding = useOnBoardingStore(state => state.onBoarding);
-    console.log(onBoarding);
+
     type OnboardingStep = {
         id: string;
         title: string;
@@ -135,11 +135,8 @@ export default function OnboardingPage() {
         },
     ] as const;
 
-    console.log(onBoarding);
-
     const [currentStep, setCurrentStep] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
     // const isFirstStep = currentStep === 0;
     // const isStepValid = formData.isValid[currentStep];
 
