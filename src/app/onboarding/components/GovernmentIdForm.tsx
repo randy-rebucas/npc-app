@@ -1,9 +1,5 @@
-// src/app/onboarding/components/GovernmentIdForm.tsx
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
 import {
   Form,
   FormControl,
@@ -15,31 +11,18 @@ import {
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import { OnboardingFormData } from '@/lib/types/onboarding';
-
-const formSchema = z.object({
-  governmentIdUrl: z.string().min(1, 'Government ID is required'),
-});
+import { UseFormReturn } from 'react-hook-form';
+import { useOnBoardingStore } from '@/lib/store/onBoardingStore';
 
 interface FormStepProps {
-  data: OnboardingFormData;
-  updateData: (data: Partial<OnboardingFormData>, isValid?: boolean) => void;
-  currentStep: number;
-  setIsValid: (isValid: boolean) => void;
+  form: UseFormReturn<OnboardingFormData>
 }
 
-export default function GovernmentIdForm({
-  data,
-  updateData,
-  currentStep,
-}: FormStepProps) {
+export default function GovernmentIdForm({ form }: FormStepProps) {
   const [fileName, setFileName] = useState<string>('');
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      governmentIdUrl: data.governmentIdUrl || '',
-    },
-  });
+  const updateFields = useOnBoardingStore(state => state.updateFields); 
+  const onBoarding = useOnBoardingStore(state => state.onBoarding);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -48,15 +31,7 @@ export default function GovernmentIdForm({
       // For now, we'll just store the file name
       setFileName(file.name);
       const url = URL.createObjectURL(file);
-      fetch(`/api/onboarding/${currentStep}`, {
-        method: 'POST',
-        body: JSON.stringify({ governmentIdUrl: url }),
-      }).then(response => {
-        console.log(response);
-        form.setValue('governmentIdUrl', url);
-        updateData({ governmentIdUrl: url });
-        return response.json();
-      }).catch(error => console.error(error));
+      updateFields({ governmentIdUrl: url });
     }
   };
 
@@ -76,6 +51,7 @@ export default function GovernmentIdForm({
                     accept="image/*,.pdf"
                     className="cursor-pointer"
                     {...field}
+                    value={onBoarding.governmentIdUrl}
                     onChange={handleFileChange}
                   />
                   {fileName && (

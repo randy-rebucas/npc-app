@@ -1,11 +1,6 @@
-// src/app/onboarding/components/ProfilePhotoForm.tsx
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -16,31 +11,19 @@ import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import Image from 'next/image';
 import { OnboardingFormData } from '@/lib/types/onboarding';
+import { UseFormReturn } from 'react-hook-form';
+import { useOnBoardingStore } from '@/lib/store/onBoardingStore';
 
-const formSchema = z.object({
-  profilePhotoUrl: z.string().min(1, 'Profile photo is required'),
-});
 
 interface FormStepProps {
-  data: OnboardingFormData;
-  updateData: (data: Partial<OnboardingFormData>, isValid?: boolean) => void;
-  currentStep: number;
-  setIsValid: (isValid: boolean) => void;
+  form: UseFormReturn<OnboardingFormData>
 }
 
-export default function ProfilePhotoForm({
-  data,
-  updateData,
-  currentStep,
-}: FormStepProps) {
-  const [previewUrl, setPreviewUrl] = useState<string>(data.profilePhotoUrl || '');
+export default function ProfilePhotoForm({ form }: FormStepProps) {
+  const [previewUrl, setPreviewUrl] = useState<string>(form.getValues('profilePhotoUrl') || '');
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      profilePhotoUrl: data.profilePhotoUrl || '',
-    },
-  });
+  const updateFields = useOnBoardingStore(state => state.updateFields);
+  const onBoarding = useOnBoardingStore(state => state.onBoarding);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -48,55 +31,44 @@ export default function ProfilePhotoForm({
       // Here you would typically upload the file to your storage service
       // For now, we'll just create a local URL
       const url = URL.createObjectURL(file);
-
-      fetch(`/api/onboarding/${currentStep}`, {
-        method: 'POST',
-        body: JSON.stringify({ profilePhotoUrl: url }),
-      }).then(response => {
-        console.log(response);
-        setPreviewUrl(url);
-        form.setValue('profilePhotoUrl', url);
-        updateData({ profilePhotoUrl: url });
-        return response.json();
-      }).catch(error => console.error(error));
+      setPreviewUrl(url);
+      updateFields({ profilePhotoUrl: url });
     }
   };
 
   return (
-    <Form {...form}>
-      <form className="space-y-6">
-        <FormField
-          control={form.control}
-          name="profilePhotoUrl"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Profile Photo</FormLabel>
-              <FormControl>
-                <div className="space-y-4">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    {...field}
-                    onChange={handleFileChange}
-                    className="cursor-pointer"
+
+    <FormField
+      control={form.control}
+      name="profilePhotoUrl"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Profile Photo</FormLabel>
+          <FormControl>
+            <div className="space-y-4">
+              <Input
+                type="file"
+                accept="image/*"
+                {...field}
+                value={onBoarding.profilePhotoUrl}
+                onChange={handleFileChange}
+                className="cursor-pointer"
+              />
+              {previewUrl && (
+                <div className="relative w-32 h-32 mx-auto">
+                  <Image
+                    src={previewUrl}
+                    alt="Profile preview"
+                    fill
+                    className="rounded-full object-cover"
                   />
-                  {previewUrl && (
-                    <div className="relative w-32 h-32 mx-auto">
-                      <Image
-                        src={previewUrl}
-                        alt="Profile preview"
-                        fill
-                        className="rounded-full object-cover"
-                      />
-                    </div>
-                  )}
                 </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </form>
-    </Form>
+              )}
+            </div>
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
   );
 }

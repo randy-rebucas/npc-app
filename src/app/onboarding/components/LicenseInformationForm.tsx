@@ -1,11 +1,6 @@
-// src/app/onboarding/components/LicenseInformationForm.tsx
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -13,7 +8,9 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { MultiSelect } from '@/components/ui/multi-select';
+import { useOnBoardingStore } from '@/lib/store/onBoardingStore';
 import { OnboardingFormData } from '@/lib/types/onboarding';
+import { UseFormReturn } from 'react-hook-form';
 
 const medicalLicenseStates = [
   'California', 'New York', 'Texas', 'Florida', 'Illinois',
@@ -25,83 +22,60 @@ const deaLicenseStates = [
   // Add more states as needed
 ];
 
-const formSchema = z.object({
-  medicalLicenseStates: z.array(z.string()).min(1, 'Select at least one state'),
-  deaLicenseStates: z.array(z.string()).min(1, 'Select at least one state'),
-});
-
 interface FormStepProps {
-  data: OnboardingFormData;
-  updateData: (data: Partial<OnboardingFormData>, isValid?: boolean) => void;
-  currentStep: number;
-  setIsValid: (isValid: boolean) => void;
+  form: UseFormReturn<OnboardingFormData>
 }
 
-export default function LicenseInformationForm({ data, updateData, currentStep }: FormStepProps) {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      medicalLicenseStates: data.medicalLicenseStates || [],
-      deaLicenseStates: data.deaLicenseStates || [],
-    },
-  });
+export default function LicenseInformationForm({ form }: FormStepProps) {
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-
-    fetch(`/api/onboarding/${currentStep}`, {
-      method: 'POST',
-      body: JSON.stringify(values),
-    }).then(response => {
-      updateData(values);
-      return response.json();
-    }).catch(error => console.error(error));
-  };
+  const updateFields = useOnBoardingStore(state => state.updateFields); 
+  const onBoarding = useOnBoardingStore(state => state.onBoarding);
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="medicalLicenseStates"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>States with Medical License</FormLabel>
-              <FormControl>
-                <MultiSelect
-                  options={medicalLicenseStates.map(state => ({
-                    label: state,
-                    value: state,
-                  }))}
-                  defaultValue={field.value}
-                  onValueChange={field.onChange}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    <>
+      <FormField
+        control={form.control}
+        name="medicalLicenseStates"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>States with Medical License</FormLabel>
+            <FormControl>
+              <MultiSelect
+                {...field}
+                options={medicalLicenseStates.map(state => ({
+                  label: state,
+                  value: state,
+                }))}
+                value={onBoarding.medicalLicenseStates}
+                onValueChange={(value) => updateFields({ medicalLicenseStates: value })}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
-        <FormField
-          control={form.control}
-          name="deaLicenseStates"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>States with DEA License</FormLabel>
-              <FormControl>
-                <MultiSelect
-                  options={deaLicenseStates.map(state => ({
-                    label: state,
-                    value: state,
-                  }))}
-                  defaultValue={field.value}
-                  onValueChange={field.onChange}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </form>
-    </Form>
+      <FormField
+        control={form.control}
+        name="deaLicenseStates"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>States with DEA License</FormLabel>
+            <FormControl>
+              <MultiSelect
+                {...field}
+                options={deaLicenseStates.map(state => ({
+                  label: state,
+                  value: state,
+                }))}
+                value={onBoarding.deaLicenseStates}
+                onValueChange={(value) => updateFields({ deaLicenseStates: value })}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </>
   );
 }

@@ -1,11 +1,7 @@
-// src/app/onboarding/components/RateMatrixForm.tsx
+
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -13,119 +9,91 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { useOnBoardingStore } from '@/lib/store/onBoardingStore';
 import { OnboardingFormData } from '@/lib/types/onboarding';
-
-const formSchema = z.object({
-  monthlyCollaborationRate: z.number().min(0),
-  additionalStateFee: z.number().min(0),
-  additionalNPFee: z.number().min(0),
-  controlledSubstancesMonthlyFee: z.number().min(0),
-  controlledSubstancesPerPrescriptionFee: z.number().min(0),
-});
+import { UseFormReturn } from 'react-hook-form';
 
 interface FormStepProps {
-  data: OnboardingFormData;
-  updateData: (data: Partial<OnboardingFormData>, isValid?: boolean) => void;
-  currentStep: number;
-  setIsValid: (isValid: boolean) => void;
+  form: UseFormReturn<OnboardingFormData>
 }
 
-export default function RateMatrixForm({ data, updateData, currentStep }: FormStepProps) {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      monthlyCollaborationRate: data.monthlyCollaborationRate || 0,
-      additionalStateFee: data.additionalStateFee || 0,
-      additionalNPFee: data.additionalNPFee || 0,
-      controlledSubstancesMonthlyFee: data.controlledSubstancesMonthlyFee || 0,
-      controlledSubstancesPerPrescriptionFee: data.controlledSubstancesPerPrescriptionFee || 0,
-    },
-  });
+export default function RateMatrixForm({ form }: FormStepProps) {
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    fetch(`/api/onboarding/${currentStep}`, {
-      method: 'POST',
-      body: JSON.stringify(values),
-    }).then(response => {
-      console.log(response);
-      updateData(values);
-      return response.json();
-    }).catch(error => console.error(error));
-  };
+  const updateFields = useOnBoardingStore(state => state.updateFields);
+  const onBoarding = useOnBoardingStore(state => state.onBoarding);
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="monthlyCollaborationRate"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Monthly Base Collaboration Rate ($)</FormLabel>
-              <FormControl>
-                <Input type="number" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    <>
 
-        <FormField
-          control={form.control}
-          name="additionalStateFee"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Additional State Fee ($)</FormLabel>
-              <FormControl>
-                <Input type="number" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <FormField
+        control={form.control}
+        name="monthlyCollaborationRate"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Monthly Base Collaboration Rate ($)</FormLabel>
+            <FormControl>
+              <Input type="number" {...field} value={onBoarding.monthlyCollaborationRate} onChange={e => updateFields({ monthlyCollaborationRate: parseFloat(e.target.value) })} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
-        <FormField
-          control={form.control}
-          name="additionalNPFee"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Additional Nurse Practitioner Fee ($)</FormLabel>
-              <FormControl>
-                <Input type="number" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <FormField
+        control={form.control}
+        name="additionalStateFee"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Additional State Fee ($)</FormLabel>
+            <FormControl>
+              <Input type="number" {...field} value={onBoarding.additionalStateFee} onChange={e => updateFields({ additionalStateFee: parseFloat(e.target.value) })} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
-        <FormField
-          control={form.control}
-          name="controlledSubstancesMonthlyFee"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Controlled Substances Monthly Fee ($)</FormLabel>
-              <FormControl>
-                <Input type="number" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <FormField
+        control={form.control}
+        name="additionalNPFee"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Additional Nurse Practitioner Fee ($)</FormLabel>
+            <FormControl>
+              <Input type="number" {...field} value={onBoarding.additionalNPFee} onChange={e => updateFields({ additionalNPFee: parseFloat(e.target.value) })} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
-        <FormField
-          control={form.control}
-          name="controlledSubstancesPerPrescriptionFee"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Controlled Substances Per Prescription Fee ($)</FormLabel>
-              <FormControl>
-                <Input type="number" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </form>
-    </Form>
+      <FormField
+        control={form.control}
+        name="controlledSubstancesMonthlyFee"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Controlled Substances Monthly Fee ($)</FormLabel>
+            <FormControl>
+              <Input type="number" {...field} value={onBoarding.controlledSubstancesMonthlyFee} onChange={e => updateFields({ controlledSubstancesMonthlyFee: parseFloat(e.target.value) })} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="controlledSubstancesPerPrescriptionFee"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Controlled Substances Per Prescription Fee ($)</FormLabel>
+            <FormControl>
+              <Input type="number" {...field} value={onBoarding.controlledSubstancesPerPrescriptionFee} onChange={e => updateFields({ controlledSubstancesPerPrescriptionFee: parseFloat(e.target.value) })} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </>
   );
 }

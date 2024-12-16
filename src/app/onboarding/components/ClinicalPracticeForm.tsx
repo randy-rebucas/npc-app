@@ -1,11 +1,8 @@
-// src/app/onboarding/components/ClinicalPracticeForm.tsx
+
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
+import { UseFormReturn } from 'react-hook-form';
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -14,6 +11,7 @@ import {
 } from '@/components/ui/form';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { OnboardingFormData } from '@/lib/types/onboarding';
+import { useOnBoardingStore } from '@/lib/store/onBoardingStore';
 
 const practiceTypes = [
   'Primary Care',
@@ -26,60 +24,38 @@ const practiceTypes = [
   'Psychiatry',
 ];
 
-const formSchema = z.object({
-  practiceTypes: z.array(z.string()).min(1, 'Select at least one practice type'),
-});
-
 interface FormStepProps {
-  data: OnboardingFormData;
-  updateData: (data: Partial<OnboardingFormData>, isValid?: boolean) => void;
-  currentStep: number;
-  setIsValid: (isValid: boolean) => void;
+  form: UseFormReturn<OnboardingFormData>
 }
 
-export default function ClinicalPracticeForm({ data, updateData, currentStep }: FormStepProps) {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      practiceTypes: data.practiceTypes || [],
-    },
-  });
+export default function ClinicalPracticeForm({ form }: FormStepProps) {
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    fetch(`/api/onboarding/${currentStep}`, {
-      method: 'POST',
-      body: JSON.stringify(values),
-    }).then(response => {
-      console.log(response);
-      updateData(values);
-      return response.json();
-    }).catch(error => console.error(error));
-  };
+  const updateFields = useOnBoardingStore(state => state.updateFields); 
+  const onBoarding = useOnBoardingStore(state => state.onBoarding);
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="practiceTypes"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Clinical Practice Types</FormLabel>
-              <FormControl>
-                <MultiSelect
-                  options={practiceTypes.map(type => ({
-                    label: type,
-                    value: type,
-                  }))}
-                  defaultValue={field.value}
-                  onValueChange={field.onChange}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </form>
-    </Form>
+    <>
+      <FormField
+        control={form.control}
+        name="practiceTypes"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Clinical Practice Types</FormLabel>
+            <FormControl>
+              <MultiSelect
+                {...field}
+                options={practiceTypes.map(type => ({
+                  label: type,
+                  value: type,
+                }))}
+                value={onBoarding.practiceTypes}
+                onValueChange={(value) => updateFields({ practiceTypes: value })}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </>
   );
 }
