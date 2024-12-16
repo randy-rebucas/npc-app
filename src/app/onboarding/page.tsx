@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -8,122 +8,133 @@ import { toast } from '@/hooks/use-toast';
 import { OnboardingFormData } from '@/lib/types/onboarding';
 import { UserInformationForm, LicenseInformationForm, ClinicalPracticeForm, RateMatrixForm, BackgroundCertificationsForm, ProfilePhotoForm, GovernmentIdForm } from './components';
 import { Form } from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
+import { useForm, UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useOnBoardingStore } from '@/lib/store/onBoardingStore';
 
-// Define steps configuration
-const ONBOARDING_STEPS = [
-    {
-        id: 'user-info',
-        title: 'User Information',
-        description: 'Please provide your basic information',
-        component: UserInformationForm,
-        formSchema: z.object({
-            firstName: z.string().min(2, 'First name must be at least 2 characters'),
-            lastName: z.string().min(2, 'Last name must be at least 2 characters'),
-            email: z.string().email('Invalid email address'),
-        }),
-        defaultValues: {
-            firstName: '',
-            lastName: '',
-            email: '',
-        },
-    },
-    {
-        id: 'license-info',
-        title: 'License Information',
-        description: 'Please provide your license details',
-        component: LicenseInformationForm,
-        formSchema: z.object({
-            medicalLicenseStates: z.array(z.string()),
-            deaLicenseStates: z.array(z.string()),
-        }),
-        defaultValues: {
-            medicalLicenseStates: [] as string[],
-            deaLicenseStates: [] as string[],
-        },
-    },
-    {
-        id: 'clinical-practice',
-        title: 'Clinical Practice',
-        description: 'Tell us about your clinical practice',
-        component: ClinicalPracticeForm,
-        formSchema: z.object({
-            practiceTypes: z.array(z.string()),
-        }),
-        defaultValues: {
-            practiceTypes: [],
-        },
-    },
-    {
-        id: 'rate-matrix',
-        title: 'Rate Matrix',
-        description: 'Set your rates and availability',
-        component: RateMatrixForm,
-        formSchema: z.object({
-            monthlyCollaborationRate: z.number(),
-            additionalStateFee: z.number(),
-            additionalNPFee: z.number(),
-            controlledSubstancesMonthlyFee: z.number(),
-            controlledSubstancesPerPrescriptionFee: z.number(),
-        }),
-        defaultValues: {
-            monthlyCollaborationRate: 0,
-            additionalStateFee: 0,
-            additionalNPFee: 0,
-            controlledSubstancesMonthlyFee: 0,
-            controlledSubstancesPerPrescriptionFee: 0,
-        },
-    },
-    {
-        id: 'background-certifications',
-        title: 'Background & Certifications',
-        description: 'Upload your certifications and background information',
-        component: BackgroundCertificationsForm,
-        formSchema: z.object({
-            description: z.string(),
-            boardCertification: z.string(),
-            additionalCertifications: z.array(z.string()),
-            linkedinProfile: z.string(),
-        }),
-        defaultValues: {
-            description: '',
-            boardCertification: '',
-            additionalCertifications: [],
-            linkedinProfile: '',
-        },
-    },
-    {
-        id: 'profile-photo',
-        title: 'Profile Photo',
-        description: 'Upload your professional photo',
-        component: ProfilePhotoForm,
-        formSchema: z.object({
-            profilePhotoUrl: z.string(),
-        }),
-        defaultValues: {
-            profilePhotoUrl: '',
-        },
-    },
-    {
-        id: 'government-id',
-        title: 'Government ID',
-        description: 'Provide your government identification',
-        component: GovernmentIdForm,
-        formSchema: z.object({
-            governmentIdUrl: z.string(),
-        }),
-        defaultValues: {
-            governmentIdUrl: '',
-        },
-    },
-];
 
 export default function OnboardingPage() {
-    
+
     const onBoarding = useOnBoardingStore(state => state.onBoarding);
+
+    type OnboardingStep = {
+        id: string;
+        title: string;
+        description: string;
+        component: React.ComponentType<{ form: UseFormReturn<OnboardingFormData> }>;
+        formSchema: z.ZodSchema;
+        defaultValues: Partial<OnboardingFormData>;
+    };
+
+    // Define steps configuration
+    const ONBOARDING_STEPS: OnboardingStep[] = [
+        {
+            id: 'user-info',
+            title: 'User Information',
+            description: 'Please provide your basic information',
+            component: UserInformationForm,
+            formSchema: z.object({
+                firstName: z.string().min(2, 'First name must be at least 2 characters'),
+                lastName: z.string().min(2, 'Last name must be at least 2 characters'),
+                email: z.string().email('Invalid email address'),
+            }),
+            defaultValues: {
+                firstName: onBoarding.firstName ?? '',
+                lastName: onBoarding.lastName ?? '',
+                email: onBoarding.email ?? '',
+            },
+        },
+        {
+            id: 'license-info',
+            title: 'License Information',
+            description: 'Please provide your license details',
+            component: LicenseInformationForm,
+            formSchema: z.object({
+                medicalLicenseStates: z.array(z.string()),
+                deaLicenseStates: z.array(z.string()),
+            }),
+            defaultValues: {
+                medicalLicenseStates: onBoarding.medicalLicenseStates ?? [],
+                deaLicenseStates: onBoarding.deaLicenseStates ?? [],
+            },
+        },
+        {
+            id: 'clinical-practice',
+            title: 'Clinical Practice',
+            description: 'Tell us about your clinical practice',
+            component: ClinicalPracticeForm,
+            formSchema: z.object({
+                practiceTypes: z.array(z.string()),
+            }),
+            defaultValues: {
+                practiceTypes: onBoarding.practiceTypes ?? [],
+            },
+        },
+        {
+            id: 'rate-matrix',
+            title: 'Rate Matrix',
+            description: 'Set your rates and availability',
+            component: RateMatrixForm,
+            formSchema: z.object({
+                monthlyCollaborationRate: z.number(),
+                additionalStateFee: z.number(),
+                additionalNPFee: z.number(),
+                controlledSubstancesMonthlyFee: z.number(),
+                controlledSubstancesPerPrescriptionFee: z.number(),
+            }),
+            defaultValues: {
+                monthlyCollaborationRate: onBoarding.monthlyCollaborationRate ?? 0,
+                additionalStateFee: onBoarding.additionalStateFee ?? 0,
+                additionalNPFee: onBoarding.additionalNPFee ?? 0,
+                controlledSubstancesMonthlyFee: onBoarding.controlledSubstancesMonthlyFee ?? 0,
+                controlledSubstancesPerPrescriptionFee: onBoarding.controlledSubstancesPerPrescriptionFee ?? 0,
+            },
+        },
+        {
+            id: 'background-certifications',
+            title: 'Background & Certifications',
+            description: 'Upload your certifications and background information',
+            component: BackgroundCertificationsForm,
+            formSchema: z.object({
+                description: z.string(),
+                boardCertification: z.string(),
+                additionalCertifications: z.array(z.string()),
+                linkedinProfile: z.string(),
+            }),
+            defaultValues: {
+                description: onBoarding.description ?? '',
+                boardCertification: onBoarding.boardCertification ?? '',
+                additionalCertifications: onBoarding.additionalCertifications ?? [],
+                linkedinProfile: onBoarding.linkedinProfile ?? '',
+            },
+        },
+        {
+            id: 'profile-photo',
+            title: 'Profile Photo',
+            description: 'Upload your professional photo',
+            component: ProfilePhotoForm,
+            formSchema: z.object({
+                profilePhotoUrl: z.string(),
+            }),
+            defaultValues: {
+                profilePhotoUrl: onBoarding.profilePhotoUrl ?? '',
+            },
+        },
+        {
+            id: 'government-id',
+            title: 'Government ID',
+            description: 'Provide your government identification',
+            component: GovernmentIdForm,
+            formSchema: z.object({
+                governmentIdUrl: z.string(),
+            }),
+            defaultValues: {
+                governmentIdUrl: onBoarding.governmentIdUrl ?? '',
+            },
+        },
+    ];
+
     console.log(onBoarding);
     const [currentStep, setCurrentStep] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -175,14 +186,9 @@ export default function OnboardingPage() {
             const currentSchema = ONBOARDING_STEPS[currentStep].formSchema;
             return zodResolver(currentSchema)(values, context, options);
         },
-        defaultValues: onBoarding,
+        defaultValues: ONBOARDING_STEPS[currentStep].defaultValues as Partial<OnboardingFormData>,
+        mode: 'onChange', // Add this to validate on change
     });
-
-    // Reset form when step changes
-    useEffect(() => {
-        form.reset(ONBOARDING_STEPS[currentStep].defaultValues);
-    }, [currentStep, form]);
-
 
     return (
         <div className="container mx-auto py-10">

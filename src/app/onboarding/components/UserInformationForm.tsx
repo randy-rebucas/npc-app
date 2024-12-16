@@ -43,7 +43,7 @@ export default function UserInformationForm({ form }: FormStepProps) {
           <FormItem>
             <FormLabel>Last Name</FormLabel>
             <FormControl>
-              <Input {...field} defaultValue={onBoarding.lastName} onChange={(e) => updateFields({ lastName: e.target.value })}/>
+              <Input {...field} value={onBoarding.lastName} onChange={(e) => updateFields({ lastName: e.target.value })}/>
             </FormControl>
             <FormMessage />
           </FormItem>
