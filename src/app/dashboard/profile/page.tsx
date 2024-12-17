@@ -20,8 +20,11 @@ export default async function ProfilePage() {
 
     // Select the profile fields
     const profile = selectedItem(user.profile, ['firstName', 'lastName']);
-    console.log(profile);
+    const bio = selectedItem(user.profile, ['description', 'boardCertification', 'linkedinProfile']);
+    const photo = selectedItem(user.profile, ['profilePhotoUrl', 'firstName', 'lastName']);
+    const rates = selectedItem(user.profile, ['monthlyCollaborationRate', 'additionalStateFee', 'additionalNPFee', 'controlledSubstancesMonthlyFee', 'controlledSubstancesPerPrescriptionFee']);
 
+    console.log(rates);
     return (
         <SidebarInset>
             <Header breadcrumbs={[
@@ -49,16 +52,16 @@ export default async function ProfilePage() {
                             <Profile profile={profile} />
                         </TabsContent>
                         <TabsContent value="bio">
-                            <Bio />
+                            <Bio bio={bio} />
                         </TabsContent>
                         <TabsContent value="photo">
-                            <Photo />
+                            <Photo photo={photo} />
                         </TabsContent>
                         <TabsContent value="calendar">
                             <Calendar />
                         </TabsContent>
                         <TabsContent value="rates">
-                            <Rates />
+                            <Rates rates={rates} />
                         </TabsContent>
                     </Tabs>
                 </div>
