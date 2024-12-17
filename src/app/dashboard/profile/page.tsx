@@ -6,8 +6,22 @@ import Profile from "@/components/ui/profile/profile";
 import Rates from "@/components/ui/profile/rates";
 import { SidebarInset } from "@/components/ui/sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { getUserByEmail } from "@/app/actions/user";
+import { selectedItem } from "@/lib/utils";
 
-export default function ProfilePage() {
+export default async function ProfilePage() {
+    // Get session
+    const session = await getServerSession(authOptions);
+
+    // Add user fetch using server action
+    const user = session?.user?.email ? await getUserByEmail(session.user.email) : null;
+
+    // Select the profile fields
+    const profile = selectedItem(user.profile, ['firstName', 'lastName']);
+    console.log(profile);
+
     return (
         <SidebarInset>
             <Header breadcrumbs={[
@@ -32,7 +46,7 @@ export default function ProfilePage() {
                             <TabsTrigger value="rates">Rates</TabsTrigger>
                         </TabsList>
                         <TabsContent value="profile">
-                            <Profile />
+                            <Profile profile={profile} />
                         </TabsContent>
                         <TabsContent value="bio">
                             <Bio />

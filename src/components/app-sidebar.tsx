@@ -1,10 +1,4 @@
-import { ChevronUp, GalleryVerticalEnd, HelpCircle, Home, Key, Settings, User, Users } from "lucide-react"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import {  GalleryVerticalEnd, HelpCircle, Home, Key, Settings, User, Users } from "lucide-react"
 
 import {
     Sidebar,
@@ -18,13 +12,10 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
-import { SignOut } from "../signout"
+
+import NavUser from "@/components/nav-user"
 
 export async function AppSidebar() {
-
-    const session = await getServerSession(authOptions);
 
     // Menu items.
     const items = [
@@ -59,7 +50,7 @@ export async function AppSidebar() {
             icon: Settings,
         },
     ]
-
+    
     return (
         <Sidebar>
             <SidebarHeader>
@@ -99,29 +90,7 @@ export async function AppSidebar() {
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <SidebarMenuButton>
-                                    <User /> {session?.user.name}
-                                    <ChevronUp className="ml-auto" />
-                                </SidebarMenuButton>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                                side="top"
-                                className="w-[--radix-popper-anchor-width]"
-                            >
-                                <DropdownMenuItem>
-                                    <span>Account</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <SignOut />
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </SidebarMenuItem>
-                </SidebarMenu>
+                <NavUser />
             </SidebarFooter>
         </Sidebar>
     )
