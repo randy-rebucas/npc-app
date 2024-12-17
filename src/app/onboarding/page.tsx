@@ -12,11 +12,20 @@ import { useForm, UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useOnBoardingStore } from '@/lib/store/onBoardingStore';
-
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 export default function OnboardingPage() {
-
+    const { data: session } = useSession();
+    const router = useRouter();
     const onBoarding = useOnBoardingStore(state => state.onBoarding);
+    const updateFields = useOnBoardingStore(state => state.updateFields);
+
+    useEffect(() => {
+        if (session?.user) {
+            updateFields({ email: session.user.email });
+        }
+    }, [session, updateFields]);
 
     type OnboardingStep = {
         id: string;
@@ -27,6 +36,15 @@ export default function OnboardingPage() {
         defaultValues: Partial<OnboardingFormData>;
     };
 
+    const MAX_FILE_SIZE = 5000000;
+
+    const checkFileType = (file: File) => {
+        if (file?.name) {
+            const fileType = file.name.split(".").pop();
+            if (fileType === "jpg" || fileType === "jpeg" || fileType === "png") return true;
+        }
+        return false;
+    }
     // Define steps configuration
     const ONBOARDING_STEPS: OnboardingStep[] = [
         {
@@ -51,8 +69,8 @@ export default function OnboardingPage() {
             description: 'Please provide your license details',
             component: LicenseInformationForm,
             formSchema: z.object({
-                medicalLicenseStates: z.array(z.string()),
-                deaLicenseStates: z.array(z.string()),
+                medicalLicenseStates: z.array(z.string()).min(1, "At least one medical license state is required"),
+                deaLicenseStates: z.array(z.string()).min(1, "At least one DEA license state is required"),
             }),
             defaultValues: {
                 medicalLicenseStates: onBoarding.medicalLicenseStates ?? [],
@@ -65,7 +83,7 @@ export default function OnboardingPage() {
             description: 'Tell us about your clinical practice',
             component: ClinicalPracticeForm,
             formSchema: z.object({
-                practiceTypes: z.array(z.string()),
+                practiceTypes: z.array(z.string()).min(1, "At least one practice type is required"),
             }),
             defaultValues: {
                 practiceTypes: onBoarding.practiceTypes ?? [],
@@ -77,11 +95,11 @@ export default function OnboardingPage() {
             description: 'Set your rates and availability',
             component: RateMatrixForm,
             formSchema: z.object({
-                monthlyCollaborationRate: z.number(),
-                additionalStateFee: z.number(),
-                additionalNPFee: z.number(),
-                controlledSubstancesMonthlyFee: z.number(),
-                controlledSubstancesPerPrescriptionFee: z.number(),
+                monthlyCollaborationRate: z.number().min(0, "Monthly collaboration rate must be greater than 0"),
+                additionalStateFee: z.number().min(0, "Additional state fee must be greater than 0"),
+                additionalNPFee: z.number().min(0, "Additional NP fee must be greater than 0"),
+                controlledSubstancesMonthlyFee: z.number().min(0, "Controlled substances monthly fee must be greater than 0"),
+                controlledSubstancesPerPrescriptionFee: z.number().min(0, "Controlled substances per prescription fee must be greater than 0"),
             }),
             defaultValues: {
                 monthlyCollaborationRate: onBoarding.monthlyCollaborationRate ?? 0,
@@ -97,10 +115,10 @@ export default function OnboardingPage() {
             description: 'Upload your certifications and background information',
             component: BackgroundCertificationsForm,
             formSchema: z.object({
-                description: z.string(),
-                boardCertification: z.string(),
-                additionalCertifications: z.array(z.string()),
-                linkedinProfile: z.string(),
+                description: z.string().min(10, "Description must be at least 10 characters"),
+                boardCertification: z.string().min(10, "Board certification must be at least 10 characters"),
+                additionalCertifications: z.array(z.string()).min(1, "At least one additional certification is required"),
+                linkedinProfile: z.string().url("Invalid LinkedIn profile URL"),
             }),
             defaultValues: {
                 description: onBoarding.description ?? '',
@@ -115,10 +133,13 @@ export default function OnboardingPage() {
             description: 'Upload your professional photo',
             component: ProfilePhotoForm,
             formSchema: z.object({
-                profilePhotoUrl: z.string(),
+                profilePhotoUrl: z.any()
+                    .refine((file: File) => file != null, "Profile Photo is required")
+                    .refine((file) => file.size < MAX_FILE_SIZE, "Max size is 5MB.")
+                    .refine((file) => checkFileType(file), "Only .jpg, .jpeg, .png formats are supported."),
             }),
             defaultValues: {
-                profilePhotoUrl: onBoarding.profilePhotoUrl ?? '',
+                profilePhotoUrl: onBoarding.profilePhotoUrl ?? null,
             },
         },
         {
@@ -127,10 +148,13 @@ export default function OnboardingPage() {
             description: 'Provide your government identification',
             component: GovernmentIdForm,
             formSchema: z.object({
-                governmentIdUrl: z.string(),
+                governmentIdUrl: z.any()
+                    .refine((file: File) => file != null, "Government ID is required")
+                    .refine((file) => file.size < MAX_FILE_SIZE, "Max size is 5MB.")
+                    .refine((file) => checkFileType(file), "Only .jpg, .jpeg, .png formats are supported."),
             }),
             defaultValues: {
-                governmentIdUrl: onBoarding.governmentIdUrl ?? '',
+                governmentIdUrl: onBoarding.governmentIdUrl ?? null,
             },
         },
     ] as const;
@@ -180,12 +204,21 @@ export default function OnboardingPage() {
 
         try {
             setIsSubmitting(true);
-            const finalData = useOnBoardingStore.getState()
-
+            const formData = new FormData();
+            const finalData = useOnBoardingStore.getState().onBoarding;
+            
+            Object.entries(finalData).forEach(([key, value]) => {
+                if (value instanceof File) {
+                    formData.append(key, value);
+                } else if (value !== null && value !== undefined) {
+                    formData.append(key, String(value));
+                }
+            });
+            console.log(formData);
             const response = await fetch('/api/onboarding', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(finalData),
+                // headers: { 'Content-Type': 'application/json' },
+                body: formData,
             });
 
             if (!response.ok) throw new Error('Submission failed');
@@ -194,6 +227,8 @@ export default function OnboardingPage() {
                 title: "Success!",
                 description: "Your onboarding information has been submitted.",
             });
+
+            router.push('/');
         } catch (error) {
             console.error('Error:', error);
             toast({

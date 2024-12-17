@@ -57,7 +57,7 @@ export default function UserInformationForm({ form }: FormStepProps) {
           <FormItem>
             <FormLabel>Email</FormLabel>
             <FormControl>
-              <Input {...field} type="email" value={onBoarding.email} onChange={(e) => updateFields({ email: e.target.value })}/>
+              <Input {...field} type="email" value={onBoarding.email} onChange={(e) => updateFields({ email: e.target.value })} readOnly/>
             </FormControl>
             <FormMessage />
           </FormItem>

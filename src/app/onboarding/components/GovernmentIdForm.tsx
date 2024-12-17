@@ -18,7 +18,7 @@ interface FormStepProps {
 }
 
 export default function GovernmentIdForm({ form }: FormStepProps) {
-  const [fileName, setFileName] = useState<string>(form.getValues('governmentIdUrl') || '');
+  const [fileName, setFileName] = useState<File | null>(form.getValues('governmentIdUrl') || null);
 
   const updateFields = useOnBoardingStore(state => state.updateFields);
   // const onBoarding = useOnBoardingStore(state => state.onBoarding);
@@ -28,9 +28,8 @@ export default function GovernmentIdForm({ form }: FormStepProps) {
     if (file) {
       // Here you would typically upload the file to your storage service
       // For now, we'll just store the file name
-      const url = URL.createObjectURL(file);
-      setFileName(file.name);
-      updateFields({ governmentIdUrl: url });
+      setFileName(file);
+      updateFields({ governmentIdUrl: file });
     }
   };
 
@@ -55,7 +54,7 @@ export default function GovernmentIdForm({ form }: FormStepProps) {
               />
               {fileName && (
                 <p className="text-sm text-muted-foreground">
-                  Uploaded: {fileName}
+                  Uploaded: {URL.createObjectURL(fileName)}
                 </p>
               )}
             </div>

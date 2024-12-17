@@ -1,3 +1,5 @@
+
+
 // src/lib/types/onboarding.ts
 export interface OnboardingFormData {
     // Step 1: User Information
@@ -26,8 +28,8 @@ export interface OnboardingFormData {
     linkedinProfile: string;
   
     // Step 6: Profile Photo
-    profilePhotoUrl: string;
+    profilePhotoUrl: File | null;
   
     // Step 7: Government ID
-    governmentIdUrl: string;
+    governmentIdUrl: File | null;
   }

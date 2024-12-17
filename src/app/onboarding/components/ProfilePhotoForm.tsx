@@ -20,19 +20,19 @@ interface FormStepProps {
 }
 
 export default function ProfilePhotoForm({ form }: FormStepProps) {
-  const [previewUrl, setPreviewUrl] = useState<string>(form.getValues('profilePhotoUrl') || '');
+  const [previewUrl, setPreviewUrl] = useState<File | null>(form.getValues('profilePhotoUrl') || null);
 
   const updateFields = useOnBoardingStore(state => state.updateFields);
   // const onBoarding = useOnBoardingStore(state => state.onBoarding);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    console.log(file);
     if (file) {
       // Here you would typically upload the file to your storage service
       // For now, we'll just create a local URL
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-      updateFields({ profilePhotoUrl: url });
+      setPreviewUrl(file);
+      updateFields({ profilePhotoUrl: file });
     }
   };
 
@@ -58,7 +58,7 @@ export default function ProfilePhotoForm({ form }: FormStepProps) {
               {previewUrl && (
                 <div className="relative w-32 h-32 mx-auto">
                   <Image
-                    src={previewUrl}
+                    src={URL.createObjectURL(previewUrl)}
                     alt="Profile preview"
                     fill
                     className="rounded-full object-cover"
