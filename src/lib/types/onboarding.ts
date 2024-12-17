@@ -1,6 +1,15 @@
+import { UseFormReturn } from "react-hook-form";
+import * as z from 'zod';
 
+export type OnboardingStep = {
+  id: string;
+  title: string;
+  description: string;
+  component: React.ComponentType<{ form: UseFormReturn<OnboardingFormData> }>;
+  formSchema: z.ZodSchema;
+  defaultValues: Partial<OnboardingFormData>;
+};
 
-// src/lib/types/onboarding.ts
 export interface OnboardingFormData {
     // Step 1: User Information
     firstName: string;
