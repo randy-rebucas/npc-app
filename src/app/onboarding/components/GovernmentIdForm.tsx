@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -19,53 +18,52 @@ interface FormStepProps {
 }
 
 export default function GovernmentIdForm({ form }: FormStepProps) {
-  const [fileName, setFileName] = useState<string>('');
+  const [fileName, setFileName] = useState<string>(form.getValues('governmentIdUrl') || '');
 
-  const updateFields = useOnBoardingStore(state => state.updateFields); 
-  const onBoarding = useOnBoardingStore(state => state.onBoarding);
+  const updateFields = useOnBoardingStore(state => state.updateFields);
+  // const onBoarding = useOnBoardingStore(state => state.onBoarding);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       // Here you would typically upload the file to your storage service
       // For now, we'll just store the file name
-      setFileName(file.name);
       const url = URL.createObjectURL(file);
+      setFileName(file.name);
       updateFields({ governmentIdUrl: url });
     }
   };
 
   return (
-    <Form {...form}>
-      <form className="space-y-6">
-        <FormField
-          control={form.control}
-          name="governmentIdUrl"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Government Issued ID</FormLabel>
-              <FormControl>
-                <div className="space-y-4">
-                  <Input
-                    type="file"
-                    accept="image/*,.pdf"
-                    className="cursor-pointer"
-                    {...field}
-                    value={onBoarding.governmentIdUrl}
-                    onChange={handleFileChange}
-                  />
-                  {fileName && (
-                    <p className="text-sm text-muted-foreground">
-                      Uploaded: {fileName}
-                    </p>
-                  )}
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </form>
-    </Form>
+
+    <FormField
+      control={form.control}
+      name="governmentIdUrl"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Government Issued ID</FormLabel>
+          <FormControl>
+            <div className="space-y-4">
+              <Input
+                type="file"
+                accept="image/*"
+                className="cursor-pointer"
+                onChange={handleFileChange}
+                name={field.name}
+                onBlur={field.onBlur}
+                ref={field.ref}
+              />
+              {fileName && (
+                <p className="text-sm text-muted-foreground">
+                  Uploaded: {fileName}
+                </p>
+              )}
+            </div>
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+
   );
 }

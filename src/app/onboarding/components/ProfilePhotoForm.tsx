@@ -23,7 +23,7 @@ export default function ProfilePhotoForm({ form }: FormStepProps) {
   const [previewUrl, setPreviewUrl] = useState<string>(form.getValues('profilePhotoUrl') || '');
 
   const updateFields = useOnBoardingStore(state => state.updateFields);
-  const onBoarding = useOnBoardingStore(state => state.onBoarding);
+  // const onBoarding = useOnBoardingStore(state => state.onBoarding);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -49,10 +49,11 @@ export default function ProfilePhotoForm({ form }: FormStepProps) {
               <Input
                 type="file"
                 accept="image/*"
-                {...field}
-                value={onBoarding.profilePhotoUrl}
                 onChange={handleFileChange}
                 className="cursor-pointer"
+                name={field.name}
+                onBlur={field.onBlur}
+                ref={field.ref}
               />
               {previewUrl && (
                 <div className="relative w-32 h-32 mx-auto">

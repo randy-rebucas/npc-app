@@ -206,7 +206,7 @@ export default function OnboardingPage() {
         }
     };
 
-
+    console.log(form.getValues());
     return (
         <div className="container mx-auto py-10">
             <Form {...form}>
