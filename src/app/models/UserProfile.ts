@@ -30,6 +30,8 @@ export interface IUserProfile {
    // Step 6: Profile Photo
   profilePhotoUrl: string;
   governmentIdUrl: string;
+
+  npiNumber: string;
 }
 
 const userProfileSchema = new Schema<IUserProfile>({

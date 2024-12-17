@@ -17,14 +17,13 @@ export default async function ProfilePage() {
 
     // Add user fetch using server action
     const user = session?.user?.email ? await getUserByEmail(session.user.email) : null;
-
+    console.log(user);
     // Select the profile fields
     const profile = selectedItem(user.profile, ['firstName', 'lastName']);
     const bio = selectedItem(user.profile, ['description', 'boardCertification', 'linkedinProfile']);
     const photo = selectedItem(user.profile, ['profilePhotoUrl', 'firstName', 'lastName']);
     const rates = selectedItem(user.profile, ['monthlyCollaborationRate', 'additionalStateFee', 'additionalNPFee', 'controlledSubstancesMonthlyFee', 'controlledSubstancesPerPrescriptionFee']);
 
-    console.log(rates);
     return (
         <SidebarInset>
             <Header breadcrumbs={[

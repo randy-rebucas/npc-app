@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { IUserProfile } from "@/app/models/UserProfile";
 
-export default function GovID() {
+export default function GovID({ govId }: { govId: Partial<IUserProfile> }) {
     return (
         <Card className="max-w-2xl">
             <CardHeader>
@@ -23,6 +24,9 @@ export default function GovID() {
                         Save
                     </Button>
                 </div>
+                <p className="text-sm text-muted-foreground">
+                    Uploaded: {govId.governmentIdUrl}
+                </p>
             </CardContent>
         </Card>
     );

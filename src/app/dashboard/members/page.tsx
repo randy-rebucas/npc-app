@@ -8,7 +8,7 @@ import Pagination from '@/components/ui/pagination';
 import { SidebarInset } from '@/components/ui/sidebar';
 import Header from '@/components/header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import Users from '@/components/ui/memberstack/users';
+// import Users from '@/components/ui/memberstack/users';
 
 export const metadata: Metadata = {
     title: 'Members',
@@ -63,7 +63,7 @@ export default async function Page({
 
                         </TabsContent>
                         <TabsContent value="api">
-                            <Users />
+                            {/* <Users /> */}
                         </TabsContent>
                     </Tabs>
                 </div>

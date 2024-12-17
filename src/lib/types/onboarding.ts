@@ -11,6 +11,7 @@ export type OnboardingStep = {
 };
 
 export interface OnboardingFormData {
+    id?: string;
     // Step 1: User Information
     firstName: string;
     lastName: string;
@@ -41,4 +42,6 @@ export interface OnboardingFormData {
   
     // Step 7: Government ID
     governmentIdUrl: File | null;
+
+    npiNumber: string;
   }

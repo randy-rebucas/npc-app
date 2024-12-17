@@ -1,3 +1,5 @@
+import { getUserByEmail } from "@/app/actions/user";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import Header from "@/components/header";
 import Certifications from "@/components/ui/credentials/certifications";
 import Education from "@/components/ui/credentials/education";
@@ -5,9 +7,28 @@ import GovID from "@/components/ui/credentials/govId";
 import Licenses from "@/components/ui/credentials/licenses";
 import { SidebarInset } from "@/components/ui/sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { selectedItem } from "@/lib/utils";
+import { getServerSession } from "next-auth";
 
 
-export default function CredentialsPage() {
+export default async function CredentialsPage() {
+    // Get session
+    const session = await getServerSession(authOptions);
+
+    // Add user fetch using server action
+    const user = session?.user?.email ? await getUserByEmail(session.user.email) : null;
+
+    // Select the profile fields
+    const licenses = selectedItem(user.profile, ['medicalLicenseStates', 'deaLicenseStates']);
+    const certifications = selectedItem(user.profile, ['additionalCertifications', 'boardCertification', 'npiNumber']);
+    const education = selectedItem(user.profile, ['education']);
+    const govId = selectedItem(user.profile, ['governmentIdUrl']);
+    
+    console.log(licenses);
+    console.log(certifications);
+    console.log(education);
+    console.log(govId);
+
     return (
         <SidebarInset>
             <Header breadcrumbs={[
@@ -34,13 +55,13 @@ export default function CredentialsPage() {
                             <Licenses />
                         </TabsContent>
                         <TabsContent value="certifications">
-                            <Certifications />
+                            <Certifications certifications={certifications} />
                         </TabsContent>
                         <TabsContent value="education">
                             <Education />
                         </TabsContent>
                         <TabsContent value="gov-id">
-                            <GovID />
+                            <GovID govId={govId}/>
                         </TabsContent>
                     </Tabs>
                 </div>

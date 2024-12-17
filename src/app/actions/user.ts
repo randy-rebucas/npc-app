@@ -32,9 +32,8 @@ export async function getUserByEmail(email: string) {
       },
     ]);
 
-    console.log(user[0]);
     const { _id, ...rest } = user[0];
-    return { id: _id, ...rest };
+    return { id: _id.toString(), ...rest };
   } catch (error) {
     console.error("Error fetching user:", error);
     throw new Error("Failed to fetch user");

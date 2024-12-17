@@ -22,7 +22,7 @@ const formSchema = z.object({
 
 export default function Profile({ profile }: { profile: Partial<IUserProfile> }) {
     const { data: session } = useSession();
-
+    console.log(profile);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
