@@ -1,7 +1,7 @@
+import { sdk } from "@/config/sharetribe";
 import connect from "@/lib/db";
 import Member from "@/app/models/Member";
 import { generatePassword } from "@/lib/utils";
-import sharetribeSDK from "sharetribe-flex-sdk";
 
 export async function POST(request: Request) {
   console.log("Syncing member to Sharetribe");
@@ -14,12 +14,6 @@ export async function POST(request: Request) {
     return;
   }
   console.log(member);
-
-  const sdk = sharetribeSDK.createInstance({
-    clientId: process.env.SHARETRIBE_CLIENT_ID,
-    clientSecret: process.env.SHARETRIBE_CLIENT_SECRET,
-    baseUrl: process.env.SHARETRIBE_MARKETPLACE_URL,
-  });
 
   const customFields = {
     firstName: member.payload.customFields["first-name"] || "User",
