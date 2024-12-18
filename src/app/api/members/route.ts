@@ -1,46 +1,29 @@
-import Member from "@/app/models/Member";
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server'
+import { MemberstackAdminService } from '@/utils/memberstack-admin'
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    console.log("Fetching members...");
-    const response = await fetch("https://api.memberstack.io/v1/members", {
-      headers: {
-        Authorization: `Bearer ${process.env.MEMBERSTACK_SECRET_KEY}`,
-        "Content-Type": "application/json",
-      },
-    });
+    const { searchParams } = new URL(request.url)
+    const page = parseInt(searchParams.get('page') || '1')
+    const perPage = parseInt(searchParams.get('perPage') || '10')
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return NextResponse.json(data);
+    const members = await MemberstackAdminService.listMembers(page, perPage)
+    return NextResponse.json(members)
   } catch (error) {
-    console.error("Error fetching members:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch members" },
-      { status: 500 }
-    );
+    console.error("Error in members:", error);
+    return NextResponse.json({ error: 'Failed to fetch members' }, { status: 500 })
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const data = await request.json();
-    console.log(data);
-    // Create and save the member in one step using create()
-    const member = new Member(data);
-    await member.save();
-    
-    console.log('Created member:', member);
-    return NextResponse.json(member);
+    const body = await request.json()
+    const { memberId, updateData } = body
+
+    const updated = await MemberstackAdminService.updateMember(memberId, updateData)
+    return NextResponse.json(updated)
   } catch (error) {
-    console.error('Error creating member:', error);
-    return NextResponse.json(
-      { error: 'Failed to create member' },
-      { status: 500 }
-    );
+    console.error("Error in members:", error);
+    return NextResponse.json({ error: 'Failed to update member' }, { status: 500 })
   }
 }

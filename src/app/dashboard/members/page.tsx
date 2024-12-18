@@ -1,31 +1,20 @@
 import { Metadata } from 'next';
-import { Suspense } from 'react';
-import { MembersTableSkeleton } from '@/components/ui/skeletons';
-import { getMembersPages } from '@/lib/data/members-data';
-import Search from '@/components/ui/search';
-import Table from '@/components/ui/member/table';
-import Pagination from '@/components/ui/pagination';
 import { SidebarInset } from '@/components/ui/sidebar';
 import Header from '@/components/header';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-// import Users from '@/components/ui/memberstack/users';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from "@/components/ui/button";
+import { MemberstackAdminService } from '@/utils/memberstack-admin';
+import { countMembers } from '@/app/actions/members';
 
 export const metadata: Metadata = {
     title: 'Members',
 };
 
-export default async function Page({
-    searchParams,
-}: {
-    searchParams?: {
-        query?: string;
-        page?: string;
-    };
-}) {
-    const params = await searchParams;
-    const query = params?.query || '';
-    const currentPage = Number(params?.page) || 1;
-    const totalPages = await getMembersPages(query);
+export default async function Page() {
+
+    const { totalCount: counts } = await MemberstackAdminService.listMembers();
+
+    const totalMembers = await countMembers();
 
     return (
         <SidebarInset>
@@ -42,30 +31,41 @@ export default async function Page({
                     <div className="flex justify-between items-center mb-6">
                         <h1 className="text-2xl font-bold">Members</h1>
                     </div>
-                    <Tabs defaultValue="hooks" className="">
-                        <TabsList>
-                            <TabsTrigger value="hooks">Hooks</TabsTrigger>
-                            <TabsTrigger value="api">API</TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="hooks">
-                            <div className='mt-4 flex items-center justify-between gap-2 md:mt-8'>
-                                <Search placeholder='Search members...' />
-                            </div>
-                            <Suspense
-                                key={query + currentPage}
-                                fallback={<MembersTableSkeleton />}
-                            >
-                                <Table query={query} currentPage={currentPage} />
-                            </Suspense>
-                            <div className='mt-5 flex w-full justify-center'>
-                                <Pagination totalPages={totalPages} />
-                            </div>
 
-                        </TabsContent>
-                        <TabsContent value="api">
-                            {/* <Users /> */}
-                        </TabsContent>
-                    </Tabs>
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">
+                                    Webhook Members
+                                </CardTitle>
+                                <Button variant="ghost" size="sm" className="text-xs" asChild>
+                                    <a href="/dashboard/members/webhook">View all</a>
+                                </Button>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{totalMembers}</div>
+                                <p className="text-xs text-muted-foreground">
+                                    Total webhook members
+                                </p>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">
+                                    Node API Members
+                                </CardTitle>
+                                <Button variant="ghost" size="sm" className="text-xs" asChild>
+                                    <a href="/dashboard/members/node-api">View all</a>
+                                </Button>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{counts}</div>
+                                <p className="text-xs text-muted-foreground">
+                                    Total node API members
+                                </p>
+                            </CardContent>
+                        </Card>
+                    </div>
                 </div>
             </div>
         </SidebarInset>

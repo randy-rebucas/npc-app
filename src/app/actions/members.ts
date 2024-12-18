@@ -17,24 +17,16 @@ export async function syncMembers(id: string) {
       return;
     }
     return member;
-    // // Example user data - adjust according to your needs
-    // const userData = {
-    //   email: "user@example.com",
-    //   firstName: "John",
-    //   lastName: "Doe",
-    //   password: "securePassword123",
-    // };
-
-    // const response = await sdk.users.create({
-    //   body: userData,
-    // });
-
-    // console.log("User created:", response);
-    // return response;
   } catch (error) {
     console.error("Error syncing members:", error);
     throw error;
   }
+}
+
+export async function countMembers() {
+  connect();
+  const count = await Member.countDocuments().exec();
+  return count;
 }
 
 export async function getUserByEmail(email: string) {
