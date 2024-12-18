@@ -12,11 +12,13 @@ import {
 export default async function MembersTable({
    query,
    currentPage,
+   ITEMS_PER_PAGE,
 }: {
    query: string;
    currentPage: number;
+   ITEMS_PER_PAGE: number;
 }) {
-   const members = await fetchFilteredMembers(query, currentPage);
+   const members = await fetchFilteredMembers(query, currentPage, ITEMS_PER_PAGE);
 
    return (
       <Table>

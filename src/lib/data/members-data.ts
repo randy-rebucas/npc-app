@@ -2,8 +2,6 @@ import { unstable_noStore as noStore } from "next/cache";
 import Member from "@/app/models/Member";
 import connect from "@/lib/db";
 
-const ITEMS_PER_PAGE = 6;
-
 export async function getMembers() {
   try {
     connect();
@@ -31,6 +29,7 @@ export async function getMembers() {
 export async function fetchFilteredMembers(
   query: string,
   currentPage: number,
+  ITEMS_PER_PAGE: number,
 ) {
   connect();
 
@@ -59,7 +58,7 @@ export async function fetchFilteredMembers(
   }
 }
 
-export async function getMembersPages(query: string) {
+export async function getMembersPages(query: string, ITEMS_PER_PAGE: number) {
   connect();
 
   noStore();
