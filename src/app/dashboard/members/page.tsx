@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from "@/components/ui/button";
 import { MemberstackAdminService } from '@/utils/memberstack-admin';
 import { countMembers } from '@/app/actions/members';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
     title: 'Members',
@@ -39,7 +40,7 @@ export default async function Page() {
                                     Webhook Members
                                 </CardTitle>
                                 <Button variant="ghost" size="sm" className="text-xs" asChild>
-                                    <a href="/dashboard/members/webhook">View all</a>
+                                    <Link href="/dashboard/members/webhook">View all</Link>
                                 </Button>
                             </CardHeader>
                             <CardContent>
@@ -55,7 +56,7 @@ export default async function Page() {
                                     Node API Members
                                 </CardTitle>
                                 <Button variant="ghost" size="sm" className="text-xs" asChild>
-                                    <a href="/dashboard/members/node-api">View all</a>
+                                    <Link href="/dashboard/members/node-api">View all</Link>
                                 </Button>
                             </CardHeader>
                             <CardContent>
