@@ -8,6 +8,7 @@ export default function GlobalError({
   reset: () => void
 }) {
   return (
+    console.log(error),
     // global-error must include html and body tags
     <html>
       <body>

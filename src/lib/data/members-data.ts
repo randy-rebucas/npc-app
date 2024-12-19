@@ -10,7 +10,7 @@ export async function getMembers() {
 
     const transformData = members.map((member) => {
       return {
-        _id: member._id.toString(),
+        id: member._id.toString(),
         event: member.event,
         email: member.payload.auth.email,
         accountSynced: member.accountSynced,
@@ -43,7 +43,7 @@ export async function fetchFilteredMembers(
     }).skip(offset).limit(ITEMS_PER_PAGE).exec();
 
     const transformData = members.map((member) => ({
-      _id: member._id.toString(),
+      id: member._id.toString(),
       event: member.event,
       email: member.payload.auth.email,
       accountSynced: member.accountSynced,

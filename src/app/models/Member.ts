@@ -9,7 +9,7 @@ export interface IMember {
   accountSynced: boolean;
   createdAt: Date;
   updatedAt: Date;
-  _id?: mongoose.Schema.Types.ObjectId;
+  id?: string;
 }
 
 // 2. Create an Schema corresponding to the document interface.

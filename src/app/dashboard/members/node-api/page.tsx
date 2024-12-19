@@ -3,16 +3,14 @@ import NodeApi from "@/components/ui/member/source/node-api";
 
 import { SidebarInset } from "@/components/ui/sidebar";
 
-export default async function Page({
-    searchParams,
-}: {
-    searchParams?: {
-        query?: string;
-        page?: string;
-    };
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
+
+
+export default async function Page(props: {
+    searchParams: SearchParams
 }) {
     const ITEMS_PER_PAGE = 10;
-    const params = await searchParams;
+    const params = await props.searchParams;
     const currentPage = Number(params?.page) || 1;
 
     return (

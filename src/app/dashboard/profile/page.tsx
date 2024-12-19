@@ -7,7 +7,7 @@ import Rates from "@/components/ui/profile/rates";
 import { SidebarInset } from "@/components/ui/sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { getUserByEmail } from "@/app/actions/user";
 import { selectedItem } from "@/lib/utils";
 

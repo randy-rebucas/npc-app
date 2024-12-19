@@ -1,7 +1,7 @@
 import SignIn from "../../components/sign-in";
 import { getServerSession } from "next-auth"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { Button } from "@/components/ui/button"
+import { authOptions } from "../api/auth/[...nextauth]/options";
 // import Banner from "@/components/root/home/Banner";
 
 export default async function Home() {

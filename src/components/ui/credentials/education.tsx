@@ -3,7 +3,14 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 
-export default function Education() {
+export type Education = {
+    undergrad: string;
+    medical: string;
+    residency: string;
+}
+
+export default function Education({ education }: { education: Education }) {
+    console.log(education);
     return (
         <Card className="max-w-2xl">
             <CardHeader>

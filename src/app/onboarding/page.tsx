@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -37,8 +37,8 @@ export default function OnboardingPage() {
     // Define the maximum file size for uploads
     const MAX_FILE_SIZE = 5000000;
 
-    // Define steps configuration
-    const ONBOARDING_STEPS: OnboardingStep[] = [
+    // Move ONBOARDING_STEPS into useMemo
+    const ONBOARDING_STEPS: OnboardingStep[] = useMemo(() => [
         {
             id: 'user-info',
             title: 'User Information',
@@ -149,7 +149,7 @@ export default function OnboardingPage() {
                 governmentIdUrl: onBoarding.governmentIdUrl ?? null,
             },
         },
-    ] as const;
+    ] as const, [onBoarding]);
 
     // First, create a union type of all possible schemas
     type FormSchema = z.infer<(typeof ONBOARDING_STEPS)[number]['formSchema']>;
@@ -169,7 +169,7 @@ export default function OnboardingPage() {
             ...onBoarding // Merge with current onBoarding state
         };
         form.reset(currentStepDefaults);
-    }, [onBoarding, currentStep, form]);
+    }, [onBoarding, currentStep, form, ONBOARDING_STEPS]);
 
     // Get the component for the current step
     const CurrentStepComponent = ONBOARDING_STEPS[currentStep].component;
@@ -254,7 +254,6 @@ export default function OnboardingPage() {
         }
     };
 
-    console.log(onBoarding);
     return (
         <div className="container mx-auto py-10">
             <Form {...form}>
