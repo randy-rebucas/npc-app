@@ -1,6 +1,6 @@
 import { SignOut } from "./signout";
 
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 import { SidebarMenuButton, SidebarMenuItem } from "./ui/sidebar";
 
@@ -8,7 +8,7 @@ import { SidebarMenu } from "./ui/sidebar";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import { ChevronsUpDown } from "lucide-react";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { getUserByEmail } from "@/app/actions/user";
 
 export default async function NavUser() {

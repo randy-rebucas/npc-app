@@ -21,10 +21,15 @@ import { cn } from "@/lib/utils"
 import { useState } from "react"
 import { format } from "date-fns"
 
+export type License = {
+    state: string;
+    licenseNumber: string;
+    expirationDate: Date;
+}
 
-export default function Licenses() {
+export default function Licenses({ licenses }: { licenses: License[] }) {
     const [date, setDate] = useState<Date>()
-
+    console.log(licenses);
     return (
         <Card className="max-w-3xl mx-auto">
             <CardHeader>

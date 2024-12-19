@@ -2,9 +2,9 @@ import Header from "@/components/header";
 import Listings from "@/components/ui/sharetribe/listings";
 import { SidebarInset } from "@/components/ui/sidebar";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { redirect } from "next/navigation";
-import { getUserByEmail } from "../actions/members";
+import { getUserByEmail } from "@/app/actions/user";
 
 
 export default async function Dashboard() {

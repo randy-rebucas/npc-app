@@ -116,7 +116,7 @@ export default function Calendar() {
         if (script) {
             initializeGoogleAPI();
         }
-    }, []);
+    }, [API_KEY, CLIENT_ID, DISCOVERY_DOC, SCOPES]);
 
     const handleGoogleSignIn = async () => {
         try {

@@ -1,4 +1,4 @@
-import { sdk } from "@/lib/sharetribe";
+import { sdk } from "@/config/sharetribe";
 import Image from "next/image";
 
 interface Listing {

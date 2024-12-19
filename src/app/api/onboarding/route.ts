@@ -88,7 +88,7 @@ export async function POST(request: Request) {
       linkedinProfile: fields.get("linkedinProfile"),
       profilePhotoUrl: fields.get("profilePhotoUrl"),
       governmentIdUrl: fields.get("governmentIdUrl"),
-      user: userResponse._id,
+      user: userResponse._id.toString(),
     });
 
     const userProfileResponse = await userProfile.save();

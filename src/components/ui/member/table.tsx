@@ -33,23 +33,22 @@ export default async function MembersTable({
             </TableRow>
          </TableHeader>
          <TableBody>
-            {members?.map((member: { _id: string; event: string; email: string; createdAt: Date; updatedAt: Date; accountSynced: boolean }) => (
-               <TableRow key={member._id}>
+            {members?.map((member: { id: string; event: string; email: string; createdAt: Date; updatedAt: Date; accountSynced: boolean }) => (
+               <TableRow key={member.id}>
                   <TableCell className="font-medium">{member.event}</TableCell>
                   <TableCell>{member.email}</TableCell>
                   <TableCell>
-                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        member.accountSynced 
-                           ? 'bg-green-100 text-green-700' 
+                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${member.accountSynced
+                           ? 'bg-green-100 text-green-700'
                            : 'bg-red-100 text-red-700'
-                     }`}>
+                        }`}>
                         {member.accountSynced ? 'Synced' : 'Not Synced'}
                      </span>
                   </TableCell>
                   <TableCell className="text-right">{member.createdAt.toLocaleDateString()}</TableCell>
                   <TableCell className="text-right">{member.updatedAt.toLocaleDateString()}</TableCell>
                   <TableCell className="text-right">
-                     <Sync id={member._id} />
+                     <Sync id={member.id} />
                   </TableCell>
                </TableRow>
             ))}

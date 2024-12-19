@@ -3,10 +3,11 @@ import { MemberstackAdminService } from "@/utils/memberstack-admin";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const member = await MemberstackAdminService.getMemberById(params.id);
+    const id = (await params).id;
+    const member = await MemberstackAdminService.getMemberById(id);
     return NextResponse.json(member);
   } catch (error) {
     console.error("Error in member:", error);
@@ -16,10 +17,11 @@ export async function GET(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await MemberstackAdminService.deleteMember(params.id);
+    const id = (await params).id;
+    await MemberstackAdminService.deleteMember(id);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error in member:", error);
