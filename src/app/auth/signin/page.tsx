@@ -123,7 +123,16 @@ export default function SignIn() {
                 Logto
               </Button>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="flex flex-col gap-4">
+              <div className="text-sm text-muted-foreground text-center">
+                Don&apos;t have an account?{" "}
+                <a
+                  href="/auth/signup"
+                  className="text-primary underline-offset-4 hover:underline"
+                >
+                  Sign up
+                </a>
+              </div>
               <p className="px-8 text-center text-sm text-muted-foreground">
                 By clicking continue, you agree to our{" "}
                 <a
