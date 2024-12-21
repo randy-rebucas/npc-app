@@ -15,9 +15,9 @@ import { X } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
 export type Education = {
-    undergrad: string;
-    medical: string;
-    residency: string;
+    undergrad?: string;
+    medical?: string;
+    residency?: string;
 }
 
 const educationFormSchema = z.object({
@@ -30,7 +30,17 @@ const educationFormSchema = z.object({
     }),
 })
 type EducationFormValues = z.infer<typeof educationFormSchema>;
-export default function Education({ education, clinicalDegree, practiceTypes, practices }: { education: Education, clinicalDegree: string, practiceTypes: string[], practices: string[] }) {
+export default function Education({ 
+    education = { undergrad: '', medical: '', residency: '' }, 
+    clinicalDegree = '', 
+    practiceTypes = [], 
+    practices = [] 
+}: { 
+    education?: Education, 
+    clinicalDegree?: string, 
+    practiceTypes?: string[], 
+    practices: string[] 
+}) {
     const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
     console.log(practiceTypes)
