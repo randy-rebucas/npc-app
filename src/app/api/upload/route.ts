@@ -46,13 +46,13 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
     try {
         const data = await request.json();
-        // /uploads/1734755780883-photo-1633332755192-727a05c4013d.jpeg
+        // 1734755780883-photo-1633332755192-727a05c4013d.jpeg
         const filename = data.profilePhotoPath.split('/')[2];
-        console.log(filename);
-        
+
+        // public/uploads/1734755780883-photo-1633332755192-727a05c4013d.jpeg
         const uploadDir = path.join(process.cwd(), 'public/uploads');
         const filepath = path.join(uploadDir, filename);
-        console.log(filepath);
+
         // Check if file exists before attempting to delete
         const fileExists = await fs.access(filepath)
             .then(() => true)
@@ -65,6 +65,7 @@ export async function DELETE(request: NextRequest) {
             );
         }
 
+        // unlink public/uploads/1734755780883-photo-1633332755192-727a05c4013d.jpeg
         await unlink(filepath);
         return NextResponse.json({ message: 'File deleted successfully' });
     } catch (error) {
