@@ -53,7 +53,7 @@ export default async function CredentialsPage() {
                             <Licenses medicalLicenseStates={licenses.medicalLicenseStates} deaLicenseStates={licenses.deaLicenseStates} states={medicalLicenseStates} />
                         </TabsContent>
                         <TabsContent value="certifications">
-                            <Certifications certifications={certifications} />
+                            <Certifications boardCertification={certifications.boardCertification} additionalCertifications={certifications.additionalCertifications} npiNumber={certifications.npiNumber}/>
                         </TabsContent>
                         <TabsContent value="education">
                             <Education education={education as EducationType} />

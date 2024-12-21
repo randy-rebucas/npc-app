@@ -64,7 +64,7 @@ export type Certification = {
   certification: string;
   issueDate: Date | null;
   expirationDate: Date | null;
-  certificateUrl: File | null;
+  certificateUrl: string;
   certificateNumber: string;
 }
 

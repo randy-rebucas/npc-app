@@ -7,36 +7,86 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from "@/components/ui/form";
-import { IUserProfile } from "@/app/models/UserProfile";
+import { Certification } from "@/lib/types/onboarding";
+import { CalendarIcon, Plus, X } from "lucide-react";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast"
+import { cn } from "@/lib/utils";
+import { format } from "date-fns"
+import { Popover, PopoverTrigger, PopoverContent } from "@radix-ui/react-popover";
+import { Calendar } from "@/components/ui/calendar"
 
 const certificationFormSchema = z.object({
-  boardCertifications: z.string(),
-  additionalCertifications: z.array(z.string()).optional(),
-  npiNumber: z.string().min(10, "NPI number must be at least 10 digits"),
+    boardCertifications: z.string(),
+    additionalCertifications: z.array(z.object({
+        certification: z.string().min(1, "Certification is required"),
+        issueDate: z.date({
+            required_error: "Issue date is required",
+        }),
+        expirationDate: z.date({
+            required_error: "Expiration date is required",
+        }),
+        certificateUrl: z.string().url("Invalid certificate URL"),
+        certificateNumber: z.string().min(1, "Certificate number is required"),
+    })),
+    npiNumber: z.string().min(10, "NPI number must be at least 10 digits"),
 });
 
 type CertificationFormValues = z.infer<typeof certificationFormSchema>;
 
-export default function Certifications({ certifications }: { certifications: Partial<IUserProfile> }) {
+export default function Certifications({ boardCertification, additionalCertifications, npiNumber }: { boardCertification: string, additionalCertifications: Certification[], npiNumber: string }) {
+    const { toast } = useToast();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const form = useForm<CertificationFormValues>({
         resolver: zodResolver(certificationFormSchema),
         defaultValues: {
-            boardCertifications: certifications.boardCertification || "",
-            additionalCertifications: certifications.additionalCertifications || [],
-            npiNumber: certifications.npiNumber || "",
+            boardCertifications: boardCertification || "",
+            additionalCertifications: additionalCertifications.map(certification => ({
+                certification: certification.certification,
+                issueDate: certification.issueDate ? new Date(certification.issueDate) : new Date(),
+                expirationDate: certification.expirationDate ? new Date(certification.expirationDate) : new Date(),
+                certificateUrl: certification.certificateUrl ? certification.certificateUrl : "",
+                certificateNumber: certification.certificateNumber ? certification.certificateNumber : "",
+            })),
+            npiNumber: npiNumber || "",
         },
     });
 
-    function onSubmit(data: CertificationFormValues) {
-        // Handle form submission
-        console.log(data);
+    async function onSubmit(data: CertificationFormValues) {
+        setIsSubmitting(true);
+        try {
+            // Update profile certifications
+            const response = await fetch("/api/profile", {
+                method: "POST",
+                body: JSON.stringify({ additionalCertifications: data.additionalCertifications, npiNumber: data.npiNumber, boardCertification: data.boardCertifications }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to update certifications");
+            }
+
+            toast({
+                title: "Success!",
+                description: "Your certifications have been updated.",
+            });
+        } catch (error) {
+            console.error(error);
+            toast({
+                title: "Error",
+                description: "Failed to update certifications",
+                variant: "destructive",
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
     }
 
     return (
@@ -63,21 +113,6 @@ export default function Certifications({ certifications }: { certifications: Par
                                 </FormItem>
                             )}
                         />
-
-                        <FormField
-                            control={form.control}
-                            name="additionalCertifications"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Additional Certifications:</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Optional" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
                         <FormField
                             control={form.control}
                             name="npiNumber"
@@ -96,8 +131,171 @@ export default function Certifications({ certifications }: { certifications: Par
                                 </FormItem>
                             )}
                         />
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <FormLabel>Additional Certifications:</FormLabel>
+                            </div>
 
-                        <Button type="submit">Save</Button>
+                            {form.watch("additionalCertifications").map((_, index) => (
+                                <div key={index} className="space-y-4 rounded-lg border p-4 relative">
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="text-destructive hover:text-destructive absolute right-2 top-2"
+                                        onClick={() => {
+                                            const current = form.getValues("additionalCertifications");
+                                            form.setValue(
+                                                "additionalCertifications",
+                                                current.filter((_, i) => i !== index)
+                                            );
+                                        }}
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </Button>
+
+                                    <FormField
+                                        control={form.control}
+                                        name={`additionalCertifications.${index}.certification`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Certification Name</FormLabel>
+                                                <FormControl>
+                                                    <Input {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <FormField
+                                            control={form.control}
+                                            name={`additionalCertifications.${index}.issueDate`}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Issue Date</FormLabel>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <FormControl>
+                                                                <Button
+                                                                    variant={"outline"}
+                                                                    className={cn(
+                                                                        "w-[280px] justify-start text-left font-normal",
+                                                                        !field.value && "text-muted-foreground"
+                                                                    )}
+                                                                >
+                                                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                                                    {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                                                                </Button>
+                                                            </FormControl>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-auto p-0"> 
+                                                            <Calendar
+                                                                mode="single"
+                                                                selected={field.value}
+                                                                onSelect={field.onChange}       
+                                                                initialFocus
+                                                            />
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={form.control}
+                                            name={`additionalCertifications.${index}.expirationDate`}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Expiration Date</FormLabel>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <FormControl>
+                                                                <Button
+                                                                    variant={"outline"}
+                                                                    className={cn(
+                                                                        "w-[280px] justify-start text-left font-normal",
+                                                                        !field.value && "text-muted-foreground"
+                                                                    )}
+                                                                >
+                                                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                                                    {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                                                                </Button>
+                                                            </FormControl>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-auto p-0">
+                                                            <Calendar
+                                                                mode="single"
+                                                                selected={field.value}
+                                                                onSelect={field.onChange}
+                                                                initialFocus
+                                                            />
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+
+                                    <FormField
+                                        control={form.control}
+                                        name={`additionalCertifications.${index}.certificateNumber`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Certificate Number</FormLabel>
+                                                <FormControl>
+                                                    <Input {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name={`additionalCertifications.${index}.certificateUrl`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Certificate URL/File</FormLabel>
+                                                <FormControl>
+                                                    <Input {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="flex justify-between">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => {
+                                    form.setValue("additionalCertifications", [
+                                        ...form.getValues("additionalCertifications"),
+                                        {
+                                            certification: "",
+                                            issueDate: new Date(),
+                                            expirationDate: new Date(),
+                                            certificateUrl: "",
+                                            certificateNumber: "",
+                                        },
+                                    ]);
+                                }}
+                            >
+                                <Plus className="h-4 w-4" />
+                                Add Certification
+                            </Button>
+
+                            <Button type="submit" disabled={isSubmitting}>
+                                {isSubmitting ? "Saving..." : "Save Changes"}
+                            </Button>
+                        </div>
                     </form>
                 </Form>
             </CardContent>
