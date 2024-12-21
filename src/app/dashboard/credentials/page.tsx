@@ -1,4 +1,5 @@
-import { getMedicalLicenseStates, getPracticeTypes } from "@/app/actions/medicallicensestates";
+import { getMedicalLicenseStates } from "@/app/actions/medicallicensestates";
+import { getPracticeTypes } from "@/app/actions/practicetypes";
 import { getUserByEmail } from "@/app/actions/user";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import Header from "@/components/header";
