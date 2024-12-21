@@ -18,7 +18,7 @@ export async function POST(request: Request) {
 
     const userProfile = await UserProfile.findOneAndUpdate({ user: user._id }, {
         ...data,
-    });
+    }, { new: true });
 
     return NextResponse.json({ userProfile });
   } catch (error) {

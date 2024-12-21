@@ -16,7 +16,7 @@ export default async function NavUser() {
     const session = await getServerSession(authOptions);
     // Add user fetch using server action
     const user = session?.user?.email ? await getUserByEmail(session.user.email) : null;
-
+    
     return (
         <SidebarMenu className="bg-popover">
             <SidebarMenuItem>

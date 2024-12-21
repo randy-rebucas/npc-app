@@ -8,19 +8,78 @@ import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 const formSchema = z.object({
-  photo: z.instanceof(File).optional(),
+    photo: z.instanceof(File).optional(),
 })
 
 export default function Photo({ photo }: { photo: Partial<IUserProfile> }) {
+    const { toast } = useToast();
+    const [photoUrl, setPhotoUrl] = useState('');
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
     });
 
-    const handleUpload = (file: File) => {
-        // Handle file upload logic here
-        console.log("File selected:", file);
+    const handleUpload = async (file: File) => {
+
+        try {
+            // Delete old file
+            const deleteResponse = await fetch("/api/upload", {
+                method: "DELETE",
+                body: JSON.stringify({ profilePhotoPath: photo.profilePhotoPath }),
+            });
+
+            if (!deleteResponse.ok) {
+                throw new Error("Failed to delete old file");
+            }
+
+            // Create FormData object
+            const formData = new FormData();
+            formData.append('file', file);
+
+            // Upload file to server
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error('Upload failed');
+            }
+            const data = await response.json();
+            console.log(data);
+            setPhotoUrl(data.url);
+
+            if (data.url) {
+
+                // Update profile photo path
+                await fetch("/api/profile", {
+                    method: "POST",
+                    body: JSON.stringify({ profilePhotoPath: data.url }),
+                });
+
+                toast({
+                    title: "Success",
+                    description: "File uploaded successfully",
+                });
+            } else {
+                toast({
+                    title: "Error",
+                    description: "Failed to upload file. Please try again.",
+                    variant: "destructive",
+                });
+            }
+        } catch (error) {
+            console.error(error);
+            toast({
+                title: "Error",
+                description: "Failed to upload file. Please try again.",
+                variant: "destructive",
+            });
+        }
     };
 
     return (
@@ -33,7 +92,7 @@ export default function Photo({ photo }: { photo: Partial<IUserProfile> }) {
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-4">
                 <Avatar className="h-32 w-32">
-                    <AvatarImage src={photo.profilePhotoPath} alt={`${photo.firstName ?? ''} ${photo.lastName ?? ''}`} />
+                    <AvatarImage src={photoUrl || photo.profilePhotoPath} alt={`${photo.firstName ?? ''} ${photo.lastName ?? ''}`} />
                     <AvatarFallback>{(photo.firstName?.charAt(0) ?? '').toUpperCase() + (photo.lastName?.charAt(0) ?? '').toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <Form {...form}>
@@ -57,9 +116,9 @@ export default function Photo({ photo }: { photo: Partial<IUserProfile> }) {
                                                 }
                                             }}
                                         />
-                                        <Button 
-                                            variant="secondary" 
-                                            className="flex items-center gap-2" 
+                                        <Button
+                                            variant="secondary"
+                                            className="flex items-center gap-2"
                                             onClick={() => document.getElementById("profile-upload")?.click()}
                                         >
                                             <svg

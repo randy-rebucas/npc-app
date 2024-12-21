@@ -9,7 +9,8 @@ import { IUserProfile } from "@/app/models/UserProfile";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 const formSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -25,7 +26,9 @@ const formSchema = z.object({
 })
 
 export default function Profile({ profile }: { profile: Partial<IUserProfile> }) {
+    const { toast } = useToast();
     const { data: session } = useSession();
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -41,8 +44,7 @@ export default function Profile({ profile }: { profile: Partial<IUserProfile> })
     });
 
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
-        console.log(data);
-        // Handle form submission
+        setIsSubmitting(true);
         try {
             const response = await fetch('/api/profile', {
                 method: 'POST',
@@ -59,6 +61,13 @@ export default function Profile({ profile }: { profile: Partial<IUserProfile> })
             });
         } catch (error) {
             console.error('Error:', error);
+            toast({
+                title: "Error",
+                description: "Failed to update profile. Please try again.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -190,7 +199,9 @@ export default function Profile({ profile }: { profile: Partial<IUserProfile> })
 
                         {/* Save Button */}
                         <div className="flex justify-end">
-                            <Button type="submit">Save</Button>
+                            <Button type="submit" disabled={isSubmitting}>
+                                {isSubmitting ? "Saving..." : "Save"}
+                            </Button>
                         </div>
                     </form>
                 </Form>

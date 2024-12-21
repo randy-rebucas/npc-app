@@ -10,6 +10,8 @@ import { IUserProfile } from "@/app/models/UserProfile";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 import {
     Form,
     FormControl,
@@ -19,30 +21,56 @@ import {
 } from "@/components/ui/form";
 
 const ratesSchema = z.object({
-    baseRate: z.number().min(0, "Base rate must be positive"),
-    stateRate: z.number().min(0, "State rate must be positive"),
-    npRate: z.number().min(0, "NP rate must be positive"),
-    controlledSubstancesRate: z.number().nullable(),
+    monthlyCollaborationRate: z.number().min(0, "Base rate must be positive"),
+    additionalStateFee: z.number().min(0, "State rate must be positive"),
+    additionalNPFee: z.number().min(0, "NP rate must be positive"),
+    controlledSubstancesMonthlyFee: z.number().nullable(),
     controlledSubstancesPerPrescriptionFee: z.number().nullable(),
 });
 
 type RatesFormValues = z.infer<typeof ratesSchema>;
 
 export default function Rates({ rates }: { rates: Partial<IUserProfile> }) {
+    const [isSubmitting, setIsSubmitting] = useState(false); 
+    const { toast } = useToast();
+
     const form = useForm<RatesFormValues>({
         resolver: zodResolver(ratesSchema),
         defaultValues: {
-            baseRate: rates.monthlyCollaborationRate ?? 0,
-            stateRate: rates.additionalStateFee ?? 0,
-            npRate: rates.additionalNPFee ?? 0,
-            controlledSubstancesRate: rates.controlledSubstancesMonthlyFee ?? 0,
+            monthlyCollaborationRate: rates.monthlyCollaborationRate ?? 0,
+            additionalStateFee: rates.additionalStateFee ?? 0,
+            additionalNPFee: rates.additionalNPFee ?? 0,
+            controlledSubstancesMonthlyFee: rates.controlledSubstancesMonthlyFee ?? 0,
             controlledSubstancesPerPrescriptionFee: rates.controlledSubstancesPerPrescriptionFee ?? 0,
         },
     });
 
     const onSubmit = async (data: RatesFormValues) => {
-        // TODO: Implement save functionality
-        console.log(data);
+        setIsSubmitting(true);
+        try {
+            const response = await fetch("/api/profile", {
+                method: "POST",
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to update profile");
+            }
+
+            toast({
+                title: "Success",
+                description: "Profile updated successfully",
+            });
+        } catch (error) {
+            console.error(error);
+            toast({
+                title: "Error",
+                description: "Failed to update profile. Please try again.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -62,7 +90,7 @@ export default function Rates({ rates }: { rates: Partial<IUserProfile> }) {
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                             <FormField
                                 control={form.control}
-                                name="baseRate"
+                                name="monthlyCollaborationRate"
                                 render={({ field }) => (
                                     <FormItem className="space-y-2">
                                         <div className="flex items-center gap-2">
@@ -97,7 +125,7 @@ export default function Rates({ rates }: { rates: Partial<IUserProfile> }) {
 
                             <FormField
                                 control={form.control}
-                                name="stateRate"
+                                name="additionalStateFee"
                                 render={({ field }) => (
                                     <FormItem className="space-y-2">
                                         <div className="flex items-center gap-2">
@@ -132,7 +160,7 @@ export default function Rates({ rates }: { rates: Partial<IUserProfile> }) {
 
                             <FormField
                                 control={form.control}
-                                name="npRate"
+                                name="additionalNPFee"
                                 render={({ field }) => (
                                     <FormItem className="space-y-2">
                                         <div className="flex items-center gap-2">
@@ -202,7 +230,7 @@ export default function Rates({ rates }: { rates: Partial<IUserProfile> }) {
 
                             <FormField
                                 control={form.control}
-                                name="controlledSubstancesRate"
+                                name="controlledSubstancesMonthlyFee"
                                 render={({ field }) => (
                                     <FormItem className="space-y-2">
                                         <div className="flex items-center gap-2">
@@ -236,7 +264,9 @@ export default function Rates({ rates }: { rates: Partial<IUserProfile> }) {
                             />
 
                             <div className="flex justify-end">
-                                <Button type="submit">Save</Button>
+                                <Button type="submit" disabled={isSubmitting}>
+                                    {isSubmitting ? "Saving..." : "Save"}
+                                </Button>
                             </div>
                         </form>
                     </Form>

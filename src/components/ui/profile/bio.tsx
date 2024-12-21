@@ -9,29 +9,32 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IUserProfile } from "@/app/models/UserProfile";
 import * as z from "zod";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 const bioFormSchema = z.object({
-  background: z.string().min(1, "Background is required"),
-  certifications: z.string().min(1, "Board certifications are required"),
-  linkedin: z.string().url().optional().or(z.literal("")),
+    description: z.string().min(1, "Background is required"),
+    boardCertification: z.string().min(1, "Board certifications are required"),
+    linkedinProfile: z.string().url().optional().or(z.literal("")),
 });
 
 type BioFormValues = z.infer<typeof bioFormSchema>;
 
 export default function Bio({ bio }: { bio: Partial<IUserProfile> }) {
+    const { toast } = useToast();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    
     const form = useForm<BioFormValues>({
         resolver: zodResolver(bioFormSchema),
         defaultValues: {
-            background: bio.description,
-            certifications: bio.boardCertification,
-            linkedin: bio.linkedinProfile,
+            description: bio.description || '',
+            boardCertification: bio.boardCertification || '',
+            linkedinProfile: bio.linkedinProfile || '',
         },
     });
 
     async function onSubmit(data: BioFormValues) {
-        console.log(data);
-        // Handle form submission
+        setIsSubmitting(true);
         try {
             const response = await fetch('/api/profile', {
                 method: 'POST',
@@ -48,6 +51,13 @@ export default function Bio({ bio }: { bio: Partial<IUserProfile> }) {
             });
         } catch (error) {
             console.error('Error:', error);
+            toast({
+                title: "Error",
+                description: "Failed to update profile. Please try again.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsSubmitting(false);
         }
     }
 
@@ -64,7 +74,7 @@ export default function Bio({ bio }: { bio: Partial<IUserProfile> }) {
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                         <FormField
                             control={form.control}
-                            name="background"
+                            name="description"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Your Background:</FormLabel>
@@ -81,7 +91,7 @@ export default function Bio({ bio }: { bio: Partial<IUserProfile> }) {
 
                         <FormField
                             control={form.control}
-                            name="certifications"
+                            name="boardCertification"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Board Certifications:</FormLabel>
@@ -97,7 +107,7 @@ export default function Bio({ bio }: { bio: Partial<IUserProfile> }) {
 
                         <FormField
                             control={form.control}
-                            name="linkedin"
+                            name="linkedinProfile"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>LinkedIn Profile:</FormLabel>
@@ -113,8 +123,8 @@ export default function Bio({ bio }: { bio: Partial<IUserProfile> }) {
                         />
 
                         <div className="flex justify-end">
-                            <Button type="submit">
-                                Save Changes
+                            <Button type="submit" disabled={isSubmitting}>
+                                {isSubmitting ? "Saving..." : "Save Changes"}
                             </Button>
                         </div>
                     </form>

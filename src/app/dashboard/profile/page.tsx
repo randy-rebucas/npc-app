@@ -17,7 +17,7 @@ export default async function ProfilePage() {
 
     // Add user fetch using server action
     const user = session?.user?.email ? await getUserByEmail(session.user.email) : null;
-    console.log(user);
+
     // Select the profile fields
     const profile = selectedItem(user.profile, ['firstName', 'lastName', 'phone', 'address', 'city', 'state', 'zip']);
     const bio = selectedItem(user.profile, ['description', 'boardCertification', 'linkedinProfile']);
