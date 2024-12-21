@@ -74,8 +74,16 @@ export default function BackgroundCertificationsForm({
                   { label: 'PALS', value: 'PALS' },
                   // Add more certification options as needed
                 ]}
-                value={onBoarding.additionalCertifications}
-                onValueChange={(value) => updateFields({ additionalCertifications: value })}
+                value={onBoarding.additionalCertifications.map(cert => cert.certification)}
+                onValueChange={(value) => updateFields({
+                  additionalCertifications: value.map(cert => ({
+                    certification: cert,
+                    issueDate: null,
+                    expirationDate: null,
+                    certificateUrl: null,
+                    certificateNumber: "",
+                  }))
+                })}
               />
             </FormControl>
             <FormMessage />

@@ -28,7 +28,7 @@ interface FormStepProps {
 
 export default function LicenseInformationForm({ form }: FormStepProps) {
 
-  const updateFields = useOnBoardingStore(state => state.updateFields); 
+  const updateFields = useOnBoardingStore(state => state.updateFields);
   const onBoarding = useOnBoardingStore(state => state.onBoarding);
 
   return (
@@ -46,8 +46,14 @@ export default function LicenseInformationForm({ form }: FormStepProps) {
                   label: state,
                   value: state,
                 }))}
-                value={onBoarding.medicalLicenseStates}
-                onValueChange={(value) => updateFields({ medicalLicenseStates: value })}
+                value={onBoarding.medicalLicenseStates.map(license => license.state)}
+                onValueChange={(values) => updateFields({
+                  medicalLicenseStates: values.map(state => ({
+                    state,
+                    licenseNumber: "",
+                    expirationDate: null
+                  }))
+                })}
               />
             </FormControl>
             <FormMessage />
@@ -68,8 +74,14 @@ export default function LicenseInformationForm({ form }: FormStepProps) {
                   label: state,
                   value: state,
                 }))}
-                value={onBoarding.deaLicenseStates}
-                onValueChange={(value) => updateFields({ deaLicenseStates: value })}
+                value={onBoarding.deaLicenseStates.map(license => license.state)}
+                onValueChange={(values) => updateFields({
+                  deaLicenseStates: values.map(state => ({
+                    state,
+                    licenseNumber: "",
+                    expirationDate: null
+                  }))
+                })}
               />
             </FormControl>
             <FormMessage />

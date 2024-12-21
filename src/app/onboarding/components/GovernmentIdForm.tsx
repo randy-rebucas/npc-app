@@ -26,23 +26,35 @@ export default function GovernmentIdForm({ form }: FormStepProps) {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Here you would typically upload the file to your storage service
-      // For now, we'll just store the file name
+      // Create FormData object
+      const formData = new FormData();
+      formData.append('file', file);
+
+      // Upload file to server
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const data = await response.json();
       setFileName(file);
-      updateFields({ governmentIdUrl: file });
+      updateFields({ governmentIdUrl: file, governmentIdPath: data.url });
     }
   };
 
   return (
-
-    <FormField
-      control={form.control}
-      name="governmentIdUrl"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>Government Issued ID</FormLabel>
-          <FormControl>
-            <div className="space-y-4">
+    <>
+      <FormField
+        control={form.control}
+        name="governmentIdUrl"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Government Issued ID</FormLabel>
+            <FormControl>
               <Input
                 type="file"
                 accept="image/*"
@@ -52,17 +64,28 @@ export default function GovernmentIdForm({ form }: FormStepProps) {
                 onBlur={field.onBlur}
                 ref={field.ref}
               />
-              {fileName && (
-                <p className="text-sm text-muted-foreground">
-                  Uploaded: {URL.createObjectURL(fileName)}
-                </p>
-              )}
-            </div>
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-
+            </FormControl>
+            <FormMessage >{fileName ? "Uploaded" : "Upload a government ID"}</FormMessage>
+          </FormItem>
+        )}
+      />
+      {fileName && <FormField
+        control={form.control}
+        name="governmentIdPath"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Government ID Path</FormLabel>
+            <FormControl>
+              <Input type="hidden" value={field.value} />
+            </FormControl>
+            {fileName && (
+              <p className="text-sm text-muted-foreground">
+                Uploaded: {URL.createObjectURL(fileName)}
+              </p>
+            )}
+          </FormItem>
+        )}
+      />}
+    </>
   );
 }

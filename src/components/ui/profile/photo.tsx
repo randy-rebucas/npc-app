@@ -33,7 +33,7 @@ export default function Photo({ photo }: { photo: Partial<IUserProfile> }) {
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-4">
                 <Avatar className="h-32 w-32">
-                    <AvatarImage src={photo.profilePhotoUrl} alt={`${photo.firstName ?? ''} ${photo.lastName ?? ''}`} />
+                    <AvatarImage src={photo.profilePhotoPath} alt={`${photo.firstName ?? ''} ${photo.lastName ?? ''}`} />
                     <AvatarFallback>{(photo.firstName?.charAt(0) ?? '').toUpperCase() + (photo.lastName?.charAt(0) ?? '').toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <Form {...form}>
