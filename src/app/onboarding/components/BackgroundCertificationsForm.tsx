@@ -78,9 +78,9 @@ export default function BackgroundCertificationsForm({
                 onValueChange={(value) => updateFields({
                   additionalCertifications: value.map(cert => ({
                     certification: cert,
-                    issueDate: null,
-                    expirationDate: null,
-                    certificateUrl: null,
+                    issueDate: new Date(),
+                    expirationDate: new Date(),
+                    certificateUrl: "",
                     certificateNumber: "",
                   }))
                 })}

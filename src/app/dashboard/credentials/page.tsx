@@ -1,9 +1,9 @@
-import { getMedicalLicenseStates } from "@/app/actions/medicallicensestates";
+import { getMedicalLicenseStates, getPracticeTypes } from "@/app/actions/medicallicensestates";
 import { getUserByEmail } from "@/app/actions/user";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import Header from "@/components/header";
 import Certifications from "@/components/ui/credentials/certifications";
-import Education, { Education as EducationType } from "@/components/ui/credentials/education";
+import Education from "@/components/ui/credentials/education";
 import GovID from "@/components/ui/credentials/govId";
 import Licenses from "@/components/ui/credentials/licenses";
 import { SidebarInset } from "@/components/ui/sidebar";
@@ -22,11 +22,11 @@ export default async function CredentialsPage() {
     // Select the profile fields
     const licenses = selectedItem(user.profile, ['medicalLicenseStates', 'deaLicenseStates']);
     const certifications = selectedItem(user.profile, ['additionalCertifications', 'boardCertification', 'npiNumber']);
-    const education = selectedItem(user.profile, ['education']);
-    const govId = selectedItem(user.profile, ['governmentIdUrl']);
+    const educations = selectedItem(user.profile, ['education', 'clinicalDegree', 'practiceTypes']);
+    const govId = selectedItem(user.profile, ['governmentIdPath']);
 
     const medicalLicenseStates = await getMedicalLicenseStates();
-
+    const practiceTypes = await getPracticeTypes();
     return (
         <SidebarInset>
             <Header breadcrumbs={[
@@ -56,7 +56,7 @@ export default async function CredentialsPage() {
                             <Certifications boardCertification={certifications.boardCertification} additionalCertifications={certifications.additionalCertifications} npiNumber={certifications.npiNumber}/>
                         </TabsContent>
                         <TabsContent value="education">
-                            <Education education={education as EducationType} />
+                            <Education education={educations.education} clinicalDegree={educations.clinicalDegree} practiceTypes={educations.practiceTypes} practices={practiceTypes}/>
                         </TabsContent>
                         <TabsContent value="gov-id">
                             <GovID govId={govId} />

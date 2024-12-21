@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const user = await User.findOne({ email: session?.user?.email });
 
     const data = await request.json();
-
+    console.log(data);
     const userProfile = await UserProfile.findOneAndUpdate({ user: user._id }, {
         ...data,
     }, { new: true });

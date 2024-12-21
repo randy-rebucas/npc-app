@@ -29,7 +29,7 @@ export default function Photo({ photo }: { photo: Partial<IUserProfile> }) {
             // Delete old file
             const deleteResponse = await fetch("/api/upload", {
                 method: "DELETE",
-                body: JSON.stringify({ profilePhotoPath: photo.profilePhotoPath }),
+                body: JSON.stringify({ path: photo.profilePhotoPath }),
             });
 
             if (!deleteResponse.ok) {

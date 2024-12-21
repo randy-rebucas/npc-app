@@ -33,6 +33,7 @@ export interface IUserProfile {
   governmentIdPath: string;
 
   npiNumber?: string;
+  clinicalDegree?: string;
   education?: Education;
 
   phone?: string;
@@ -102,6 +103,7 @@ const userProfileSchema = new Schema<IUserProfile>(
     governmentIdPath: { type: String },
 
     npiNumber: { type: String },
+    clinicalDegree: { type: String },
     education: educationSchema,
   },
   { timestamps: true }

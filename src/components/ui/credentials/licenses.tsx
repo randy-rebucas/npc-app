@@ -74,8 +74,6 @@ export default function Licenses({ medicalLicenseStates, deaLicenseStates, state
         }
     })
 
-    console.log(deaLicenseStates)
-
     async function onSubmit(values: z.infer<typeof licenseSchema>) {
         setIsSubmitting(true);
         try {

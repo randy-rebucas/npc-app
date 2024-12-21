@@ -47,7 +47,7 @@ export async function DELETE(request: NextRequest) {
     try {
         const data = await request.json();
         // 1734755780883-photo-1633332755192-727a05c4013d.jpeg
-        const filename = data.profilePhotoPath.split('/')[2];
+        const filename = data.path.split('/')[2];
 
         // public/uploads/1734755780883-photo-1633332755192-727a05c4013d.jpeg
         const uploadDir = path.join(process.cwd(), 'public/uploads');
