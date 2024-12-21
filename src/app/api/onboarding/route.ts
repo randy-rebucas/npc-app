@@ -1,7 +1,5 @@
 import UserProfile from "@/app/models/UserProfile";
 import User from "@/app/models/User";
-import { writeFile } from "fs/promises";
-import path from "path";
 import connect from "@/lib/db";
 import bcrypt from "bcrypt";
 
@@ -14,35 +12,7 @@ export const config = {
 export async function POST(request: Request) {
   try {
     await connect();
-
-    // Convert the request to form data
-    const formData = await request.formData();
-    const fields = new Map();
-
-    // Process all form fields
-    for (const [fieldName, value] of formData.entries()) {
-      if (fieldName === "profilePhotoUrl" || fieldName === "governmentIdUrl") {
-        const file = value as File;
-
-        // Create unique filename
-        const timestamp = Date.now();
-        const filename = `${fieldName}-${timestamp}${path.extname(file.name)}`;
-        const uploadDir = path.join(process.cwd(), "public/uploads");
-        const filepath = path.join(uploadDir, filename);
-
-        // Convert file to Buffer and save
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-
-        // Save file to uploads directory
-        await writeFile(filepath, buffer);
-
-        // Store the relative path in the database
-        fields.set(fieldName, `/uploads/${filename}`);
-      } else {
-        fields.set(fieldName, value);
-      }
-    }
+    const body = await request.json();
 
     // Generate random password (12 characters)
     const generatePassword = () => {
@@ -59,8 +29,8 @@ export async function POST(request: Request) {
     const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
 
     const user = new User({
-      username: fields.get("email").split("@")[0],
-      email: fields.get("email"),
+      username: body.email.split("@")[0],
+      email: body.email,
       password: hashedPassword,
       onboardingStatus: "completed",
     });
@@ -68,26 +38,22 @@ export async function POST(request: Request) {
     const userResponse = await user.save();
 
     const userProfile = new UserProfile({
-      firstName: fields.get("firstName"),
-      lastName: fields.get("lastName"),
-      medicalLicenseStates: fields.get("medicalLicenseStates"),
-      deaLicenseStates: fields.get("deaLicenseStates"),
-      practiceTypes: fields.get("practiceTypes"),
-      monthlyCollaborationRate: fields.get("monthlyCollaborationRate"),
-      additionalStateFee: fields.get("additionalStateFee"),
-      additionalNPFee: fields.get("additionalNPFee"),
-      controlledSubstancesMonthlyFee: fields.get(
-        "controlledSubstancesMonthlyFee"
-      ),
-      controlledSubstancesPerPrescriptionFee: fields.get(
-        "controlledSubstancesPerPrescriptionFee"
-      ),
-      description: fields.get("description"),
-      boardCertification: fields.get("boardCertification"),
-      additionalCertifications: fields.get("additionalCertifications"),
-      linkedinProfile: fields.get("linkedinProfile"),
-      profilePhotoUrl: fields.get("profilePhotoUrl"),
-      governmentIdUrl: fields.get("governmentIdUrl"),
+      firstName: body.firstName,
+      lastName: body.lastName,
+      medicalLicenseStates: body.medicalLicenseStates || [],
+      deaLicenseStates: body.deaLicenseStates || [],
+      practiceTypes: body.practiceTypes || [],
+      monthlyCollaborationRate: body.monthlyCollaborationRate,
+      additionalStateFee: body.additionalStateFee,
+      additionalNPFee: body.additionalNPFee,
+      controlledSubstancesMonthlyFee: body.controlledSubstancesMonthlyFee,
+      controlledSubstancesPerPrescriptionFee: body.controlledSubstancesPerPrescriptionFee,
+      description: body.description,
+      boardCertification: body.boardCertification,
+      additionalCertifications: body.additionalCertifications || [],
+      linkedinProfile: body.linkedinProfile,
+      profilePhotoPath: body.profilePhotoPath,
+      governmentIdPath: body.governmentIdPath,
       user: userResponse._id.toString(),
     });
 

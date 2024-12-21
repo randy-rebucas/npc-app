@@ -19,9 +19,9 @@ export default async function ProfilePage() {
     const user = session?.user?.email ? await getUserByEmail(session.user.email) : null;
     console.log(user);
     // Select the profile fields
-    const profile = selectedItem(user.profile, ['firstName', 'lastName']);
+    const profile = selectedItem(user.profile, ['firstName', 'lastName', 'phone', 'address', 'city', 'state', 'zip']);
     const bio = selectedItem(user.profile, ['description', 'boardCertification', 'linkedinProfile']);
-    const photo = selectedItem(user.profile, ['profilePhotoUrl', 'firstName', 'lastName']);
+    const photo = selectedItem(user.profile, ['profilePhotoPath', 'firstName', 'lastName']);
     const rates = selectedItem(user.profile, ['monthlyCollaborationRate', 'additionalStateFee', 'additionalNPFee', 'controlledSubstancesMonthlyFee', 'controlledSubstancesPerPrescriptionFee']);
 
     return (

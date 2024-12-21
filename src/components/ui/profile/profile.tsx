@@ -9,11 +9,15 @@ import { IUserProfile } from "@/app/models/UserProfile";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { toast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
-  phone: z.string().regex(/^\d{3}-\d{3}-\d{4}$/, "Please enter a valid phone number (e.g. 555-555-4444)"),
+  phone: z.string().regex(
+    /^\+?[1-9]\d{1,14}$/, 
+    "Please enter a valid international phone number (e.g. +12125551234)"
+  ),
   address: z.string().optional(),
   city: z.string().optional(),
   state: z.string().optional(),
@@ -26,15 +30,36 @@ export default function Profile({ profile }: { profile: Partial<IUserProfile> })
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            firstName: profile.firstName,
-            lastName: profile.lastName,
-            // ... existing defaultValues ...
+            firstName: profile.firstName || '',
+            lastName: profile.lastName || '',
+            phone: profile.phone || '',
+            address: profile.address || '',
+            city: profile.city || '',
+            state: profile.state || '',
+            zip: profile.zip || '',
         }
     });
 
-    const onSubmit = (data: z.infer<typeof formSchema>) => {
+    const onSubmit = async (data: z.infer<typeof formSchema>) => {
         console.log(data);
         // Handle form submission
+        try {
+            const response = await fetch('/api/profile', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update profile');
+            }
+
+            toast({
+                title: "Success!",
+                description: "Your profile has been updated.",
+            });
+        } catch (error) {
+            console.error('Error:', error);
+        }
     };
 
     return (
@@ -85,9 +110,9 @@ export default function Profile({ profile }: { profile: Partial<IUserProfile> })
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Phone</FormLabel>
-                                    <p className="text-sm text-muted-foreground">We&apos;ll only call you in an emergency</p>
+                                    <p className="text-sm text-muted-foreground">Please include country code (e.g. +1 for US/Canada)</p>
                                     <FormControl>
-                                        <Input placeholder="e.g. 555-555-4444" {...field} />
+                                        <Input placeholder="e.g. +12125551234" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

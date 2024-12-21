@@ -1,10 +1,11 @@
+import { getMedicalLicenseStates } from "@/app/actions/medicallicensestates";
 import { getUserByEmail } from "@/app/actions/user";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import Header from "@/components/header";
 import Certifications from "@/components/ui/credentials/certifications";
 import Education, { Education as EducationType } from "@/components/ui/credentials/education";
 import GovID from "@/components/ui/credentials/govId";
-import Licenses, { License } from "@/components/ui/credentials/licenses";
+import Licenses from "@/components/ui/credentials/licenses";
 import { SidebarInset } from "@/components/ui/sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { selectedItem } from "@/lib/utils";
@@ -19,10 +20,12 @@ export default async function CredentialsPage() {
     const user = session?.user?.email ? await getUserByEmail(session.user.email) : null;
 
     // Select the profile fields
-    const licenses = selectedItem(user.profile, ['medicalLicenseStates', 'deaLicenseStates']) as License[];
+    const licenses = selectedItem(user.profile, ['medicalLicenseStates', 'deaLicenseStates']);
     const certifications = selectedItem(user.profile, ['additionalCertifications', 'boardCertification', 'npiNumber']);
     const education = selectedItem(user.profile, ['education']);
     const govId = selectedItem(user.profile, ['governmentIdUrl']);
+
+    const medicalLicenseStates = await getMedicalLicenseStates();
 
     return (
         <SidebarInset>
@@ -47,7 +50,7 @@ export default async function CredentialsPage() {
                             <TabsTrigger value="gov-id">Gov ID</TabsTrigger>
                         </TabsList>
                         <TabsContent value="license">
-                            <Licenses licenses={licenses} />
+                            <Licenses medicalLicenseStates={licenses.medicalLicenseStates} deaLicenseStates={licenses.deaLicenseStates} states={medicalLicenseStates} />
                         </TabsContent>
                         <TabsContent value="certifications">
                             <Certifications certifications={certifications} />

@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IUserProfile } from "@/app/models/UserProfile";
 import * as z from "zod";
+import { toast } from "@/hooks/use-toast";
 
 const bioFormSchema = z.object({
   background: z.string().min(1, "Background is required"),
@@ -28,9 +29,26 @@ export default function Bio({ bio }: { bio: Partial<IUserProfile> }) {
         },
     });
 
-    function onSubmit(data: BioFormValues) {
+    async function onSubmit(data: BioFormValues) {
         console.log(data);
         // Handle form submission
+        try {
+            const response = await fetch('/api/profile', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update profile');
+            }
+
+            toast({
+                title: "Success!",
+                description: "Your profile has been updated.",
+            });
+        } catch (error) {
+            console.error('Error:', error);
+        }
     }
 
     return (

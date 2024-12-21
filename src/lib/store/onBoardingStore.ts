@@ -27,9 +27,10 @@ export const INITIAL_ON_BOARDING_DATA: OnboardingFormData = {
   boardCertification: "",
   additionalCertifications: [],
   linkedinProfile: "",
+  profilePhotoPath: "",
   profilePhotoUrl: null,
+  governmentIdPath: "",
   governmentIdUrl: null,
-  npiNumber: "",
 };
 
 export const useOnBoardingStore = create<State & Actions>()(

@@ -61,8 +61,16 @@ export default function OnboardingPage() {
             description: 'Please provide your license details',
             component: LicenseInformationForm,
             formSchema: z.object({
-                medicalLicenseStates: z.array(z.string()).min(1, "At least one medical license state is required"),
-                deaLicenseStates: z.array(z.string()).min(1, "At least one DEA license state is required"),
+                medicalLicenseStates: z.array(z.object({
+                    state: z.string().min(1, "State is required"),
+                    licenseNumber: z.string().nullable(),
+                    expirationDate: z.date().nullable(),
+                })).min(1, "At least one medical license state is required"),
+                deaLicenseStates: z.array(z.object({
+                    state: z.string().min(1, "State is required"),
+                    licenseNumber: z.string().nullable(),
+                    expirationDate: z.date().nullable(),
+                })).min(1, "At least one DEA license state is required"),
             }),
             defaultValues: {
                 medicalLicenseStates: onBoarding.medicalLicenseStates ?? [],
@@ -108,8 +116,14 @@ export default function OnboardingPage() {
             component: BackgroundCertificationsForm,
             formSchema: z.object({
                 description: z.string().min(10, "Description must be at least 10 characters"),
-                boardCertification: z.string().min(10, "Board certification must be at least 10 characters"),
-                additionalCertifications: z.array(z.string()).min(1, "At least one additional certification is required"),
+                boardCertification: z.string().min(1, "Board certification is required"),
+                additionalCertifications: z.array(z.object({
+                    certification: z.string().min(1, "Certification is required"),
+                    issueDate: z.date().nullable(),
+                    expirationDate: z.date().nullable(),
+                    certificateUrl: z.any().nullable(),
+                    certificateNumber: z.string().nullable(),
+                })).min(1, "At least one additional certification is required"),
                 linkedinProfile: z.string().url("Invalid LinkedIn profile URL"),
             }),
             defaultValues: {
@@ -125,12 +139,14 @@ export default function OnboardingPage() {
             description: 'Upload your professional photo',
             component: ProfilePhotoForm,
             formSchema: z.object({
+                photo: z.any(),
                 profilePhotoUrl: z.any()
                     .refine((file: File) => file != null, "Profile Photo is required")
                     .refine((file) => file.size < MAX_FILE_SIZE, "Max size is 5MB.")
                     .refine((file) => checkFileType(file), "Only .jpg, .jpeg, .png formats are supported."),
             }),
             defaultValues: {
+                profilePhotoPath: onBoarding.profilePhotoPath ?? '',
                 profilePhotoUrl: onBoarding.profilePhotoUrl ?? null,
             },
         },
@@ -140,12 +156,14 @@ export default function OnboardingPage() {
             description: 'Provide your government identification',
             component: GovernmentIdForm,
             formSchema: z.object({
+                governmentIdPath: z.string().min(1, "Government ID path is required"),
                 governmentIdUrl: z.any()
                     .refine((file: File) => file != null, "Government ID is required")
                     .refine((file) => file.size < MAX_FILE_SIZE, "Max size is 5MB.")
                     .refine((file) => checkFileType(file), "Only .jpg, .jpeg, .png formats are supported."),
             }),
             defaultValues: {
+                governmentIdPath: onBoarding.governmentIdPath ?? '',
                 governmentIdUrl: onBoarding.governmentIdUrl ?? null,
             },
         },
@@ -192,64 +210,41 @@ export default function OnboardingPage() {
 
         // If not the last step, move to the next step
         if (!isLastStep) {
-            setCurrentStep(prev => {
-                if (prev >= ONBOARDING_STEPS.length - 1) return prev;
-                return prev + 1;
-            });
-            form.reset(ONBOARDING_STEPS[currentStep + 1].defaultValues);
+            setCurrentStep(prev => prev + 1);
             return;
         }
 
         try {
-            // Set the submitting state to true
             setIsSubmitting(true);
-
-            // Create a FormData object to send the data to the server
-            const formData = new FormData();
-
-            // Get the final data from the store
             const finalData = useOnBoardingStore.getState().onBoarding;
 
-            // Loop through the final data and append it to the formData object
-            Object.entries(finalData).forEach(([key, value]) => {
-                if (value instanceof File) {
-                    formData.append(key, value);
-                } else if (value !== null && value !== undefined) {
-                    formData.append(key, String(value));
-                }
-            });
-
-            // Log the formData object
-            console.log(formData);
-
-            // Send the formData to the server
-            const response = await fetch('/api/onboarding', {
+            // First submit the JSON data
+            const jsonResponse = await fetch('/api/onboarding', {
                 method: 'POST',
-                body: formData,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(finalData),
             });
 
-            // Check if the response is ok
-            if (!response.ok) throw new Error('Submission failed');
+            if (!jsonResponse.ok) {
+                throw new Error('Failed to submit JSON data');
+            }
 
-            // Show a success toast
             toast({
                 title: "Success!",
                 description: "Your onboarding information has been submitted.",
             });
 
-            // Redirect to the home page
             router.push('/');
         } catch (error) {
             console.error('Error:', error);
-
-            // Show an error toast
             toast({
                 title: "Error",
-                description: "Failed to submit form. Please try again.",
+                description: error instanceof Error ? error.message : "Failed to submit form. Please try again.",
                 variant: "destructive",
             });
         } finally {
-            // Set the submitting state to false
             setIsSubmitting(false);
         }
     };

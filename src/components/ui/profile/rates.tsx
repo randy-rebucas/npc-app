@@ -23,6 +23,7 @@ const ratesSchema = z.object({
     stateRate: z.number().min(0, "State rate must be positive"),
     npRate: z.number().min(0, "NP rate must be positive"),
     controlledSubstancesRate: z.number().nullable(),
+    controlledSubstancesPerPrescriptionFee: z.number().nullable(),
 });
 
 type RatesFormValues = z.infer<typeof ratesSchema>;
@@ -35,6 +36,7 @@ export default function Rates({ rates }: { rates: Partial<IUserProfile> }) {
             stateRate: rates.additionalStateFee ?? 0,
             npRate: rates.additionalNPFee ?? 0,
             controlledSubstancesRate: rates.controlledSubstancesMonthlyFee ?? 0,
+            controlledSubstancesPerPrescriptionFee: rates.controlledSubstancesPerPrescriptionFee ?? 0,
         },
     });
 
@@ -142,6 +144,41 @@ export default function Rates({ rates }: { rates: Partial<IUserProfile> }) {
                                                     </TooltipTrigger>
                                                     <TooltipContent>
                                                         <p>Information about NP fee</p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
+                                        </div>
+                                        <FormControl>
+                                            <div className="relative">
+                                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">$</span>
+                                                <Input
+                                                    type="number"
+                                                    className="pl-7"
+                                                    {...field}
+                                                    value={field.value ?? ''}
+                                                    onChange={e => field.onChange(e.target.value ? Number(e.target.value) : null)}
+                                                />
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="controlledSubstancesPerPrescriptionFee"
+                                render={({ field }) => (
+                                    <FormItem className="space-y-2">
+                                        <div className="flex items-center gap-2">
+                                            <Label>*Optional* Controlled substances prescribing fee per prescription?</Label>
+                                            <TooltipProvider>
+                                                <Tooltip>
+                                                    <TooltipTrigger>
+                                                        <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p>Information about controlled substances prescribing fee per prescription</p>
                                                     </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
