@@ -9,14 +9,16 @@ function OnboardingCheck({ children }: { children: React.ReactNode }) {
     const router = useRouter();
 
     useEffect(() => {
-        const fetchUser = async () => {
-            const response = await fetch(`/api/user/${session?.user?.id}`);
+        const fetchUser = async (userId: string) => {
+            const response = await fetch(`/api/user/${userId}`);
             const user = await response.json();
             if (user?.onboardingStatus === "incomplete") {
                 router.push("/onboarding");
             }
         };
-        fetchUser();
+        if (session?.user?.id) {
+            fetchUser(session?.user?.id);
+        }
     }, [session, router]);
 
     return <>{children}</>;

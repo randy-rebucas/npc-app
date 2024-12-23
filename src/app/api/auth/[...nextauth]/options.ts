@@ -60,14 +60,14 @@ export const authOptions: NextAuthOptions = {
           name: profile.name ?? profile.username,
           email: profile.email,
           image: profile.picture,
-          role: profile.role,
+          role: "CUSTOMER",
         };
       },
     },
   ],
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
-    signIn: "/auth/signin",
+    signIn: "/signin",
     newUser: "/onboarding",
   },
   callbacks: {
