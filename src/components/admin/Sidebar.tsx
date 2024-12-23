@@ -25,8 +25,8 @@ export async function AdminSidebar() {
             icon: LayoutDashboard,
         },
         {
-            title: "Members",
-            url: "/admin/dashboard/members",
+            title: "Users",
+            url: "/admin/dashboard/users",
             icon: Users,
         },
         {
