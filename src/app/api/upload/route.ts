@@ -55,10 +55,7 @@ export async function DELETE(request: NextRequest) {
       .then(() => true)
       .catch(() => false);
 
-    if (!fileExists) {
-      return NextResponse.json({ error: "File not found" }, { status: 404 });
-    } else {
-      // unlink public/uploads/1734755780883-photo-1633332755192-727a05c4013d.jpeg
+    if (fileExists) {
       await unlink(filepath);
       console.log("File found and deleted");
     }
