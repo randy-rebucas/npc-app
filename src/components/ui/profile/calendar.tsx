@@ -1,31 +1,8 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { InfoIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import Script from "next/script";
-
-interface GoogleUser {
-    // Add properties as needed
-    id: string;
-}
-
-interface CalendarListParams {
-    calendarId: string;
-    timeMin: string;
-    showDeleted: boolean;
-    singleEvents: boolean;
-    maxResults: number;
-    orderBy: string;
-}
-
-interface CalendarResponse {
-    result: {
-        items: Array<CalendarEvent>;
-    };
-}
+import { useSession } from "next-auth/react";
 
 interface CalendarEvent {
     id: string;
@@ -35,180 +12,243 @@ interface CalendarEvent {
     };
 }
 
-interface GoogleApiInitParams {
-    apiKey: string;
-    clientId: string;
-    discoveryDocs: string[];
-    scope: string;
+interface GoogleTokenResponse {
+    access_token: string;
+    error?: string;
 }
 
 declare global {
     interface Window {
-        gapi: {
-            load(
-                apiName: string,
-                callback: () => void
-            ): void;
-            auth2: {
-                getAuthInstance(): {
-                    signIn(): Promise<GoogleUser>;
-                    isSignedIn: {
-                        get(): boolean;
-                    };
-                };
-            };
-            client: {
-                calendar: {
-                    events: {
-                        list(params: CalendarListParams): Promise<CalendarResponse>;
-                    };
-                };
-                init(params: GoogleApiInitParams): Promise<void>;
-            };
-        };
+        google: {
+            accounts: {
+                oauth2: {
+                    initTokenClient(config: {
+                        client_id: string,
+                        scope: string,
+                        callback: (response: { access_token: string }) => void
+                    }): {
+                        requestAccessToken(): void
+                    }
+                }
+            }
+        }
     }
 }
 
 export default function Calendar() {
+    const { data: session } = useSession();
     const [isConnected, setIsConnected] = useState(false);
     const [events, setEvents] = useState<CalendarEvent[]>([]);
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(true);
+    const [tokenError, setTokenError] = useState<string>("");
+    const [isScriptLoaded, setIsScriptLoaded] = useState(false);
 
-    // Add your Google Client ID from Google Cloud Console
     const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-    const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
-    const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
     const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
 
     useEffect(() => {
-        if (!CLIENT_ID || !API_KEY) {
+        if (!CLIENT_ID) {
             setError("Missing Google Calendar credentials");
             setIsLoading(false);
             return;
         }
+        setIsLoading(false);
+    }, [CLIENT_ID]);
 
-        const initializeGoogleAPI = () => {
-            window.gapi.load('client:auth2', async () => {
-                try {
-                    await window.gapi.client.init({
-                        apiKey: API_KEY,
-                        clientId: CLIENT_ID,
-                        discoveryDocs: [DISCOVERY_DOC],
-                        scope: SCOPES,
-                    });
-                    
-                    // Check if already signed in
-                    if (window.gapi.auth2.getAuthInstance().isSignedIn.get()) {
-                        setIsConnected(true);
-                        await fetchCalendarEvents();
-                    }
-                } catch (err) {
-                    setError("Failed to initialize Google Calendar API");
-                    console.error(err);
-                } finally {
-                    setIsLoading(false);
+    useEffect(() => {
+        const fetchAccessToken = async () => {
+            try {
+                setIsLoading(true);
+                const response = await fetch(`/api/calendar/${session?.user?.id}`);
+                const accessTokenData = await response.json();
+
+                if (accessTokenData.access_token) {
+                    setIsConnected(true);
+                    await fetchCalendarEvents(accessTokenData.access_token);
                 }
-            });
-        };
-
-        const script = document.querySelector('script[src="https://apis.google.com/js/api.js"]');
-        if (script) {
-            initializeGoogleAPI();
-        }
-    }, [API_KEY, CLIENT_ID, DISCOVERY_DOC, SCOPES]);
-
-    const handleGoogleSignIn = async () => {
-        try {
-            const response = await window.gapi.auth2.getAuthInstance().signIn();
-            if (response) {
-                setIsConnected(true);
-                await fetchCalendarEvents();
+            } catch (error) {
+                console.error('Error fetching access token:', error);
+                setError('Failed to fetch access token');
+            } finally {
+                setIsLoading(false);
             }
+        };
+        fetchAccessToken();
+    }, [session?.user?.id, isScriptLoaded]);
+
+    const fetchCalendarEvents = async (token: string) => {
+        try {
+            setIsLoading(true);
+            setError("");
+
+            if (!token) {
+                throw new Error("No access token available");
+            }
+
+            console.log("Fetching calendar events with token:", token.substring(0, 10) + "...");
+
+            const response = await fetch(
+                `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${new Date().toISOString()}&maxResults=10&orderBy=startTime&singleEvents=true`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json',
+                    }
+                }
+            );
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                console.error('Calendar API Error:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    error: errorData
+                });
+                throw new Error(`Calendar API error: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log("Calendar events received:", data);
+
+            if (!data.items) {
+                console.warn("No items property in response:", data);
+            }
+
+            setEvents(data.items || []);
         } catch (err) {
-            setError("Failed to connect to Google Calendar");
-            console.error(err);
+            console.error("Calendar fetch error:", err);
+            setError(err instanceof Error ? err.message : "Failed to fetch calendar events");
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const fetchCalendarEvents = async () => {
+    const handleGoogleSignIn = () => {
         try {
-            const response = await window.gapi.client.calendar.events.list({
-                'calendarId': 'primary',
-                'timeMin': (new Date()).toISOString(),
-                'showDeleted': false,
-                'singleEvents': true,
-                'maxResults': 10,
-                'orderBy': 'startTime'
+            setError("");
+            setTokenError("");
+            setIsLoading(true);
+
+            const client = window.google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID!,
+                scope: SCOPES,
+                callback: async (response: GoogleTokenResponse) => {
+                    if (response.error) {
+                        setTokenError(`Authentication failed: ${response.error}`);
+                        setIsLoading(false);
+                        return;
+                    }
+
+                    if (response.access_token) {
+                        console.log("Access token received:", response.access_token);
+                        const tokenInfo = await fetch("/api/calendar", {
+                            method: "POST",
+                            body: JSON.stringify({ access_token: response.access_token, user_id: session?.user?.id }),
+                        });
+                        const tokenInfoData = await tokenInfo.json();
+                        console.log("Token info:", tokenInfoData);
+                        setIsConnected(true);
+                        await fetchCalendarEvents(response.access_token);
+                    } else {
+                        setTokenError("No access token received");
+                        setIsLoading(false);
+                    }
+                },
             });
-            setEvents(response.result.items as CalendarEvent[]);
+            client.requestAccessToken();
         } catch (err) {
-            setError("Failed to fetch calendar events");
+            setError("Failed to initialize Google Sign-In");
+            setIsLoading(false);
             console.error(err);
         }
     };
 
     const handleScriptLoad = () => {
-        if (typeof window.gapi !== 'undefined') {
-            window.gapi.load('client:auth2', () => {});
+        setIsScriptLoaded(true);
+    };
+
+    const handleDisconnect = async () => {
+        try {
+            setIsLoading(true);
+            await fetch(`/api/calendar/${session?.user?.id}`, {
+                method: 'DELETE'
+            });
+            setIsConnected(false);
+            setEvents([]);
+        } catch (error) {
+            console.error('Error disconnecting calendar:', error);
+            setError('Failed to disconnect calendar');
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
-        <div className="max-w-2xl mx-auto space-y-6">
-            <Script 
-                src="https://apis.google.com/js/api.js" 
-                onLoad={handleScriptLoad}
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+            <Script
+                src="https://accounts.google.com/gsi/client"
                 strategy="lazyOnload"
+                onLoad={handleScriptLoad}
             />
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-xl font-semibold">Calendar</CardTitle>
-                    <p className="text-sm text-muted-foreground">
+            <div className="rounded-lg">
+                <div className="mb-6">
+                    <h2 className="text-xl font-semibold text-gray-900">Calendar</h2>
+                    <p className="text-sm text-gray-600 mt-1">
                         Connect your Google Calendar to sync your schedule.
                     </p>
-                </CardHeader>
-                <CardContent>
-                    <div className="space-y-4">
-                        <div>
-                            <h2 className="text-lg font-semibold mb-2">Calendar Sync</h2>
-                            {error && (
-                                <Alert variant="destructive">
-                                    <AlertDescription>{error}</AlertDescription>
-                                </Alert>
-                            )}
-                            {isLoading ? (
-                                <p>Loading...</p>
-                            ) : !isConnected ? (
-                                <Button onClick={handleGoogleSignIn}>
-                                    Connect Google Calendar
-                                </Button>
-                            ) : (
-                                <div className="space-y-4">
-                                    <Alert variant="default" className="bg-green-50">
-                                        <InfoIcon className="h-4 w-4" />
-                                        <AlertDescription>Calendar connected successfully!</AlertDescription>
-                                    </Alert>
-                                    {events.length > 0 ? (
-                                        <div className="space-y-2">
-                                            {events.map((event: CalendarEvent) => (
-                                                <div key={event.id} className="p-2 border rounded">
-                                                    <h3 className="font-medium">{event.summary}</h3>
-                                                    <p className="text-sm text-gray-500">
-                                                        {new Date(event.start.dateTime).toLocaleString()}
-                                                    </p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <p>No upcoming events</p>
-                                    )}
+                </div>
+
+
+                <div className="space-y-4">
+                    <div>
+                        <h2 className="text-lg font-semibold mb-2">Calendar Sync</h2>
+                        {(error || tokenError) && (
+                            <div className="p-4 border-l-4 border-red-500 bg-red-50 text-red-700 rounded">
+                                <p>{error || tokenError}</p>
+                            </div>
+                        )}
+                        {isLoading ? (
+                            <p>Loading...</p>
+                        ) : !isConnected ? (
+                            <button
+                                onClick={handleGoogleSignIn}
+                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                            >
+                                Connect Google Calendar
+                            </button>
+                        ) : (
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center">
+                                    <h3 className="font-medium">Connected</h3>
+                                    <button
+                                        onClick={handleDisconnect}
+                                        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                                    >
+                                        Disconnect
+                                    </button>
                                 </div>
-                            )}
-                        </div>
+                                {events?.length > 0 ? (
+                                    <div className="space-y-2">
+                                        {events.map((event: CalendarEvent) => (
+                                            <div key={event.id} className="p-2 border rounded">
+                                                <h3 className="font-medium">{event.summary}</h3>
+                                                <p className="text-sm text-gray-500">
+                                                    {new Date(event.start.dateTime).toLocaleString()}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p>No upcoming events</p>
+                                )}
+                            </div>
+                        )}
                     </div>
-                </CardContent>
-            </Card>
+                </div>
+
+            </div>
         </div>
     );
 }

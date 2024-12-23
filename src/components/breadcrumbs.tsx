@@ -1,5 +1,5 @@
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import React from 'react';
+import Link from 'next/link';
+import { ChevronRight } from 'lucide-react';
 
 interface Breadcrumb {
     label: string;
@@ -7,31 +7,32 @@ interface Breadcrumb {
     active?: boolean;
 }
 
-export default function Breadcrumbs({
-    breadcrumbs,
-}: {
-    breadcrumbs: Breadcrumb[];
-}) {
+export default function Breadcrumbs({ breadcrumbs }: { breadcrumbs: Breadcrumb[] }) {
     return (
-        <Breadcrumb>
-            <BreadcrumbList>
-                {breadcrumbs.map((breadcrumb, index) => (
-                    <React.Fragment key={breadcrumb.label}>
-                        <BreadcrumbItem className="hidden md:block">
-                            {breadcrumb.active ? (
-                                <BreadcrumbPage>{breadcrumb.label}</BreadcrumbPage>
-                            ) : (
-                                <BreadcrumbLink href={breadcrumb.href}>
-                                    {breadcrumb.label}
-                                </BreadcrumbLink>
+
+        <ol className="flex items-center">
+            {breadcrumbs.map((breadcrumb, index) => (
+                <li key={breadcrumb.label} className="flex items-center last:mr-0">
+                    {breadcrumb.active ? (
+                        <span className="font-medium text-slate-800 text-sm">
+                            {breadcrumb.label}
+                        </span>
+                    ) : (
+                        <>
+                            <Link
+                                href={breadcrumb.href}
+                                className="text-sm text-slate-600 hover:text-slate-900 transition-all duration-200 hover:scale-105"
+                            >
+                                {breadcrumb.label}
+                            </Link>
+                            {index < breadcrumbs.length - 1 && (
+                                <ChevronRight className="h-3.5 w-3.5 mx-2 text-slate-400 flex-shrink-0" />
                             )}
-                        </BreadcrumbItem>
-                        {index < breadcrumbs.length - 1 && (
-                            <BreadcrumbSeparator className="hidden md:block" />
-                        )}
-                    </React.Fragment>
-                ))}
-            </BreadcrumbList>
-        </Breadcrumb>
+                        </>
+                    )}
+                </li>
+            ))}
+        </ol>
+
     );
 }

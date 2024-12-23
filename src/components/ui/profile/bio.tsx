@@ -1,16 +1,11 @@
 'use client';
 
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IUserProfile } from "@/app/models/UserProfile";
 import * as z from "zod";
-import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const bioFormSchema = z.object({
     description: z.string().min(1, "Background is required"),
@@ -21,9 +16,9 @@ const bioFormSchema = z.object({
 type BioFormValues = z.infer<typeof bioFormSchema>;
 
 export default function Bio({ bio }: { bio: Partial<IUserProfile> }) {
-    const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    
+    const { toast } = useToast();
+
     const form = useForm<BioFormValues>({
         resolver: zodResolver(bioFormSchema),
         defaultValues: {
@@ -48,6 +43,7 @@ export default function Bio({ bio }: { bio: Partial<IUserProfile> }) {
             toast({
                 title: "Success!",
                 description: "Your profile has been updated.",
+                variant: "default",
             });
         } catch (error) {
             console.error('Error:', error);
@@ -62,74 +58,69 @@ export default function Bio({ bio }: { bio: Partial<IUserProfile> }) {
     }
 
     return (
-        <Card className="max-w-2xl">
-            <CardHeader>
-                <CardTitle className="text-xl font-semibold">Bio</CardTitle>
-                <p className="text-sm text-muted-foreground">
+        <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">Bio</h2>
+                <p className="text-sm text-gray-600 mt-1">
                     This will be shown to prospective Nurse Practitioners seeking a Collaborating Physician after our matching process.
                 </p>
-            </CardHeader>
-            <CardContent>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        <FormField
-                            control={form.control}
-                            name="description"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Your Background:</FormLabel>
-                                    <FormControl>
-                                        <Textarea 
-                                            {...field}
-                                            placeholder="Tell us about your medical background and experience..."
-                                            className="min-h-[100px] resize-none"
-                                        />
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
+            </div>
 
-                        <FormField
-                            control={form.control}
-                            name="boardCertification"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Board Certifications:</FormLabel>
-                                    <FormControl>
-                                        <Input 
-                                            {...field}
-                                            placeholder="e.g., American Board of Internal Medicine (ABIM)"
-                                        />
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                        Your Background:
+                    </label>
+                    <textarea
+                        {...form.register("description")}
+                        className="w-full min-h-[100px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                        placeholder="Tell us about your medical background and experience..."
+                    />
+                    {form.formState.errors.description && (
+                        <p className="text-sm text-red-500">{form.formState.errors.description.message}</p>
+                    )}
+                </div>
 
-                        <FormField
-                            control={form.control}
-                            name="linkedinProfile"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>LinkedIn Profile:</FormLabel>
-                                    <FormControl>
-                                        <Input 
-                                            {...field}
-                                            type="url"
-                                            placeholder="https://linkedin.com/in/your-profile"
-                                        />
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
+                <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                        Board Certifications:
+                    </label>
+                    <input
+                        {...form.register("boardCertification")}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="e.g., American Board of Internal Medicine (ABIM)"
+                    />
+                    {form.formState.errors.boardCertification && (
+                        <p className="text-sm text-red-500">{form.formState.errors.boardCertification.message}</p>
+                    )}
+                </div>
 
-                        <div className="flex justify-end">
-                            <Button type="submit" disabled={isSubmitting}>
-                                {isSubmitting ? "Saving..." : "Save Changes"}
-                            </Button>
-                        </div>
-                    </form>
-                </Form>
-            </CardContent>
-        </Card>
+                <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                        LinkedIn Profile:
+                    </label>
+                    <input
+                        type="url"
+                        {...form.register("linkedinProfile")}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="https://linkedin.com/in/your-profile"
+                    />
+                    {form.formState.errors.linkedinProfile && (
+                        <p className="text-sm text-red-500">{form.formState.errors.linkedinProfile.message}</p>
+                    )}
+                </div>
+
+                <div className="flex justify-end">
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isSubmitting ? "Saving..." : "Save Changes"}
+                    </button>
+                </div>
+            </form>
+
+        </div>
     );
 }

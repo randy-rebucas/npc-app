@@ -1,4 +1,4 @@
-import { GalleryVerticalEnd, Home, Settings, Users } from "lucide-react"
+import { GalleryVerticalEnd, LayoutDashboard, Settings, Users } from "lucide-react"
 
 import {
     Sidebar,
@@ -20,18 +20,18 @@ export async function AdminSidebar() {
     // Menu items.
     const items = [
         {
-            title: "Home",
-            url: "/admin",
-            icon: Home,
+            title: "Dashboard",
+            url: "/admin/dashboard",
+            icon: LayoutDashboard,
         },
         {
             title: "Members",
-            url: "/admin/members",
+            url: "/admin/dashboard/members",
             icon: Users,
         },
         {
             title: "Settings",
-            url: "/admin/settings",
+            url: "/admin/dashboard/settings",
             icon: Settings,
         },
     ]
