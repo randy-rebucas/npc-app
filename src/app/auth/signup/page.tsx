@@ -19,6 +19,7 @@ import {
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { toast } from "@/hooks/use-toast"
+import connect from "@/lib/db";
 
 const formSchema = z.object({
     username: z.string().min(2, {
@@ -56,13 +57,26 @@ export default function SignUp() {
         setIsLoading(true)
         try {
             // Add your sign-up logic here
-            await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API call
-            console.log(values)
-            toast({
-                title: "Account created successfully!",
-                description: "You can now sign in with your credentials.",
-            })
-            router.push('/auth/signin')
+            await connect(); 
+            const response = await fetch('/api/auth/signup', {
+                method: 'POST',
+                body: JSON.stringify(values),
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                toast({
+                    title: "Account created successfully!",
+                    description: "You can now sign in with your credentials.",
+                })
+                router.push('/auth/signin')
+            } else {
+                toast({
+                    title: "Error",
+                    description: data.message,
+                    variant: "destructive",
+                })
+            }
         } catch (error) {
             console.error(error)
             toast({

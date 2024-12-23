@@ -1,4 +1,4 @@
-import Header from "@/components/header";
+import AdminHeader from "@/components/admin/Header";
 import NodeApi from "@/components/ui/member/source/node-api";
 
 import { SidebarInset } from "@/components/ui/sidebar";
@@ -15,15 +15,15 @@ export default async function Page(props: {
 
     return (
         <SidebarInset>
-            <Header breadcrumbs={[
-                { label: 'Dashboard', href: '/dashboard' },
+            <AdminHeader breadcrumbs={[
+                { label: 'Admin', href: '/admin' },
                 {
                     label: 'Members',
-                    href: '/dashboard/members',
+                    href: '/admin/members',
                 },
                 {
                     label: 'Node API',
-                    href: '/dashboard/members/node-api',
+                    href: '/admin/members/node-api',
                     active: true,
                 },
             ]} />

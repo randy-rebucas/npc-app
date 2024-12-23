@@ -1,29 +1,13 @@
-import Header from "@/components/header";
 import Listings from "@/components/ui/sharetribe/listings";
 import { SidebarInset } from "@/components/ui/sidebar";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import { redirect } from "next/navigation";
-import { getOnboardingStatus } from "@/app/actions/user";
+import AdminHeader from "@/components/admin/Header";
 
 
-export default async function Dashboard() {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-        return redirect("/auth/signin");
-    }
-
-    const onboardingStatus = await getOnboardingStatus(session.user.id); 
-
-    if (!onboardingStatus || onboardingStatus === "incomplete") {
-        return redirect("/onboarding");
-    }
-    
+export default function AdminPage() {
     return (
         <SidebarInset>
-            <Header breadcrumbs={[
-                { label: 'Dashboard', href: '/dashboard' }
+            <AdminHeader breadcrumbs={[
+                { label: 'Admin', href: '/admin' }
             ]} />
             <div className="flex flex-1 flex-col gap-4 p-4">
                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">

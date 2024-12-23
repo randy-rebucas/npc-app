@@ -42,3 +42,15 @@ export async function getUserByEmail(email: string) {
     throw new Error("Failed to fetch user");
   }
 }
+
+export async function getUserById(id: string) {
+  await connect();
+  const user = await User.findById(id);
+  return user;
+}
+
+export async function getOnboardingStatus(id: string) {
+  await connect();
+  const user = await User.findById(id);
+  return user?.onboardingStatus;
+}

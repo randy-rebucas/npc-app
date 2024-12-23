@@ -3,18 +3,20 @@ import connect from "@/lib/db";
 import User from "@/app/models/User";
 import UserProfile from "@/app/models/UserProfile";
 import { signIn } from "next-auth/react";
+import bcrypt from "bcrypt";
 
 export async function POST(req: Request) {
   const { username, email, password, confirmPassword } = await req.json();
   console.log(username, email, password, confirmPassword);
   await connect();
   try {
-    // TODO: Add your sign-up logic here
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+    const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({
       username,
       email,
-      password,
+      password: hashedPassword,
+      role: "CUSTOMER",
+      provider: "credentials",
     });
 
     await UserProfile.create({
@@ -23,7 +25,7 @@ export async function POST(req: Request) {
 
     await signIn("credentials", {
       email,
-      password,
+      password: hashedPassword,
       callbackUrl: "/onboarding",
     });
 

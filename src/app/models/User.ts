@@ -6,6 +6,8 @@ export interface IUser {
   username: string;
   password: string;
   onboardingStatus: string;
+  provider: string;
+  role: string;
 }
 
 const userSchema = new Schema<IUser>(
@@ -14,6 +16,8 @@ const userSchema = new Schema<IUser>(
     username: { type: String, required: true },
     password: { type: String, required: true },
     onboardingStatus: { type: String, default: "incomplete" },
+    provider: { type: String, required: true },
+    role: { type: String, required: true },
   },
   { timestamps: true }
 );

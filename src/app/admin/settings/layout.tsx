@@ -1,4 +1,4 @@
-import Header from "@/components/header";
+import AdminHeader from "@/components/admin/Header";
 import { SidebarInset } from "@/components/ui/sidebar";
 
 
@@ -13,11 +13,11 @@ export default function SettingsLayout({
 }) {
     return (
         <SidebarInset>
-            <Header breadcrumbs={[
-                { label: 'Dashboard', href: '/dashboard' },
+            <AdminHeader breadcrumbs={[
+                { label: 'Admin', href: '/admin' },
                 {
                     label: 'Settings',
-                    href: '/dashboard/settings',
+                    href: '/admin/settings',
                     active: true,
                 },
             ]} />
