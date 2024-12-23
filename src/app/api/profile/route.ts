@@ -4,6 +4,7 @@ import UserProfile from "@/app/models/UserProfile";
 import { authOptions } from "../auth/[...nextauth]/options";
 import { getServerSession } from "next-auth";
 import User from "@/app/models/User";
+import { createEvent } from "@/app/actions/events";
 
 export async function POST(request: Request) {
   try {
@@ -15,11 +16,16 @@ export async function POST(request: Request) {
     const user = await User.findOne({ email: session?.user?.email });
 
     const data = await request.json();
-    console.log(data);
+
     const userProfile = await UserProfile.findOneAndUpdate({ user: user._id }, {
         ...data,
     }, { new: true });
 
+    await createEvent({
+        user: user._id,
+        email: user.email!,
+        type: 'member-updated'
+    });
     return NextResponse.json({ userProfile });
   } catch (error) {
     console.error(error);

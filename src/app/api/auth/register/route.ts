@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import connect from "@/lib/db";
 import User from "@/app/models/User";
 import UserProfile from "@/app/models/UserProfile";
-import { signIn } from "next-auth/react";
 import bcrypt from "bcrypt";
+import { createEvent } from "@/app/actions/events";
 
 export async function POST(req: Request) {
   const { username, email, password, confirmPassword } = await req.json();
@@ -23,10 +23,10 @@ export async function POST(req: Request) {
       user: user._id,
     });
 
-    await signIn("credentials", {
-      email,
-      password: hashedPassword,
-      callbackUrl: "/onboarding",
+    await createEvent({
+      user: user._id,
+      email: user.email!,
+      type: 'member-created'
     });
 
     return NextResponse.json({ message: "Account created successfully" });

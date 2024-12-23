@@ -40,7 +40,7 @@ export default async function AdminMembersPage() {
                                     Webhook Members
                                 </CardTitle>
                                 <Button variant="ghost" size="sm" className="text-xs" asChild>
-                                    <Link href="/admin/members/webhook">View all</Link>
+                                    <Link href="/admin/dashboard/members/webhook">View all</Link>
                                 </Button>
                             </CardHeader>
                             <CardContent>
@@ -56,7 +56,7 @@ export default async function AdminMembersPage() {
                                     Node API Members
                                 </CardTitle>
                                 <Button variant="ghost" size="sm" className="text-xs" asChild>
-                                    <Link href="/admin/members/node-api">View all</Link>
+                                    <Link href="/admin/dashboard/members/node-api">View all</Link>
                                 </Button>
                             </CardHeader>
                             <CardContent>

@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 import connect from "@/lib/db";
 import User from "@/app/models/User";
+import { createEvent } from "@/app/actions/events";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -101,6 +102,12 @@ export const authOptions: NextAuthOptions = {
           return false;
         }
       }
+      // Log the sign-in event
+      await createEvent({
+        user: user.id,
+        email: user.email!,
+        type: 'logged-in'
+      });
       return true;
     },
 

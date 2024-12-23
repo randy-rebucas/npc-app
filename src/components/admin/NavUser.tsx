@@ -1,4 +1,3 @@
-import { SignOut } from "@/components/signout";
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
@@ -43,9 +42,6 @@ export default async function AdminNavUser() {
                     >
                         <DropdownMenuItem>
                             <span>Account</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <SignOut />
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

@@ -2,6 +2,7 @@ import { sdk } from "@/config/sharetribe";
 import connect from "@/lib/db";
 import Member from "@/app/models/Member";
 import { generatePassword } from "@/lib/utils";
+import { createEvent } from "@/app/actions/events";
 
 export async function POST(request: Request) {
   try {
@@ -51,6 +52,14 @@ export async function POST(request: Request) {
           accountSynced: true,
         },
       });
+
+      // Create an event
+      await createEvent({
+        user: member._id,
+        email: member.payload.auth.email,
+        type: "member-synced",
+      });
+
       console.log("Synced member to Sharetribe");
       return Response.json(sharetribeUser);
     }
@@ -61,9 +70,6 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     console.error("Error syncing member to Sharetribe:", error);
-    return Response.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }
