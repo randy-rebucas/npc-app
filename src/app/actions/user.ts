@@ -50,6 +50,7 @@ export async function getUserById(id: string) {
 }
 
 export async function getOnboardingStatus(id: string) {
+  console.log(id);
   await connect();
   const user = await User.findById(id);
   return user?.onboardingStatus;

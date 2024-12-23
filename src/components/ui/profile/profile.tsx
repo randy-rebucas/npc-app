@@ -1,16 +1,12 @@
 'use client';
 
-import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
-import { IUserProfile } from "@/app/models/UserProfile";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { IUserProfile } from "@/app/models/UserProfile";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -26,8 +22,8 @@ const formSchema = z.object({
 })
 
 export default function Profile({ profile }: { profile: Partial<IUserProfile> }) {
-    const { toast } = useToast();
     const { data: session } = useSession();
+    const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -72,140 +68,118 @@ export default function Profile({ profile }: { profile: Partial<IUserProfile> })
     };
 
     return (
-        <Card className="max-w-2xl">
-            <CardHeader>
-                <CardTitle className="text-xl font-semibold">Profile Information</CardTitle>
-                <p className="text-sm text-muted-foreground">
+        <div className="p-6 max-w-2xl mx-auto">
+            <div className="mb-6">
+                <h2 className="text-xl font-semibold">Profile Information</h2>
+                <p className="text-sm text-gray-500">
                     Please make sure your information is up to date.
                 </p>
-            </CardHeader>
-            <CardContent className="space-y-6">
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        {/* Name Section */}
-                        <div className="flex gap-4">
-                            <FormField
-                                control={form.control}
-                                name="firstName"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>First Name</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="First name" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="lastName"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Last Name</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Last name" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-
-                        {/* Phone Section */}
-                        <FormField
-                            control={form.control}
-                            name="phone"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Phone</FormLabel>
-                                    <p className="text-sm text-muted-foreground">Please include country code (e.g. +1 for US/Canada)</p>
-                                    <FormControl>
-                                        <Input placeholder="e.g. +12125551234" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
+            </div>
+            
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                {/* Name Section */}
+                <div className="flex gap-4">
+                    <div className="flex-1">
+                        <label className="block text-sm font-medium mb-1">First Name</label>
+                        <input
+                            {...form.register("firstName")}
+                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="First name"
                         />
-
-                        {/* Address Section */}
-                        <FormField
-                            control={form.control}
-                            name="address"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Address</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Address" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
+                        {form.formState.errors.firstName && (
+                            <p className="text-red-500 text-sm mt-1">{form.formState.errors.firstName.message}</p>
+                        )}
+                    </div>
+                    <div className="flex-1">
+                        <label className="block text-sm font-medium mb-1">Last Name</label>
+                        <input
+                            {...form.register("lastName")}
+                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Last name"
                         />
-                        
-                        <div className="flex gap-4">
-                            <FormField
-                                control={form.control}
-                                name="city"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormControl>
-                                            <Input placeholder="City" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="state"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormControl>
-                                            <Input placeholder="State" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="zip"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormControl>
-                                            <Input placeholder="ZIP" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
+                        {form.formState.errors.lastName && (
+                            <p className="text-red-500 text-sm mt-1">{form.formState.errors.lastName.message}</p>
+                        )}
+                    </div>
+                </div>
 
-                        {/* Email Section - Keeping as is since it's readonly */}
-                        <div>
-                            <label className="text-sm font-medium">Email</label>
-                            <div className="flex items-center gap-4 mt-1.5">
-                                <Input
-                                    defaultValue={session?.user?.email}
-                                    readOnly
-                                    className="bg-muted"
-                                />
-                                <Button variant="outline">
-                                    Change Email Address
-                                </Button>
-                            </div>
-                        </div>
+                {/* Phone Section */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Phone</label>
+                    <p className="text-sm text-gray-500 mb-1">Please include country code (e.g. +1 for US/Canada)</p>
+                    <input
+                        {...form.register("phone")}
+                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g. +12125551234"
+                    />
+                    {form.formState.errors.phone && (
+                        <p className="text-red-500 text-sm mt-1">{form.formState.errors.phone.message}</p>
+                    )}
+                </div>
 
-                        {/* Save Button */}
-                        <div className="flex justify-end">
-                            <Button type="submit" disabled={isSubmitting}>
-                                {isSubmitting ? "Saving..." : "Save"}
-                            </Button>
-                        </div>
-                    </form>
-                </Form>
-            </CardContent>
-        </Card>
+                {/* Address Section */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Address</label>
+                    <input
+                        {...form.register("address")}
+                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Address"
+                    />
+                </div>
+
+                <div className="flex gap-4">
+                    <div className="flex-1">
+                        <input
+                            {...form.register("city")}
+                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="City"
+                        />
+                    </div>
+                    <div className="flex-1">
+                        <input
+                            {...form.register("state")}
+                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="State"
+                        />
+                    </div>
+                    <div className="flex-1">
+                        <input
+                            {...form.register("zip")}
+                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="ZIP"
+                        />
+                    </div>
+                </div>
+
+                {/* Email Section */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Email</label>
+                    <div className="flex items-center gap-4">
+                        <input
+                            defaultValue={session?.user?.email}
+                            readOnly
+                            className="flex-1 px-3 py-2 border rounded-md bg-gray-50"
+                        />
+                        <button
+                            type="button"
+                            className="px-4 py-2 border rounded-md hover:bg-gray-50"
+                        >
+                            Change Email Address
+                        </button>
+                    </div>
+                </div>
+
+                {/* Save Button */}
+                <div className="flex justify-end">
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isSubmitting ? "Saving..." : "Save"}
+                    </button>
+                </div>
+            </form>
+        </div>
     );
 }

@@ -1,5 +1,6 @@
 
-export default function OnboardingLayout({ children }: { children: React.ReactNode }) {
+export default async function OnboardingLayout({ children }: { children: React.ReactNode }) {
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-slate-50">
             <div className="w-full max-w-3xl px-4 py-8 mx-auto">
