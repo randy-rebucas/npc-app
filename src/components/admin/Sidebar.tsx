@@ -1,4 +1,4 @@
-import {  GalleryVerticalEnd, HelpCircle, Home, Key, Settings, User } from "lucide-react"
+import { GalleryVerticalEnd, Home, Settings, Users } from "lucide-react"
 
 import {
     Sidebar,
@@ -13,39 +13,29 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
-import NavUser from "@/components/nav-user"
+import AdminNavUser from "@/components/admin/NavUser"
 
-export async function AppSidebar() {
+export async function AdminSidebar() {
 
     // Menu items.
     const items = [
         {
             title: "Home",
-            url: "/dashboard",
+            url: "/admin",
             icon: Home,
         },
         {
-            title: "Profile",
-            url: "/dashboard/profile",
-            icon: User,
-        },
-        {
-            title: "Credentials",
-            url: "/dashboard/credentials",
-            icon: Key,
-        },
-        {
-            title: "Help",
-            url: "/dashboard/help",
-            icon: HelpCircle,
+            title: "Members",
+            url: "/admin/members",
+            icon: Users,
         },
         {
             title: "Settings",
-            url: "/dashboard/settings",
+            url: "/admin/settings",
             icon: Settings,
         },
     ]
-    
+
     return (
         <Sidebar>
             <SidebarHeader>
@@ -85,7 +75,7 @@ export async function AppSidebar() {
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter>
-                <NavUser />
+                <AdminNavUser />
             </SidebarFooter>
         </Sidebar>
     )

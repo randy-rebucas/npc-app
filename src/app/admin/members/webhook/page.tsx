@@ -1,4 +1,4 @@
-import Header from "@/components/header";
+import AdminHeader from "@/components/admin/Header";
 import Webhook from "@/components/ui/member/source/webhook";
 import { SidebarInset } from "@/components/ui/sidebar";
 import { Metadata } from "next";
@@ -20,15 +20,15 @@ export default async function Page(props: {
 
     return (
         <SidebarInset>
-            <Header breadcrumbs={[
-                { label: 'Dashboard', href: '/dashboard' },
+            <AdminHeader breadcrumbs={[
+                { label: 'Admin', href: '/admin' },
                 {
                     label: 'Members',
-                    href: '/dashboard/members',
+                    href: '/admin/members',
                 },
                 {
                     label: 'Webhook',
-                    href: '/dashboard/members/webhook',
+                    href: '/admin/members/webhook',
                     active: true,
                 },
             ]} />

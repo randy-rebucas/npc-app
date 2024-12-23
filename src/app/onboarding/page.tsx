@@ -224,7 +224,10 @@ export default function OnboardingPage() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(finalData),
+                body: JSON.stringify({
+                    ...finalData,
+                    userId: session?.user.id
+                }),
             });
 
             if (!jsonResponse.ok) {

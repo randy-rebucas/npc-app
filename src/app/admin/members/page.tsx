@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { SidebarInset } from '@/components/ui/sidebar';
-import Header from '@/components/header';
+import AdminHeader from "@/components/admin/Header";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from "@/components/ui/button";
 import { MemberstackAdminService } from '@/utils/memberstack-admin';
@@ -11,19 +11,19 @@ export const metadata: Metadata = {
     title: 'Members',
 };
 
-export default async function Page() {
-
+export default async function AdminMembersPage() {
+    
     const { totalCount: counts } = await MemberstackAdminService.listMembers();
 
     const totalMembers = await countMembers();
 
     return (
         <SidebarInset>
-            <Header breadcrumbs={[
-                { label: 'Dashboard', href: '/dashboard' },
+            <AdminHeader breadcrumbs={[
+                { label: 'Admin', href: '/admin' },
                 {
                     label: 'Members',
-                    href: '/dashboard/members',
+                    href: '/admin/members',
                     active: true,
                 },
             ]} />
@@ -40,7 +40,7 @@ export default async function Page() {
                                     Webhook Members
                                 </CardTitle>
                                 <Button variant="ghost" size="sm" className="text-xs" asChild>
-                                    <Link href="/dashboard/members/webhook">View all</Link>
+                                    <Link href="/admin/members/webhook">View all</Link>
                                 </Button>
                             </CardHeader>
                             <CardContent>
@@ -56,7 +56,7 @@ export default async function Page() {
                                     Node API Members
                                 </CardTitle>
                                 <Button variant="ghost" size="sm" className="text-xs" asChild>
-                                    <Link href="/dashboard/members/node-api">View all</Link>
+                                    <Link href="/admin/members/node-api">View all</Link>
                                 </Button>
                             </CardHeader>
                             <CardContent>
