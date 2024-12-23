@@ -186,7 +186,7 @@ export default function Calendar() {
 
     return (
 
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="p-6 max-w-2xl mx-auto">
             <Script
                 src="https://accounts.google.com/gsi/client"
                 strategy="lazyOnload"

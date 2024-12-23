@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 
-export default function ProfileTabs({ tabs, content }: { tabs: string[], content: React.ReactNode[] }) {
-    const [activeTab, setActiveTab] = useState<string>('profile');
+export default function Tabs({ tabs, initialTab, content }: { tabs: string[], initialTab: string, content: React.ReactNode[] }) {
+    const [activeTab, setActiveTab] = useState<string>(initialTab);
 
     return (
         <div className="bg-white rounded-lg shadow">

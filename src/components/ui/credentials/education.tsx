@@ -1,18 +1,10 @@
 "use client"
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { useToast } from "@/hooks/use-toast"
 import { useState } from "react"
-import { Separator } from "@radix-ui/react-separator";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { X } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
+import { useToast } from "@/hooks/use-toast"
 
 export type Education = {
     undergrad?: string;
@@ -29,21 +21,23 @@ const educationFormSchema = z.object({
         residency: z.string().min(2, "Residency program is required"),
     }),
 })
+
 type EducationFormValues = z.infer<typeof educationFormSchema>;
-export default function Education({ 
-    education = { undergrad: '', medical: '', residency: '' }, 
-    clinicalDegree = '', 
-    practiceTypes = [], 
-    practices = [] 
-}: { 
-    education?: Education, 
-    clinicalDegree?: string, 
-    practiceTypes?: string[], 
-    practices: string[] 
+
+export default function Education({
+    education = { undergrad: '', medical: '', residency: '' },
+    clinicalDegree = '',
+    practiceTypes = [],
+    practices = []
+}: {
+    education?: Education,
+    clinicalDegree?: string,
+    practiceTypes?: string[],
+    practices: string[]
 }) {
     const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    console.log(practiceTypes)
+
     const form = useForm<EducationFormValues>({
         resolver: zodResolver(educationFormSchema),
         defaultValues: {
@@ -56,20 +50,20 @@ export default function Education({
             },
         },
     })
-    console.log(practices)
+
     async function onSubmit(data: EducationFormValues) {
         setIsSubmitting(true);
-
         try {
-            // Update profile education
             const response = await fetch("/api/profile", {
                 method: "POST",
-                body: JSON.stringify({ clinicalDegree: data.clinicalDegree, education: data.education, practiceTypes: data.practiceTypes }),
+                body: JSON.stringify({
+                    clinicalDegree: data.clinicalDegree,
+                    education: data.education,
+                    practiceTypes: data.practiceTypes
+                }),
             });
 
-            if (!response.ok) {
-                throw new Error("Failed to update education");
-            }
+            if (!response.ok) throw new Error("Failed to update education");
 
             toast({
                 title: "Success!",
@@ -89,148 +83,96 @@ export default function Education({
     }
 
     return (
-        <Card className="max-w-2xl">
-            <CardHeader>
-                <CardTitle className="text-xl font-semibold">Degree</CardTitle>
-                <p className="text-sm text-muted-foreground">
+        <div className="p-6 max-w-2xl mx-auto">
+            <div className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900">Degree</h2>
+                <p className="text-gray-600 mt-2">
                     This will be shown to prospective Nurse Practitioners seeking a Collaborating Physician
                 </p>
-            </CardHeader>
-            <CardContent className="space-y-6">
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <FormField
-                            control={form.control}
-                            name="clinicalDegree"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Clinical Degree Type:</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="MD" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <div>
-                            <div className="flex items-center justify-between mb-2">
-                                <h2 className="text-lg font-semibold">Practice Types</h2>
-                            </div>
-                            <p className="text-sm text-muted-foreground mb-4">
-                                Select the practice types you are interested in
-                            </p>
+            </div>
+
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                {/* Clinical Degree Field */}
+                <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                        Clinical Degree Type
+                    </label>
+                    <input
+                        type="text"
+                        {...form.register("clinicalDegree")}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="MD"
+                    />
+                </div>
+
+                {/* Practice Types Section */}
+                <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Practice Types</h3>
+                    <div className="flex flex-wrap gap-2">
+                        {form.watch("practiceTypes").map((type) => (
+                            <span key={type} className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                                {type}
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const newTypes = form.getValues("practiceTypes").filter(t => t !== type);
+                                        form.setValue("practiceTypes", newTypes);
+                                    }}
+                                    className="ml-2 text-blue-600 hover:text-blue-800"
+                                >×</button>
+                            </span>
+                        ))}
+                    </div>
+                    <select
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            if (value && !form.getValues("practiceTypes").includes(value)) {
+                                form.setValue("practiceTypes", [...form.getValues("practiceTypes"), value]);
+                            }
+                        }}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                        <option value="">Select practice types</option>
+                        {practices
+                            .filter(practice => !form.watch("practiceTypes").includes(practice))
+                            .map(type => (
+                                <option key={type} value={type}>{type}</option>
+                            ))
+                        }
+                    </select>
+                </div>
+
+                <hr className="my-8 border-gray-200" />
+
+                {/* Education Fields */}
+                <div className="space-y-6">
+                    <h3 className="text-lg font-semibold text-gray-900">Education</h3>
+                    {(['undergrad', 'medical', 'residency'] as const).map((field: keyof Education) => (
+                        <div key={field} className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700">
+                                {field.charAt(0).toUpperCase() + field.slice(1)} Institution
+                            </label>
+                            <input
+                                type="text"
+                                {...form.register(`education.${field}`)}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                placeholder={`Enter your ${field} institution`}
+                            />
                         </div>
-                        
-                        <FormField
-                            control={form.control}
-                            name="practiceTypes"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Practice Types</FormLabel>
-                                    <div className="space-y-4">
-                                        <div className="flex flex-wrap gap-2">
-                                            {field.value.map((type) => (
-                                                <Badge key={type} variant="secondary">
-                                                    {type}
-                                                    <button
-                                                        type="button"
-                                                        className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                                                        onClick={() => {
-                                                            const newTypes = field.value.filter((t) => t !== type)
-                                                            field.onChange(newTypes)
-                                                        }}
-                                                    >
-                                                        <X className="h-3 w-3" />
-                                                        <span className="sr-only">Remove</span>
-                                                    </button>
-                                                </Badge>
-                                            ))}
-                                        </div>
-                                        <Select
-                                            onValueChange={(value) => {
-                                                if (!field.value.includes(value)) {
-                                                    field.onChange([...field.value, value])
-                                                }
-                                            }}
-                                        >
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select practice types" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {practices.filter(practice => !field.value.includes(practice)).map((type) => (
-                                                    <SelectItem key={type} value={type}>
-                                                        {type}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </div>
-                                </FormItem>
-                            )}
-                        />
+                    ))}
+                </div>
 
-                        <Separator /> 
-
-                        <div>
-                            <div className="flex items-center justify-between mb-2">
-                                <h2 className="text-lg font-semibold">Education</h2>
-                            </div>
-                            <p className="text-sm text-muted-foreground mb-4">
-                                Tell us more about your education
-                            </p>
-                        </div>
-
-                        <FormField
-                            control={form.control}
-                            name="education.undergrad"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Undergrad Institution:</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Enter your undergraduate institution" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                                              
-                        <FormField
-                            control={form.control}
-                            name="education.medical"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Medical Degree Institution:</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Enter your medical school" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="education.residency"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Residency Program:</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Enter your residency program" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting ? "Saving..." : "Save Changes"}
-                        </Button>
-                    </form>
-                </Form>
-            </CardContent>
-        </Card>
+                {/* Submit Button */}
+                <div className="flex justify-end pt-6">
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                    >
+                        {isSubmitting ? "Saving..." : "Save Changes"}
+                    </button>
+                </div>
+            </form>
+        </div>
     );
 }

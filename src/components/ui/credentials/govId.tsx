@@ -1,31 +1,25 @@
 "use client"
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { IUserProfile } from "@/app/models/UserProfile";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
-
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { IUserProfile } from "@/app/models/UserProfile";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   governmentId: z.instanceof(File).optional(),
 });
 
 export default function GovID({ govId }: { govId: Partial<IUserProfile> }) {
-    const { toast } = useToast();
     const [govIdUrl, setGovIdUrl] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { toast } = useToast();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
     });
-    console.log(govId);
+
     async function onSubmit(values: z.infer<typeof formSchema>) {
         console.log(values);
         setIsSubmitting(true);
@@ -68,8 +62,8 @@ export default function GovID({ govId }: { govId: Partial<IUserProfile> }) {
                 });
 
                 toast({
-                    title: "Success",
-                    description: "File uploaded successfully",
+                    title: "Success!",
+                    description: "Your government ID has been updated.",
                 });
             } else {
                 toast({
@@ -91,51 +85,60 @@ export default function GovID({ govId }: { govId: Partial<IUserProfile> }) {
     }
 
     return (
-        <Card className="max-w-2xl">
-            <CardHeader>
-                <CardTitle className="text-xl font-semibold">Government ID</CardTitle>
-                <CardDescription>
+        <div className="p-6 max-w-2xl mx-auto">
+            <div className="mb-6">
+                <h2 className="text-2xl font-bold text-gray-800">Government ID</h2>
+                <p className="text-gray-600 mt-1">
                     Your record of upload of your Government Issue ID.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        <FormField
-                            control={form.control}
-                            name="governmentId"
-                            render={({ field: { onChange } }) => (
-                                <FormItem>
-                                    <FormLabel>Upload Government ID</FormLabel>
-                                    <FormControl>
-                                        <Input 
-                                            type="file" 
-                                            accept="image/*"
-                                            onChange={(e) => onChange(e.target.files?.[0])}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        
-                        <div className="flex justify-between items-center">
-                            <Badge variant="secondary" className="bg-gray-100 text-gray-700 hover:bg-gray-100">
-                                {govId.governmentIdPath ? 'Document Uploaded' : 'No Document'}
-                            </Badge>
-                            <Button type="submit" disabled={isSubmitting}>
-                                {isSubmitting ? "Saving..." : "Save Changes"}
-                            </Button>
-                        </div>
+                </p>
+            </div>
 
-                        {govIdUrl || govId.governmentIdPath && (
-                            <p className="text-sm text-muted-foreground">
-                                Uploaded: {govIdUrl || govId.governmentIdPath}
-                            </p>
-                        )}
-                    </form>
-                </Form>
-            </CardContent>
-        </Card>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                        Upload Government ID
+                    </label>
+                    <div className="relative">
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => form.setValue('governmentId', e.target.files?.[0])}
+                            className="block w-full text-sm text-gray-500
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded-full file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-blue-50 file:text-blue-700
+                                hover:file:bg-blue-100
+                                cursor-pointer"
+                        />
+                    </div>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                    <span className={`px-3 py-1 rounded-full text-sm 
+                        ${govId.governmentIdPath 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-gray-100 text-gray-700'}`}>
+                        {govId.governmentIdPath ? 'Document Uploaded' : 'No Document'}
+                    </span>
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg
+                            hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed
+                            transition duration-150 ease-in-out"
+                    >
+                        {isSubmitting ? "Saving..." : "Save Changes"}
+                    </button>
+                </div>
+
+                {(govIdUrl || govId.governmentIdPath) && (
+                    <p className="text-sm text-gray-500">
+                        Uploaded: {govIdUrl || govId.governmentIdPath}
+                    </p>
+                )}
+            </form>
+
+        </div>
     );
 }

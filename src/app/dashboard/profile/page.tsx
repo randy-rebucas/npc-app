@@ -9,7 +9,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { getUserByEmail } from "@/app/actions/user";
 import { selectedItem } from "@/lib/utils";
-import ProfileTabs from "@/components/ProfileTabs";
+import Tabs from "@/components/tabs";
 
 export default async function ProfilePage() {
     const session = await getServerSession(authOptions);
@@ -41,8 +41,9 @@ export default async function ProfilePage() {
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-3xl font-semibold text-gray-900">Profile</h1>
                 </div>
-                <ProfileTabs 
+                <Tabs 
                     tabs={['Profile', 'Bio', 'Photo', 'Calendar', 'Rates']}  
+                    initialTab="profile"
                     content={[
                         <Profile key="profile" profile={profile} />,
                         <Bio key="bio" bio={bio} />,

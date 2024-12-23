@@ -85,7 +85,7 @@ export default function Photo({ photo }: { photo: Partial<IUserProfile> }) {
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="p-6 max-w-2xl mx-auto">
             <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900">Profile Picture</h2>
                 <p className="text-sm text-gray-500">
@@ -150,7 +150,7 @@ export default function Photo({ photo }: { photo: Partial<IUserProfile> }) {
                     </button>
                 </div>
 
-                        
+
             </div>
         </div>
     );

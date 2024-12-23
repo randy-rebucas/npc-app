@@ -88,7 +88,7 @@ export default function Rates({ rates }: { rates: Partial<IUserProfile> }) {
 
     return (
 
-        <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="p-6 max-w-2xl mx-auto">
             <div className="mb-6">
                 <h2 className="text-xl font-semibold">Update Your Rate Matrix</h2>
                 <p className="text-gray-600 text-sm">

@@ -3,36 +3,17 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
-import { Certification } from "@/lib/types/onboarding";
-import { CalendarIcon, Plus, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast"
-import { cn } from "@/lib/utils";
-import { format } from "date-fns"
-import { Popover, PopoverTrigger, PopoverContent } from "@radix-ui/react-popover";
-import { Calendar } from "@/components/ui/calendar"
+import { Certification } from "@/lib/types/onboarding";
+import { useToast } from "@/hooks/use-toast";
 
 const certificationFormSchema = z.object({
     boardCertifications: z.string(),
     additionalCertifications: z.array(z.object({
         certification: z.string().min(1, "Certification is required"),
-        issueDate: z.date({
-            required_error: "Issue date is required",
-        }),
-        expirationDate: z.date({
-            required_error: "Expiration date is required",
-        }),
+        issueDate: z.string().min(1, "Issue date is required"),
+        expirationDate: z.string().min(1, "Expiration date is required"),
         certificateUrl: z.string().url("Invalid certificate URL"),
         certificateNumber: z.string().min(1, "Certificate number is required"),
     })),
@@ -41,9 +22,13 @@ const certificationFormSchema = z.object({
 
 type CertificationFormValues = z.infer<typeof certificationFormSchema>;
 
-export default function Certifications({ boardCertification, additionalCertifications, npiNumber }: { boardCertification: string, additionalCertifications: Certification[], npiNumber: string }) {
-    const { toast } = useToast();
+export default function Certifications({ boardCertification, additionalCertifications, npiNumber }: { 
+    boardCertification: string, 
+    additionalCertifications: Certification[], 
+    npiNumber: string 
+}) {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { toast } = useToast();
 
     const form = useForm<CertificationFormValues>({
         resolver: zodResolver(certificationFormSchema),
@@ -51,10 +36,10 @@ export default function Certifications({ boardCertification, additionalCertifica
             boardCertifications: boardCertification || "",
             additionalCertifications: additionalCertifications.map(certification => ({
                 certification: certification.certification,
-                issueDate: certification.issueDate ? new Date(certification.issueDate) : new Date(),
-                expirationDate: certification.expirationDate ? new Date(certification.expirationDate) : new Date(),
-                certificateUrl: certification.certificateUrl ? certification.certificateUrl : "",
-                certificateNumber: certification.certificateNumber ? certification.certificateNumber : "",
+                issueDate: certification.issueDate?.toISOString().split('T')[0] || "",
+                expirationDate: certification.expirationDate?.toISOString().split('T')[0] || "",
+                certificateUrl: certification.certificateUrl || "",
+                certificateNumber: certification.certificateNumber || "",
             })),
             npiNumber: npiNumber || "",
         },
@@ -62,15 +47,22 @@ export default function Certifications({ boardCertification, additionalCertifica
 
     async function onSubmit(data: CertificationFormValues) {
         setIsSubmitting(true);
+
         try {
-            // Update profile certifications
             const response = await fetch("/api/profile", {
                 method: "POST",
-                body: JSON.stringify({ additionalCertifications: data.additionalCertifications, npiNumber: data.npiNumber, boardCertification: data.boardCertifications }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    additionalCertifications: data.additionalCertifications,
+                    npiNumber: data.npiNumber,
+                    boardCertification: data.boardCertifications
+                }),
             });
 
             if (!response.ok) {
-                throw new Error("Failed to update certifications");
+                throw new Error(await response.text() || "Failed to update certifications");
             }
 
             toast({
@@ -90,215 +82,142 @@ export default function Certifications({ boardCertification, additionalCertifica
     }
 
     return (
-        <Card className="max-w-2xl">
-            <CardHeader>
-                <CardTitle className="text-xl font-semibold">Certifications</CardTitle>
-                <p className="text-sm text-muted-foreground">
-                    This will be shown to prospective Nurse Practitioners seeking a Collaborating Physician
+        <div className="p-6 max-w-2xl mx-auto">
+            {/* Header Section */}
+            <div className="p-6 border-b border-gray-200">
+                <h2 className="text-2xl font-bold text-gray-900">Certifications</h2>
+                <p className="text-sm text-gray-500 mt-1">
+                    Please provide your certification details for verification
                 </p>
-            </CardHeader>
-            <CardContent>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        <FormField
-                            control={form.control}
-                            name="boardCertifications"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Board Certifications:</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Enter board certifications" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="npiNumber"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <div className="flex items-center justify-between">
-                                        <FormLabel>NPI#</FormLabel>
-                                    </div>
-                                    <p className="text-xs text-muted-foreground">
-                                        Please don&apos;t adjust this number after approved.
-                                    </p>
-                                    <FormControl>
-                                        <Input placeholder="123456789" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <FormLabel>Additional Certifications:</FormLabel>
-                            </div>
+            </div>
 
-                            {form.watch("additionalCertifications").map((_, index) => (
-                                <div key={index} className="space-y-4 rounded-lg border p-4 relative">
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                        className="text-destructive hover:text-destructive absolute right-2 top-2"
-                                        onClick={() => {
-                                            const current = form.getValues("additionalCertifications");
-                                            form.setValue(
-                                                "additionalCertifications",
-                                                current.filter((_, i) => i !== index)
-                                            );
-                                        }}
-                                    >
-                                        <X className="h-4 w-4" />
-                                    </Button>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 space-y-8">
+                {/* Primary Information Section */}
+                <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">
+                            Board Certifications
+                        </label>
+                        <input
+                            {...form.register("boardCertifications")}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            placeholder="Enter your board certifications"
+                        />
+                        {form.formState.errors.boardCertifications && (
+                            <p className="text-sm text-red-500">{form.formState.errors.boardCertifications.message}</p>
+                        )}
+                    </div>
 
-                                    <FormField
-                                        control={form.control}
-                                        name={`additionalCertifications.${index}.certification`}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Certification Name</FormLabel>
-                                                <FormControl>
-                                                    <Input {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
+                    <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">NPI Number</label>
+                        <div className="relative">
+                            <input
+                                {...form.register("npiNumber")}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                placeholder="Enter your 10-digit NPI number"
+                            />
+                            <p className="absolute -bottom-5 text-xs text-gray-500">
+                                Please don&apos;t modify after approval
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Additional Certifications Section */}
+                <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                        <label className="text-sm font-medium text-gray-700">Additional Certifications</label>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                form.setValue("additionalCertifications", [
+                                    ...form.getValues("additionalCertifications"),
+                                    {
+                                        certification: "",
+                                        issueDate: new Date().toISOString().split('T')[0],
+                                        expirationDate: new Date().toISOString().split('T')[0],
+                                        certificateUrl: "",
+                                        certificateNumber: "",
+                                    },
+                                ]);
+                            }}
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        >
+                            <Plus className="h-4 w-4" />
+                            Add Certification
+                        </button>
+                    </div>
+
+                    <div className="space-y-4">
+                        {form.watch("additionalCertifications").map((_, index) => (
+                            <div key={index} className="p-6 bg-gray-50 rounded-xl border border-gray-200 relative hover:border-blue-200 transition-colors">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const currentFields = [...form.getValues("additionalCertifications")];
+                                        currentFields.splice(index, 1);
+                                        form.setValue("additionalCertifications", currentFields);
+                                    }}
+                                    className="absolute right-4 top-4 p-1 rounded-full hover:bg-gray-200 transition-colors"
+                                >
+                                    <X className="h-4 w-4 text-gray-500" />
+                                </button>
+
+                                <div className="space-y-4">
+                                    <input
+                                        {...form.register(`additionalCertifications.${index}.certification`)}
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
+                                        placeholder="Certification Name"
                                     />
 
                                     <div className="grid grid-cols-2 gap-4">
-                                        <FormField
-                                            control={form.control}
-                                            name={`additionalCertifications.${index}.issueDate`}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Issue Date</FormLabel>
-                                                    <Popover>
-                                                        <PopoverTrigger asChild>
-                                                            <FormControl>
-                                                                <Button
-                                                                    variant={"outline"}
-                                                                    className={cn(
-                                                                        "w-[280px] justify-start text-left font-normal",
-                                                                        !field.value && "text-muted-foreground"
-                                                                    )}
-                                                                >
-                                                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                                                    {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                                                                </Button>
-                                                            </FormControl>
-                                                        </PopoverTrigger>
-                                                        <PopoverContent className="w-auto p-0"> 
-                                                            <Calendar
-                                                                mode="single"
-                                                                selected={field.value}
-                                                                onSelect={field.onChange}       
-                                                                initialFocus
-                                                            />
-                                                        </PopoverContent>
-                                                    </Popover>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <FormField
-                                            control={form.control}
-                                            name={`additionalCertifications.${index}.expirationDate`}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Expiration Date</FormLabel>
-                                                    <Popover>
-                                                        <PopoverTrigger asChild>
-                                                            <FormControl>
-                                                                <Button
-                                                                    variant={"outline"}
-                                                                    className={cn(
-                                                                        "w-[280px] justify-start text-left font-normal",
-                                                                        !field.value && "text-muted-foreground"
-                                                                    )}
-                                                                >
-                                                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                                                    {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                                                                </Button>
-                                                            </FormControl>
-                                                        </PopoverTrigger>
-                                                        <PopoverContent className="w-auto p-0">
-                                                            <Calendar
-                                                                mode="single"
-                                                                selected={field.value}
-                                                                onSelect={field.onChange}
-                                                                initialFocus
-                                                            />
-                                                        </PopoverContent>
-                                                    </Popover>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
+                                        <div className="space-y-1">
+                                            <label className="text-sm text-gray-600">Issue Date</label>
+                                            <input
+                                                type="date"
+                                                {...form.register(`additionalCertifications.${index}.issueDate`)}
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
+                                            />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-sm text-gray-600">Expiration Date</label>
+                                            <input
+                                                type="date"
+                                                {...form.register(`additionalCertifications.${index}.expirationDate`)}
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
+                                            />
+                                        </div>
                                     </div>
 
-                                    <FormField
-                                        control={form.control}
-                                        name={`additionalCertifications.${index}.certificateNumber`}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Certificate Number</FormLabel>
-                                                <FormControl>
-                                                    <Input {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <FormField
-                                        control={form.control}
-                                        name={`additionalCertifications.${index}.certificateUrl`}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Certificate URL/File</FormLabel>
-                                                <FormControl>
-                                                    <Input {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <input
+                                            {...form.register(`additionalCertifications.${index}.certificateNumber`)}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
+                                            placeholder="Certificate Number"
+                                        />
+                                        <input
+                                            {...form.register(`additionalCertifications.${index}.certificateUrl`)}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
+                                            placeholder="Certificate URL"
+                                        />
+                                    </div>
                                 </div>
-                            ))}
-                        </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
 
-                        <div className="flex justify-between">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => {
-                                    form.setValue("additionalCertifications", [
-                                        ...form.getValues("additionalCertifications"),
-                                        {
-                                            certification: "",
-                                            issueDate: new Date(),
-                                            expirationDate: new Date(),
-                                            certificateUrl: "",
-                                            certificateNumber: "",
-                                        },
-                                    ]);
-                                }}
-                            >
-                                <Plus className="h-4 w-4" />
-                                Add Certification
-                            </Button>
-
-                            <Button type="submit" disabled={isSubmitting}>
-                                {isSubmitting ? "Saving..." : "Save Changes"}
-                            </Button>
-                        </div>
-                    </form>
-                </Form>
-            </CardContent>
-        </Card>
+                {/* Submit Button */}
+                <div className="flex justify-end pt-6">
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                    >
+                        {isSubmitting ? "Saving..." : "Save Changes"}
+                    </button>
+                </div>
+            </form>
+        </div>
     );
 }

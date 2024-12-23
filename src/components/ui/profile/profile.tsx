@@ -68,7 +68,7 @@ export default function Profile({ profile }: { profile: Partial<IUserProfile> })
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="p-6 max-w-2xl mx-auto">
             <div className="mb-6">
                 <h2 className="text-xl font-semibold">Profile Information</h2>
                 <p className="text-sm text-gray-500">
