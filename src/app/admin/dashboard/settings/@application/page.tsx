@@ -18,6 +18,7 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { IConfig } from "@/app/models/Config";
 
 const formSchema = z.object({
   siteName: z.string().min(2, {
@@ -40,23 +41,31 @@ const formSchema = z.object({
 
 export default function Application() {
   const [isLoading, setIsLoading] = useState(false);
+  const [config, setConfig] = useState<IConfig | null>(null);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      siteName: "",
-      siteDescription: "",
-      siteUrl: "",
-      siteLogo: "",
-      siteFavicon: "",
-      maintenanceMode: false,
+      siteName: config?.siteName || "",
+      siteDescription: config?.siteDescription || "",
+      siteUrl: config?.siteUrl || "",
+      siteLogo: config?.siteLogo || "",
+      siteFavicon: config?.siteFavicon || "",
+      maintenanceMode: config?.maintenanceMode || false,
     },
   });
 
   useEffect(() => {
     fetch("/api/config").then(res => res.json()).then(data => {
-      form.reset(data)
+      setConfig(data)
+
+      form.setValue("siteName", data.siteName || "");
+      form.setValue("siteDescription", data.siteDescription || "");
+      form.setValue("siteUrl", data.siteUrl || "");
+      form.setValue("siteLogo", data.siteLogo || "");
+      form.setValue("siteFavicon", data.siteFavicon || "");
+      form.setValue("maintenanceMode", data.maintenanceMode || false);
     })
   }, [])
 
@@ -71,6 +80,10 @@ export default function Application() {
       });
       const data = await res.json();
       console.log(data);
+      toast({
+        title: "Success",
+        description: "Configuration updated successfully",
+      });
     } catch (error) {
       console.error(error);
       toast({
@@ -105,7 +118,7 @@ export default function Application() {
                   <FormItem>
                     <FormLabel>Site Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="My Application" {...field} />
+                      <Input placeholder={config?.siteName || "My Application"} {...field} />
                     </FormControl>
                     <FormDescription>
                       This is your site's name as it appears throughout the
@@ -124,7 +137,7 @@ export default function Application() {
                     <FormLabel>Site Description</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="A brief description of your site"
+                        placeholder={config?.siteDescription || "A brief description of your site"}
                         {...field}
                       />
                     </FormControl>
@@ -144,7 +157,7 @@ export default function Application() {
                     <FormLabel>Site Logo URL</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="https://example.com/logo.png"
+                        placeholder={config?.siteLogo || "https://example.com/logo.png"}
                         {...field}
                       />
                     </FormControl>
@@ -164,7 +177,7 @@ export default function Application() {
                     <FormLabel>Site Favicon URL</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="https://example.com/favicon.ico"
+                        placeholder={config?.siteFavicon || "https://example.com/favicon.ico"}
                         {...field}
                       />
                     </FormControl>
@@ -183,7 +196,7 @@ export default function Application() {
                   <FormItem>
                     <FormLabel>Site URL</FormLabel>
                     <FormControl>
-                      <Input placeholder="https://example.com" {...field} />
+                      <Input placeholder={config?.siteUrl || "https://example.com"} {...field} />
                     </FormControl>
                     <FormDescription>
                       The base URL of your application.
@@ -216,7 +229,9 @@ export default function Application() {
                 )}
               />
 
-              <Button type="submit">Save changes</Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Saving..." : "Save changes"}
+              </Button>
             </form>
           </Form>
         </CardContent>

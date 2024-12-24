@@ -14,9 +14,10 @@ import {
 } from "@/components/ui/sidebar"
 
 import AdminNavUser from "@/components/admin/NavUser"
+import { IConfig } from "@/app/models/Config"
 
-export async function AdminSidebar() {
-
+export async function AdminSidebar({ config }: { config: IConfig }) {
+    console.log(config);
     // Menu items.
     const items = [
         {
@@ -57,7 +58,7 @@ export async function AdminSidebar() {
                                     <GalleryVerticalEnd className="size-4" />
                                 </div>
                                 <div className="flex flex-col gap-0.5 leading-none">
-                                    <span className="font-semibold">{process.env.NEXT_PUBLIC_APP_NAME}</span>
+                                    <span className="font-semibold">{config.siteName || process.env.NEXT_PUBLIC_APP_NAME}</span>
                                     <span className="">v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
                                 </div>
                             </a>
