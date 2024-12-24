@@ -1,4 +1,9 @@
 import Header from "@/components/header";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: 'Help',
+ };
 
 export default async function HelpPage() {
     return (

@@ -1,7 +1,12 @@
 import NodeApi from "@/components/ui/member/source/node-api";
+import { Metadata } from "next";
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 
+
+export const metadata: Metadata = {
+    title: 'Admin Node API',
+};
 
 export default async function Page(props: {
     searchParams: SearchParams

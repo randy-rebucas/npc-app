@@ -2,6 +2,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, UserPlus, RefreshCcw, Webhook, Shrub } from "lucide-react";
 import { countMembers } from "@/app/actions/members";
 import { MemberstackAdminService } from "@/utils/memberstack-admin";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: 'Admin Dashboard',
+ };
 
 export default async function AdminDashboard() {
 

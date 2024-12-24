@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Webhook from "@/components/ui/member/source/webhook";
 
 export const metadata: Metadata = {
-    title: 'Webhook',
+    title: 'Admin Webhook',
 };
 
 export default async function Page({ searchParams }: {

@@ -10,7 +10,11 @@ import GovID from "@/components/ui/credentials/govId";
 import Licenses from "@/components/ui/credentials/licenses";
 import { selectedItem } from "@/lib/utils";
 import { getServerSession } from "next-auth";
+import { Metadata } from "next";
 
+export const metadata: Metadata = {
+    title: 'Credentials',
+ };
 
 export default async function CredentialsPage() {
     const session = await getServerSession(authOptions);

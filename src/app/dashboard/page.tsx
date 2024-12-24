@@ -3,7 +3,12 @@ import { SidebarInset } from "@/components/ui/sidebar";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { redirect } from "next/navigation";
+import { Metadata } from "next";
 
+export const metadata: Metadata = {
+    title: 'Dashboard',
+ };
+ 
 export default async function Dashboard() {
     const session = await getServerSession(authOptions);
 

@@ -3,6 +3,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { AuthProvider } from "@/providers/auth-provider";
 import { Toaster } from "@/components/ui/toaster";
+import { getConfig } from "./actions/config";
+
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -15,9 +17,30 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
+const siteConfig = await getConfig();
+
 export const metadata: Metadata = {
-  title: "NPC App",
-  description: "NPC App",
+  title: {
+    default: siteConfig.siteName,
+    template: `%s | ${siteConfig.siteName}`,
+  },
+  description: siteConfig.siteDescription,
+  keywords: siteConfig.keywords,
+  authors: [
+    {
+      name: siteConfig.author,
+      url: siteConfig.authorUrl,
+    },
+  ],
+  creator: siteConfig.author,
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteConfig.siteUrl,
+    title: siteConfig.siteName,
+    description: siteConfig.siteDescription,
+    siteName: siteConfig.siteName,
+  },
 };
 
 export default function RootLayout({

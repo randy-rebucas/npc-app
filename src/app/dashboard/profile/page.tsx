@@ -10,6 +10,10 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { getUserByEmail } from "@/app/actions/user";
 import { selectedItem } from "@/lib/utils";
 import Tabs from "@/components/tabs";
+import { Metadata } from "next";
+export const metadata: Metadata = {
+    title: 'Profile',
+ };
 
 export default async function ProfilePage() {
     const session = await getServerSession(authOptions);

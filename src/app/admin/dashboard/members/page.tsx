@@ -6,7 +6,7 @@ import { countMembers } from '@/app/actions/members';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-    title: 'Members',
+    title: 'Admin Members',
 };
 
 export default async function AdminMembersPage() {
