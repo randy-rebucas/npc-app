@@ -75,3 +75,17 @@ export async function getMembersPages(query: string, ITEMS_PER_PAGE: number) {
   }
 }
 
+export async function getMembersCount(query: string) {
+  connect();
+
+  try {
+    const count = await Member.countDocuments({
+      email: { $regex: query, $options: 'i' }
+    }).exec();
+    return count;
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error(`Failed to fetch total number of members.`);
+  }
+}
+

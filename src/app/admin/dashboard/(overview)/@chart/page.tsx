@@ -1,12 +1,11 @@
 'use client'
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Card } from '../ui/card';
-import { CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { useState } from 'react';
 
-export function Chart() {
+export default function AdminChartPage() {
     const [period, setPeriod] = useState('7days');
     const [view, setView] = useState('daily');
 

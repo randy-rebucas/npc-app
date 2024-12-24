@@ -1,7 +1,7 @@
 import { MemberstackAdminService } from '@/utils/memberstack-admin'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
-import CustomPagination from "@/components/pagination";
+import CustomPagination from "@/components/ui/member/pagination";
 
 import {
     Table,

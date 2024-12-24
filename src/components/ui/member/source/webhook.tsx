@@ -1,26 +1,49 @@
-
-import CustomPagination from "@/components/pagination";
-import Search from "@/components/ui/search";
+import Search from "@/components/ui/member/search";
 import { Suspense } from "react";
 import { MembersTableSkeleton } from "../../skeletons";
-import { getMembersPages } from "@/lib/data/members-data";
+import { getMembersCount, getMembersPages } from "@/lib/data/members-data";
 import Table from "@/components/ui/member/table";
+import { Select, SelectValue, SelectContent, SelectItem, SelectTrigger } from "@radix-ui/react-select";
+import CustomPagination from "../custom-pagination";
 
 export default async function Webhook({ query, currentPage, ITEMS_PER_PAGE }: { query: string, currentPage: number, ITEMS_PER_PAGE: number }) {
     const totalPages = await getMembersPages(query, ITEMS_PER_PAGE);
+    const totalItems = await getMembersCount(query);
+    const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+    const endItem = Math.min(currentPage * ITEMS_PER_PAGE, totalItems);
+
     return (
-        <div className="space-y-4">
-            <div className='mt-4 flex items-center justify-between gap-2 md:mt-8'>
-                <Search placeholder='Search members...' />
+        <>
+            <div className="flex items-center gap-4">
+                <Search placeholder='Search webhooks...' />
+                <Select>
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                    </SelectContent>
+                </Select>
             </div>
+            
             <Suspense
                 key={query + currentPage}
                 fallback={<MembersTableSkeleton />}>
-                <Table query={query} currentPage={currentPage} ITEMS_PER_PAGE={ITEMS_PER_PAGE} />
+                <div className="rounded-md border">
+                    <Table query={query} currentPage={currentPage} ITEMS_PER_PAGE={ITEMS_PER_PAGE} />
+                </div>
             </Suspense>
-            <div className='mt-5 flex w-full justify-center'>
-                <CustomPagination totalPages={totalPages} currentPage={currentPage} />
-            </div>
-        </div>
+
+            <CustomPagination
+                startItem={startItem}
+                endItem={endItem}
+                totalItems={totalItems}
+                currentPage={currentPage}
+                query={query}
+                totalPages={totalPages}
+            />
+        </>
     )
 }

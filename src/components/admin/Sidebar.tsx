@@ -30,6 +30,11 @@ export async function AdminSidebar() {
             icon: Users,
         },
         {
+            title: "Members",
+            url: "/admin/dashboard/members",
+            icon: Users,
+        },
+        {
             title: "Event Log",
             url: "/admin/dashboard/event-log",
             icon: List,

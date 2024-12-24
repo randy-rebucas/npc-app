@@ -1,45 +1,23 @@
-import AdminHeader from "@/components/admin/Header";
-import Webhook from "@/components/ui/member/source/webhook";
-import { SidebarInset } from "@/components/ui/sidebar";
 import { Metadata } from "next";
+import Webhook from "@/components/ui/member/source/webhook";
 
 export const metadata: Metadata = {
     title: 'Webhook',
 };
 
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
-
-export default async function Page(props: {
-    searchParams: SearchParams
+export default async function Page({ searchParams }: {
+    searchParams: { [key: string]: string | string[] | undefined }
 }) {
+    
     const ITEMS_PER_PAGE = 10;
-
-    const searchParams = await props.searchParams
-    const query = searchParams.query || '';
-    const currentPage = Number(searchParams?.page) || 1;
+    const query = String(searchParams?.query || '');
+    const currentPage = Number(searchParams?.page || 1);
 
     return (
-        <SidebarInset>
-            <AdminHeader breadcrumbs={[
-                { label: 'Admin', href: '/admin' },
-                {
-                    label: 'Members',
-                    href: '/admin/members',
-                },
-                {
-                    label: 'Webhook',
-                    href: '/admin/members/webhook',
-                    active: true,
-                },
-            ]} />
-            <div className="flex flex-1 flex-col gap-4 p-4">
-                <div className="mx-auto w-full">
-                    <div className="flex justify-between items-center mb-6">
-                        <h1 className="text-2xl font-bold">Webhook Members</h1>
-                    </div>
-                    <Webhook query={query as string} currentPage={currentPage} ITEMS_PER_PAGE={ITEMS_PER_PAGE} />
-                </div>
+        <div className="flex flex-1 flex-col gap-4 p-4">
+            <div className="mx-auto w-full space-y-4">
+                <Webhook query={query as string} currentPage={currentPage} ITEMS_PER_PAGE={ITEMS_PER_PAGE} />;  
             </div>
-        </SidebarInset>
-    )
+        </div>
+    );
 }

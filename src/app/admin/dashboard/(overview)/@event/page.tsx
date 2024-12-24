@@ -1,10 +1,8 @@
-import { UserMinus } from "lucide-react";
-import { LogIn, RefreshCcw, UserCog, UserPlus } from "lucide-react";
-import { Card, CardTitle, CardContent, CardHeader } from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { LogIn, RefreshCcw, UserCog, UserPlus, UserMinus } from "lucide-react";
 import { getEvents } from "@/app/actions/events";
 
-export async function Event() {
-
+export default async function AdminEventPage() {
     const getEventIcon = (type: string) => {
         switch (type) {
             case 'logged-in':
