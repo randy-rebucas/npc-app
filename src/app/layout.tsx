@@ -3,8 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { AuthProvider } from "@/providers/auth-provider";
 import { Toaster } from "@/components/ui/toaster";
-import { getConfig } from "./actions/config";
-
+import { getConfigValue } from "@/app/actions/config"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -17,29 +16,27 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-const siteConfig = await getConfig();
-
 export const metadata: Metadata = {
   title: {
-    default: siteConfig.siteName,
-    template: `%s | ${siteConfig.siteName}`,
+    default: await getConfigValue("siteName") || process.env.NEXT_PUBLIC_APP_NAME,
+    template: `%s | ${await getConfigValue("siteName") || process.env.NEXT_PUBLIC_APP_NAME}`,
   },
-  description: siteConfig.siteDescription,
-  keywords: siteConfig.keywords,
+  description: await getConfigValue("siteDescription") || process.env.NEXT_PUBLIC_APP_DESCRIPTION,
+  keywords: await getConfigValue("keywords") || process.env.NEXT_PUBLIC_APP_KEYWORDS,
   authors: [
     {
-      name: siteConfig.author,
-      url: siteConfig.authorUrl,
+      name: await getConfigValue("author") || process.env.NEXT_PUBLIC_APP_AUTHOR,
+      url: await getConfigValue("authorUrl") || process.env.NEXT_PUBLIC_APP_AUTHOR_URL,
     },
   ],
-  creator: siteConfig.author,
+  creator: await getConfigValue("author") || process.env.NEXT_PUBLIC_APP_AUTHOR,
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: siteConfig.siteUrl,
-    title: siteConfig.siteName,
-    description: siteConfig.siteDescription,
-    siteName: siteConfig.siteName,
+    url: await getConfigValue("siteUrl") || process.env.NEXT_PUBLIC_APP_URL,
+    title: await getConfigValue("siteName") || process.env.NEXT_PUBLIC_APP_NAME,
+    description: await getConfigValue("siteDescription") || process.env.NEXT_PUBLIC_APP_DESCRIPTION,
+    siteName: await getConfigValue("siteName") || process.env.NEXT_PUBLIC_APP_NAME,
   },
 };
 

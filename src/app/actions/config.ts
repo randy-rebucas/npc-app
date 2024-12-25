@@ -6,3 +6,9 @@ export async function getConfig() {
     const config = await Config.findOne({})
     return config
 }
+
+export async function getConfigValue(key: string) {
+    await connect()
+    const config = await Config.findOne({})
+    return config ? config[key] : null
+}

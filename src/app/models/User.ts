@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import bcrypt from "bcrypt";
 
 export interface IUser {
   id: string;
@@ -26,3 +27,8 @@ const User =
   mongoose.models.Users ?? mongoose.model<IUser>("Users", userSchema);
 
 export default User;
+
+User.prototype.comparePassword = async function (password: string) {
+  return await bcrypt.compare(password, this.password);
+};
+

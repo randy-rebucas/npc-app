@@ -14,6 +14,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+
 
 const formSchema = z
   .object({
@@ -27,6 +30,8 @@ const formSchema = z
   });
 
 export default function Password() {
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -36,9 +41,50 @@ export default function Password() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Handle password change here
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    try {
+      // First verify current password
+      const verifyResponse = await fetch("/api/user/verify-password", {
+        method: "POST",
+        body: JSON.stringify({ password: values.currentPassword }),
+      });
+      const data = await verifyResponse.json();
+      console.log(data);
+      if (!data.isMatch) {
+        toast({
+          title: "Error",
+          description: "Current password is incorrect",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // If verification successful, proceed with password change
+      const response = await fetch("/api/user", {
+        method: "PUT",
+        body: JSON.stringify(values),
+      });
+      
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Password updated successfully",
+        });
+        form.reset();
+      } else {
+        throw new Error("Failed to update password");
+      }
+    } catch (error) {
+      console.error("Error in password:", error);
+      toast({
+        title: "Error",
+        description: "An error occurred while changing your password",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -95,7 +141,9 @@ export default function Password() {
                   </FormItem>
                 )}
               />
-              <Button type="submit">Update Password</Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Updating..." : "Update Password"}
+              </Button>
             </form>
           </Form>
         </CardContent>

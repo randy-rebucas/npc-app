@@ -15,57 +15,101 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { IConfig } from "@/app/models/Config";
 
-const formSchema = z.object({
-  siteName: z.string().min(2, {
-    message: "Site name must be at least 2 characters.",
-  }),
-  siteDescription: z.string().min(2, {
-    message: "Site description must be at least 2 characters.",
-  }),
-  siteLogo: z.string().url({
-    message: "Please enter a valid URL.",
-  }),
-  siteFavicon: z.string().url({
-    message: "Please enter a valid URL.",
-  }),
-  siteUrl: z.string().url({
-    message: "Please enter a valid URL.",
-  }),
-  maintenanceMode: z.boolean().default(false),
-});
+type ValidationConfig =
+  | { type: "url"; message: string }
+  | { type: "min"; min: number; message: string }
+  | { type: "boolean" };
+
+const INITIAL_CONFIG = {
+  siteName: {
+    value: "",
+    type: "string",
+    label: "Site Name",
+    description: "This is your site's name as it appears throughout the application.",
+    placeholder: "My Application",
+    validation: { type: "min", min: 2, message: "Site name must be at least 2 characters." } as ValidationConfig
+  },
+  siteDescription: {
+    value: "",
+    type: "string",
+    label: "Site Description",
+    description: "This description will be used for SEO and meta tags.",
+    placeholder: "A brief description of your site",
+    validation: { min: 2, message: "Site description must be at least 2 characters." } as ValidationConfig
+  },
+  siteUrl: {
+    value: "",
+    type: "string",
+    label: "Site URL",
+    description: "The base URL of your application.",
+    placeholder: "https://example.com",
+    validation: { type: "url", message: "Please enter a valid URL." } as ValidationConfig
+  },
+  siteLogo: {
+    value: "",
+    type: "string",
+    label: "Site Logo URL",
+    description: "The URL of your site's logo image.",
+    placeholder: "https://example.com/logo.png",
+    validation: { type: "url", message: "Please enter a valid URL." } as ValidationConfig
+  },
+  siteFavicon: {
+    value: "",
+    type: "string",
+    label: "Site Favicon URL",
+    description: "The URL of your site's favicon.",
+    placeholder: "https://example.com/favicon.ico",
+    validation: { type: "url", message: "Please enter a valid URL." } as ValidationConfig
+  }
+} as const;
+
+const formSchema = z.object(
+  Object.entries(INITIAL_CONFIG).reduce((acc, [key, config]) => {
+    let validator;
+    if (config.type === "string") {
+      validator = config.validation.type === "url"
+        ? z.string().url({ message: config.validation.message })
+        : config.validation.type === "min"
+          ? z.string().min(config.validation.min, { message: config.validation.message })
+          : z.string();
+    } else if (config.type === "boolean") {
+      validator = z.boolean().default(false);
+    }
+    return { ...acc, [key]: validator! };
+  }, {})
+);
+
+type SiteConfig = {
+  [K in keyof typeof INITIAL_CONFIG]: typeof INITIAL_CONFIG[K]["type"] extends "boolean"
+  ? boolean
+  : string;
+};
 
 export default function Application() {
   const [isLoading, setIsLoading] = useState(false);
-  const [config, setConfig] = useState<IConfig | null>(null);
   const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<SiteConfig>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      siteName: config?.siteName || "",
-      siteDescription: config?.siteDescription || "",
-      siteUrl: config?.siteUrl || "",
-      siteLogo: config?.siteLogo || "",
-      siteFavicon: config?.siteFavicon || "",
-      maintenanceMode: config?.maintenanceMode || false,
+      siteName: "",
+      siteDescription: "",
+      siteUrl: "",
+      siteLogo: "",
+      siteFavicon: ""
     },
   });
 
   useEffect(() => {
     fetch("/api/config").then(res => res.json()).then(data => {
-      setConfig(data)
-
       form.setValue("siteName", data.siteName || "");
       form.setValue("siteDescription", data.siteDescription || "");
       form.setValue("siteUrl", data.siteUrl || "");
       form.setValue("siteLogo", data.siteLogo || "");
       form.setValue("siteFavicon", data.siteFavicon || "");
-      form.setValue("maintenanceMode", data.maintenanceMode || false);
     })
   }, [])
 
@@ -78,12 +122,18 @@ export default function Application() {
         method: "POST",
         body: JSON.stringify(values),
       });
-      const data = await res.json();
-      console.log(data);
-      toast({
-        title: "Success",
-        description: "Configuration updated successfully",
-      });
+
+      if (res.ok) {
+        toast({
+          title: "Success",
+          description: "Configuration updated successfully",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to update configuration",
+        });
+      }
     } catch (error) {
       console.error(error);
       toast({
@@ -111,126 +161,31 @@ export default function Application() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="siteName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Site Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder={config?.siteName || "My Application"} {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      This is your site's name as it appears throughout the
-                      application.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="siteDescription"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Site Description</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={config?.siteDescription || "A brief description of your site"}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      This description will be used for SEO and meta tags.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="siteLogo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Site Logo URL</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={config?.siteLogo || "https://example.com/logo.png"}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      The URL of your site's logo image.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="siteFavicon"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Site Favicon URL</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={config?.siteFavicon || "https://example.com/favicon.ico"}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      The URL of your site's favicon.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="siteUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Site URL</FormLabel>
-                    <FormControl>
-                      <Input placeholder={config?.siteUrl || "https://example.com"} {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      The base URL of your application.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="maintenanceMode"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">
-                        Maintenance Mode
-                      </FormLabel>
+              {Object.entries(INITIAL_CONFIG).map(([key, config]) => (
+                <FormField
+                  key={key}
+                  control={form.control}
+                  name={key as keyof z.infer<typeof formSchema>}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{config.label}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={config.placeholder as string}
+                          {...field}
+                        />
+                      </FormControl>
                       <FormDescription>
-                        Put the application in maintenance mode.
+                        {config.description}
                       </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ))}
 
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Saving..." : "Save changes"}
+                {isLoading ? "Updating..." : "Update"}
               </Button>
             </form>
           </Form>

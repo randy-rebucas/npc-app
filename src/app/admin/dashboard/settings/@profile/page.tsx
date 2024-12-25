@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -20,35 +19,73 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 const profileFormSchema = z.object({
-  username: z.string().min(2).max(30),
-  email: z.string().email(),
-  bio: z.string().max(160).optional(),
+  username: z
+    .string()
+    .min(2)
+    .max(30)
+    .refine(
+      async (username) => {
+        const response = await fetch(`/api/user/validate?username=${username}`);
+        return response.ok;
+      },
+      { message: "Username is already taken" }
+    ),
+  email: z
+    .string()
+    .email()
+    .refine(
+      async (email) => {
+        const response = await fetch(`/api/user/validate?email=${email}`);
+        return response.ok;
+      },
+      { message: "Email is already in use" }
+    ),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export default function Profile() {
+  const [isLoading, setIsLoading] = useState(false); 
+  const { toast } = useToast();
+
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
       username: "",
-      email: "",
-      bio: "",
+      email: ""
     },
+    mode: "onBlur",
   });
 
-  function onSubmit(data: ProfileFormValues) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+  const onSubmit = async (data: ProfileFormValues) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/user", {
+        method: "PUT",
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
+      }
+
+      toast({
+        title: "Success",
+        description: "Profile updated successfully",
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -96,20 +133,9 @@ export default function Profile() {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="bio"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Bio</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Tell us about yourself" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit">Save changes</Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Saving..." : "Save changes"}
+              </Button>
             </form>
           </Form>
         </CardContent>
