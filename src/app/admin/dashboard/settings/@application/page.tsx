@@ -111,7 +111,7 @@ export default function Application() {
       form.setValue("siteLogo", data.siteLogo || "");
       form.setValue("siteFavicon", data.siteFavicon || "");
     })
-  }, [])
+  }, [form])
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);

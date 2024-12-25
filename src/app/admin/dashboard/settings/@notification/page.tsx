@@ -104,7 +104,7 @@ export default function Notification() {
       form.setValue("securityAlerts", data.securityAlerts || true);
       form.setValue("maintenanceMode", data.maintenanceMode || false);
     })
-  }, [])
+  }, [form])
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);

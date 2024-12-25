@@ -1,8 +1,7 @@
 import { MemberstackAdminService } from '@/utils/memberstack-admin'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
-import CustomPagination from "@/components/ui/member/pagination";
-
+import CustomPagination from "@/components/ui/member/custom-pagination";
 import {
     Table,
     TableBody,
@@ -11,6 +10,8 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
+import Search from "@/components/ui/member/search";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface Member {
     id: string
@@ -25,8 +26,23 @@ interface Member {
 export default async function NodeApi({ currentPage, ITEMS_PER_PAGE }: { currentPage: number, ITEMS_PER_PAGE: number }) {
     const { data: members, totalCount: count } = await MemberstackAdminService.listMembers(currentPage, ITEMS_PER_PAGE)
     const totalPages = Math.ceil(count / ITEMS_PER_PAGE);
+    const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+    const endItem = Math.min(currentPage * ITEMS_PER_PAGE, count);
     return (
-        <div className="space-y-4">
+        <>
+            <div className="flex items-center gap-4">
+                <Search placeholder='Search webhooks...' />
+                <Select>
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                    </SelectContent>
+                </Select> 
+            </div>
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -60,9 +76,8 @@ export default async function NodeApi({ currentPage, ITEMS_PER_PAGE }: { current
                 </TableBody>
             </Table>
 
-            <div className='mt-5 flex w-full justify-center'>
-                <CustomPagination totalPages={totalPages} currentPage={currentPage} />
-            </div>
-        </div>
+            <CustomPagination totalPages={totalPages} currentPage={currentPage} totalItems={count} startItem={startItem} endItem={endItem} query={''} />
+
+        </>
     )
 }

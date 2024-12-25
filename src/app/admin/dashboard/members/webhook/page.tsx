@@ -5,13 +5,16 @@ export const metadata: Metadata = {
     title: 'Admin Webhook',
 };
 
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
+
 export default async function Page({ searchParams }: {
-    searchParams: { [key: string]: string | string[] | undefined }
+    searchParams: SearchParams
 }) {
     
     const ITEMS_PER_PAGE = 10;
-    const query = String(searchParams?.query || '');
-    const currentPage = Number(searchParams?.page || 1);
+    const params = await searchParams;
+    const query = String(params?.query || '');
+    const currentPage = Number(params?.page || 1); 
 
     return (
         <div className="flex flex-1 flex-col gap-4 p-4">

@@ -1,7 +1,6 @@
 import AdminHeader from "@/components/admin/Header";
 import { SidebarInset } from "@/components/ui/sidebar";
 import { getEvents } from "@/app/actions/events";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDistanceToNow } from "date-fns";
 import { LogIn, UserCog, UserPlus, UserMinus, RefreshCcw } from "lucide-react";
 import { Input } from "@/components/ui/input";
