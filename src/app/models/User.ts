@@ -6,19 +6,25 @@ export interface IUser {
   email: string;
   username: string;
   password: string;
-  onboardingStatus: string;
+  onboardingStatus: "incomplete" | "completed";
   provider: string;
-  role: string;
+  role: "ADMIN" | "CUSTOMER";
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const userSchema = new Schema<IUser>(
   {
-    email: { type: String, required: true },
-    username: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    onboardingStatus: { type: String, default: "incomplete" },
+    onboardingStatus: {
+      type: String,
+      enum: ["incomplete", "completed"],
+      default: "incomplete",
+    },
     provider: { type: String, required: true },
-    role: { type: String, required: true },
+    role: { type: String, enum: ["ADMIN", "CUSTOMER"], default: "CUSTOMER" },
   },
   { timestamps: true }
 );
@@ -31,4 +37,3 @@ export default User;
 User.prototype.comparePassword = async function (password: string) {
   return await bcrypt.compare(password, this.password);
 };
-

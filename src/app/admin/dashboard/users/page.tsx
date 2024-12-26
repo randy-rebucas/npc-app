@@ -1,29 +1,57 @@
 import AdminHeader from "@/components/admin/Header";
 import { SidebarInset } from "@/components/ui/sidebar";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import Search from "@/components/ui/member/search";
 import { Button } from "@/components/ui/button";
 import { Metadata } from "next";
+import { UserActions } from "@/components/ui/user/actions";
+import { getUsers } from "@/app/actions/user";
+import Filter from "@/components/ui/member/filter";
+import CustomPagination from "@/components/ui/member/custom-pagination";
+
+interface UserResponse {
+    id: string;
+    username: string;
+    email: string;
+    role: "ADMIN" | "CUSTOMER";
+    provider: string;
+    onboardingStatus: "incomplete" | "completed";
+    createdAt: Date;
+}
 
 export const metadata: Metadata = {
     title: 'Admin Users',
- };
+};
 
-export default function AdminUsers() {
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
+
+export default async function AdminUsers(props: {
+    searchParams: SearchParams
+}) {
+    const ITEMS_PER_PAGE = 10;
+    const params = await props.searchParams;
+    // search params
+    const query = String(params?.query || '');
+    // page
+    const currentPage = Number(params?.page) || 1;
+    // filters
+    const role = String(params?.role || 'all');
+    const onboardingStatus = String(params?.onboardingStatus || 'all');
+
+    // get users
+    const { users, total } = await getUsers({ page: currentPage, search: query, role: role, onboardingStatus: onboardingStatus, limit: ITEMS_PER_PAGE });
+    
+    const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+    const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+    const endItem = Math.min(startItem + ITEMS_PER_PAGE - 1, total);
+
     return (
         <SidebarInset>
             <AdminHeader breadcrumbs={[
@@ -39,71 +67,55 @@ export default function AdminUsers() {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <Input 
-                            placeholder="Search users..." 
-                            className="max-w-sm"
-                        />
-                        <Select>
-                            <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Role" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All Roles</SelectItem>
-                                <SelectItem value="admin">Admin</SelectItem>
-                                <SelectItem value="user">User</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <Select>
-                            <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All Status</SelectItem>
-                                <SelectItem value="active">Active</SelectItem>
-                                <SelectItem value="inactive">Inactive</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <Search placeholder='Search users...' />
+                        <Filter target="role" options={[{ 'ADMIN': 'Admin' }, { 'CUSTOMER': 'Customer' }]} placeholder="Role" defaultValue="all" />
+                        <Filter target="onboardingStatus" options={[{ 'incomplete': 'Incomplete' }, { 'completed': 'Completed' }]} placeholder="Status" defaultValue="all" />
                     </div>
 
                     <div className="rounded-md border">
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Name</TableHead>
+                                    <TableHead>Username</TableHead>
                                     <TableHead>Email</TableHead>
                                     <TableHead>Role</TableHead>
-                                    <TableHead>Status</TableHead>
+                                    <TableHead>Provider</TableHead>
+                                    <TableHead>Onboarding</TableHead>
                                     <TableHead>Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                <TableRow>
-                                    <TableCell>John Doe</TableCell>
-                                    <TableCell>john@example.com</TableCell>
-                                    <TableCell>Admin</TableCell>
-                                    <TableCell>Active</TableCell>
-                                    <TableCell>
-                                        <Button variant="ghost" size="sm">Edit</Button>
-                                    </TableCell>
-                                </TableRow>
-                                {/* Add more rows as needed */}
+                                {users.map((user: UserResponse) => (
+                                    <TableRow key={user.id} className="group">
+                                        <TableCell>{user.username}</TableCell>
+                                        <TableCell>{user.email}</TableCell>
+                                        <TableCell>{user.role}</TableCell>
+                                        <TableCell>
+                                            {user.provider}
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.onboardingStatus === 'completed' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'
+                                                }`}>
+                                                {user.onboardingStatus}
+                                            </span>
+                                        </TableCell>
+                                        <TableCell>
+                                            <UserActions userId={user.id} />
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
                             </TableBody>
                         </Table>
                     </div>
 
-                    <div className="flex items-center justify-between">
-                        <div className="text-sm text-muted-foreground">
-                            Showing 1 to 10 of 100 entries
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm" disabled>
-                                Previous
-                            </Button>
-                            <Button variant="outline" size="sm">
-                                Next
-                            </Button>
-                        </div>
-                    </div>
+                    <CustomPagination
+                        startItem={startItem}
+                        endItem={endItem}
+                        totalItems={total}
+                        currentPage={currentPage}
+                        query={query}
+                        totalPages={totalPages}
+                    />
                 </div>
             </div>
         </SidebarInset>
