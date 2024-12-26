@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LogIn, RefreshCcw, UserCog, UserPlus, UserMinus } from "lucide-react";
 import { getEvents } from "@/app/actions/events";
+import Link from "next/link";
 
 export default async function AdminEventPage() {
     const getEventIcon = (type: string) => {
@@ -26,7 +27,7 @@ export default async function AdminEventPage() {
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-base font-medium">Event Log</CardTitle>
-                <a href="/admin/dashboard/events" className="text-sm text-blue-600 hover:underline">View all</a>
+                <Link href="/admin/dashboard/events" className="text-sm text-blue-600 hover:underline">View all</Link>
             </CardHeader>
             <CardContent>
                 <div className="space-y-4">

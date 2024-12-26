@@ -1,46 +1,54 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, UserPlus, RefreshCcw, Webhook, Shrub } from "lucide-react";
+import { Users, RefreshCcw, Webhook, Shrub } from "lucide-react";
 import { countMembers } from "@/app/actions/members";
 import { MemberstackAdminService } from "@/utils/memberstack-admin";
 import { Metadata } from "next";
+import { countUsers } from "@/app/actions/user";
+import { startOfMonth, subMonths } from "date-fns";
+import { calculatePercentageChange } from "@/lib/utils";
 
 export const metadata: Metadata = {
     title: 'Admin Dashboard',
- };
+};
 
 export default async function AdminDashboard() {
 
-    const { totalCount: counts } = await MemberstackAdminService.listMembers();
+    const { totalCount: currentMemberstackCount } = await MemberstackAdminService.listMembers();
+    const currentMembers = await countMembers();
+    const currentUsers = await countUsers();
+    const currentSyncedMembers = await countMembers(undefined, "true");
 
-    const totalMembers = await countMembers();
+    // Get last month's counts
+    const lastMonthStart = startOfMonth(subMonths(new Date(), 1));
+    const lastMonthUsers = await countUsers(lastMonthStart);
+    const lastMonthMembers = await countMembers(lastMonthStart);
+
+    // Calculate percentage changes
+    const userChange = calculatePercentageChange(lastMonthUsers, currentUsers);
+    const memberChange = calculatePercentageChange(lastMonthMembers, currentMembers);
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <StatsCard
-                title="Total Members"
-                value="3"
-                description="0% vs last month"
+                title="Total Users"
+                value={currentUsers.toString()}
+                description={`${userChange.toFixed(2)}% vs last month`}
                 icon={Users}
             />
             <StatsCard
-                title="Signups (last 30 days)"
-                value="0"
-                description="0% vs previous 30 days"
-                icon={UserPlus}
-            />
-            <StatsCard
                 title="Webhook Events"
-                value={totalMembers.toString()}
+                value={currentMembers.toString()}
+                description={`${memberChange.toFixed(2)}% vs last month`}
                 icon={Webhook}
             />
             <StatsCard
                 title="Memstack Members"
-                value={counts}
+                value={currentMemberstackCount}
                 icon={Shrub}
             />
             <StatsCard
                 title="Synced Members"
-                value="0"
+                value={currentSyncedMembers.toString()}
                 icon={RefreshCcw}
             />
         </div>

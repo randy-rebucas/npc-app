@@ -145,6 +145,14 @@ export async function sendInvite(id: string) {
   return user;
 }
 
+export async function countUsers(date?: Date) {
+  await connect();
+  const query = date ? { createdAt: { $lte: date } } : {};
+
+  const count = await User.countDocuments(query);
+  return count;
+}
+
 export async function getUsers({
   page = 1,
   search = "",

@@ -3,23 +3,56 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
-import { useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 export default function AdminChartPage() {
     const [period, setPeriod] = useState('7days');
     const [view, setView] = useState('daily');
+    const [data, setData] = useState<DataPoint[]>([]);
 
-    console.log(period, view);
-    const mockSignupData = [
-        { date: '2024-03-01', signups: 4 },
-        { date: '2024-03-02', signups: 3 },
-        { date: '2024-03-03', signups: 5 },
-        { date: '2024-03-04', signups: 2 },
-        { date: '2024-03-05', signups: 7 },
-        { date: '2024-03-06', signups: 4 },
-        { date: '2024-03-07', signups: 6 },
-    ];
+    interface DataPoint {
+        date: string;
+        signups: number;
+    }
 
+    const processDataByView = useCallback((rawData: DataPoint[], view: string) => {
+        if (view === 'daily') return rawData;
+
+        const groupedData = rawData.reduce((acc: Record<string, DataPoint>, curr: DataPoint) => {
+            const date = new Date(curr.date);
+            let key: string;
+
+            if (view === 'weekly') {
+                // Get the Monday of the week
+                const day = date.getDay();
+                const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+                const monday = new Date(date.setDate(diff));
+                key = monday.toISOString().split('T')[0];
+            } else { // monthly
+                key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-01`;
+            }
+
+            if (!acc[key]) {
+                acc[key] = { date: key, signups: 0 };
+            }
+            acc[key].signups += curr.signups;
+            return acc;
+        }, {});
+
+        return Object.values(groupedData);
+    }, []);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const response = await fetch(`/api/users?period=${period}`);
+            const { users } = await response.json() as { users: DataPoint[] };
+            const processedData = processDataByView(users, view);
+            setData(processedData as DataPoint[]);
+        };
+        fetchData();
+    }, [period, view, processDataByView]); // Add view as dependency
+
+    // Update the LineChart to use the actual data
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -49,11 +82,19 @@ export default function AdminChartPage() {
             </CardHeader>
             <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={mockSignupData}>
+                    <LineChart data={data}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis
                             dataKey="date"
-                            tickFormatter={(date) => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            tickFormatter={(date) => {
+                                const d = new Date(date);
+                                if (view === 'monthly') {
+                                    return d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+                                } else if (view === 'weekly') {
+                                    return `Week of ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+                                }
+                                return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                            }}
                         />
                         <YAxis />
                         <Tooltip

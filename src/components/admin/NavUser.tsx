@@ -1,11 +1,10 @@
 
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 import { SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 
 import { SidebarMenu } from "@/components/ui/sidebar";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
-import { ChevronsUpDown } from "lucide-react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { getUserByEmail } from "@/app/actions/user";
@@ -33,17 +32,8 @@ export default async function AdminNavUser() {
                                 <span className="truncate font-semibold">{user?.username}</span>
                                 <span className="truncate text-xs">{user?.email}</span>
                             </div>
-                            <ChevronsUpDown className="ml-auto size-4" />
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                        side="top"
-                        className="w-[--radix-popper-anchor-width]"
-                    >
-                        <DropdownMenuItem>
-                            <span>Account</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
                 </DropdownMenu>
             </SidebarMenuItem>
         </SidebarMenu>

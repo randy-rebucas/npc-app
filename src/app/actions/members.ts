@@ -4,9 +4,18 @@ import Member from "../models/Member";
 import connect from "@/lib/db";
 import User, { IUser } from "../models/User";
 
-export async function countMembers() {
+interface CountMemberQuery {
+  createdAt?: { $lte: Date };
+  accountSynced?: string;
+}
+
+export async function countMembers(date?: Date, sync?: string) {
   connect();
-  const count = await Member.countDocuments().exec();
+  const query: CountMemberQuery = date ? { createdAt: { $lte: date } } : {};
+  if (sync) {
+    query.accountSynced = sync;
+  }
+  const count = await Member.countDocuments(query).exec();
   return count;
 }
 

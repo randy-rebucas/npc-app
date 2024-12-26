@@ -46,3 +46,8 @@ export const generatePassword = () => {
     .sort(() => Math.random() - 0.5)
     .join("");
 };
+
+export const calculatePercentageChange = (previous: number, current: number) => {
+  if (previous === 0) return 0;
+  return ((current - previous) / previous) * 100;
+};
