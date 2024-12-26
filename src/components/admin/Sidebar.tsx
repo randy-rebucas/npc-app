@@ -1,4 +1,4 @@
-import { GalleryVerticalEnd, LayoutDashboard, Settings, Users, List } from "lucide-react"
+import { GalleryVerticalEnd, LayoutDashboard, Settings, Users, List, HelpCircle, FileText, Folder } from "lucide-react"
 
 import {
     Sidebar,
@@ -39,6 +39,21 @@ export async function AdminSidebar() {
             title: "Event Log",
             url: "/admin/dashboard/event-log",
             icon: List,
+        },
+        {
+            title: "Requested Features",
+            url: "/admin/dashboard/help/features",
+            icon: HelpCircle,
+        },
+        {
+            title: "Enquiries",
+            url: "/admin/dashboard/help/enquiries",
+            icon: Folder,
+        },
+        {
+            title: "Reported Issues",
+            url: "/admin/dashboard/help/issues",
+            icon: FileText,
         },
         {
             title: "Settings",
