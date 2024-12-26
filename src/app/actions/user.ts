@@ -13,7 +13,7 @@ interface GetUsersParams {
 
 interface UserQuery {
   $or?: {
-    name?: { $regex: string; $options: string } | string;
+    username?: { $regex: string; $options: string } | string;
     email?: { $regex: string; $options: string } | string;
   }[];
   role?: string;
@@ -159,7 +159,7 @@ export async function getUsers({
 
     if (search) {
       query.$or = [
-        { name: { $regex: search, $options: "i" } },
+        { username: { $regex: search, $options: "i" } },
         { email: { $regex: search, $options: "i" } },
       ];
     }

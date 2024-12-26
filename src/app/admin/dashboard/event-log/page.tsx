@@ -3,13 +3,13 @@ import { SidebarInset } from "@/components/ui/sidebar";
 import { getEvents } from "@/app/actions/events";
 import { formatDistanceToNow } from "date-fns";
 import { LogIn, UserCog, UserPlus, UserMinus, RefreshCcw } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table";
 import { Metadata } from "next";
+import { SearchParams } from "@/lib/types/search-params";
+import Pagination from "@/components/ui/member/pagination";
+import Search from "@/components/ui/member/search";
+import Filter from "@/components/ui/member/filter";
 
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 
 export const metadata: Metadata = {
     title: 'Admin Event Log',
@@ -21,8 +21,15 @@ export default async function EventLog(props: {
     const ITEMS_PER_PAGE = 10;
 
     const searchParams = await props.searchParams
-    const page = Number(searchParams?.page) || 1;
-    const { events } = await getEvents({ page, limit: ITEMS_PER_PAGE });
+    const currentPage = Number(searchParams?.page) || 1;
+    const query = String(searchParams?.query || '');
+    const type = String(searchParams?.type || 'all');
+
+    const { events, total } = await getEvents({ page: currentPage, search: query, type: type, limit: ITEMS_PER_PAGE });
+
+    const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+    const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+    const endItem = Math.min(currentPage * ITEMS_PER_PAGE, total);
 
     const getEventIcon = (type: string) => {
         switch (type) {
@@ -55,23 +62,8 @@ export default async function EventLog(props: {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <Input 
-                            placeholder="Search events..." 
-                            className="max-w-sm"
-                        />
-                        <Select>
-                            <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Event Type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All Events</SelectItem>
-                                <SelectItem value="logged-in">Logged In</SelectItem>
-                                <SelectItem value="member-updated">Member Updated</SelectItem>
-                                <SelectItem value="member-created">Member Created</SelectItem>
-                                <SelectItem value="member-deleted">Member Deleted</SelectItem>
-                                <SelectItem value="member-synced">Member Synced</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <Search placeholder='Search events...' />
+                        <Filter target="type" options={[{ 'logged-in': 'Logged In' }, { 'member-updated': 'Member Updated' }, { 'member-created': 'Member Created' }, { 'member-deleted': 'Member Deleted' }, { 'member-synced': 'Member Synced' }]} placeholder="Type" defaultValue="all" />
                     </div>
 
                     <div className="rounded-md border">
@@ -79,7 +71,7 @@ export default async function EventLog(props: {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Event</TableHead>
-                                    <TableHead>User</TableHead>
+                                    <TableHead>Email</TableHead>
                                     <TableHead>Type</TableHead>
                                     <TableHead>Time</TableHead>
                                 </TableRow>
@@ -88,7 +80,7 @@ export default async function EventLog(props: {
                                 {events.map((event) => {
                                     const Icon = getEventIcon(event.type);
                                     return (
-                                        <TableRow key={event._id}>
+                                        <TableRow key={event.id}>
                                             <TableCell>
                                                 <div className="flex items-center gap-2">
                                                     <div className="rounded-full p-2 bg-gray-100">
@@ -106,26 +98,14 @@ export default async function EventLog(props: {
                         </Table>
                     </div>
 
-                    <div className="flex items-center justify-between">
-                        <div className="text-sm text-muted-foreground">
-                            Showing {((page - 1) * ITEMS_PER_PAGE) + 1} to {page * ITEMS_PER_PAGE} entries
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Button 
-                                variant="outline" 
-                                size="sm" 
-                                disabled={page === 1}
-                            >
-                                Previous
-                            </Button>
-                            <Button 
-                                variant="outline" 
-                                size="sm"
-                            >
-                                Next
-                            </Button>
-                        </div>
-                    </div>
+                    <Pagination
+                        startItem={startItem}
+                        endItem={endItem}
+                        totalItems={total}
+                        currentPage={currentPage}
+                        query={query}
+                        totalPages={totalPages}
+                    />
                 </div>
             </div>
         </SidebarInset>
