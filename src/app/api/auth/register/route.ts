@@ -6,8 +6,8 @@ import bcrypt from "bcrypt";
 import { createEvent } from "@/app/actions/events";
 
 export async function POST(req: Request) {
-  const { username, email, password, confirmPassword } = await req.json();
-  console.log(username, email, password, confirmPassword);
+  const { username, email, password } = await req.json();
+
   await connect();
   try {
     const hashedPassword = await bcrypt.hash(password, 10);

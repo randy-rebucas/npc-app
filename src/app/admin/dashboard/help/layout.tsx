@@ -16,7 +16,7 @@ type Breadcrumb = {
 export default function HelpLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const currentTab = pathname.split('/').pop();
-    console.log(currentTab);
+  
     const isFeatures = pathname.split('/').pop() === 'features';
     const isEnquiries = pathname.split('/').pop() === 'enquiries';
     const isIssues = pathname.split('/').pop() === 'issues';

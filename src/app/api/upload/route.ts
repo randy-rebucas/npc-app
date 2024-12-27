@@ -57,7 +57,6 @@ export async function DELETE(request: NextRequest) {
 
     if (fileExists) {
       await unlink(filepath);
-      console.log("File found and deleted");
     }
 
     return NextResponse.json({ message: "File deleted successfully" });

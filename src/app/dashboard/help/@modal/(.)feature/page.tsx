@@ -47,7 +47,6 @@ export default function FeatureModal() {
                 body: JSON.stringify(values),
             });
             if (response.ok) {
-                console.log("Report submitted successfully");
                 toast({
                     title: "Feature requested successfully",
                     description: "Thank you for your feature request. We will get back to you soon.",

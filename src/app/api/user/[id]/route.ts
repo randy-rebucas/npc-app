@@ -19,12 +19,6 @@ export async function GET(
   }
 }
 
-export async function POST(request: Request) {
-  const data = await request.json();
-  console.log(data);
-  return NextResponse.json({ message: "Profile updated successfully" });
-}
-
 export async function PUT(
   request: Request,
 ) {

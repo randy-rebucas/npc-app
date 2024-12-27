@@ -37,9 +37,8 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ users });
   } catch (error) {
-    console.log(error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: error instanceof Error ? error.message : "Internal server error" },
       { status: 500 }
     );
   }

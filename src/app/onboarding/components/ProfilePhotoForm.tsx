@@ -27,7 +27,7 @@ export default function ProfilePhotoForm({ form }: FormStepProps) {
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    console.log(file);
+ 
     if (file) {
       try {
         // Create FormData object

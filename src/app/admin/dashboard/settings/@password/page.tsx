@@ -50,7 +50,7 @@ export default function Password() {
         body: JSON.stringify({ password: values.currentPassword }),
       });
       const data = await verifyResponse.json();
-      console.log(data);
+
       if (!data.isMatch) {
         toast({
           title: "Error",

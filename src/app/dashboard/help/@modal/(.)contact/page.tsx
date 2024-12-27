@@ -61,7 +61,6 @@ export default function ContactModal() {
                 body: JSON.stringify(values),
             });
             if (response.ok) {
-                console.log("Report submitted successfully");
                 toast({
                     title: "Enquiry submitted successfully",
                     description: "Thank you for your enquiry. We will get back to you soon.",

@@ -5,10 +5,10 @@ import { NextResponse } from "next/server";
 import User from "@/app/models/User";
 import connect from "@/lib/db";
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     await connect();
-    console.log(request);
+ 
     const session = await getServerSession(authOptions);
     const user = await User.findById(session?.user.id);
     return NextResponse.json(user);

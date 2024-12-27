@@ -47,7 +47,6 @@ export default function ReportModal() {
                 body: JSON.stringify(values),
             });
             if (response.ok) {
-                console.log("Report submitted successfully");
                 toast({
                     title: "Report submitted successfully",
                     description: "Thank you for your report. We will get back to you soon.",

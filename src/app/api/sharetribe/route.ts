@@ -6,7 +6,6 @@ import { createEvent } from "@/app/actions/events";
 
 export async function POST(request: Request) {
   try {
-    console.log("Syncing member to Sharetribe");
     await connect();
     const { id } = await request.json();
 
@@ -15,8 +14,6 @@ export async function POST(request: Request) {
     if (!member) {
       return Response.json({ error: "Member not found" }, { status: 404 });
     }
-
-    console.log(member);
 
     const customFields = {
       firstName: member.payload.customFields["first-name"] || "User",
@@ -60,7 +57,6 @@ export async function POST(request: Request) {
         type: "member-synced",
       });
 
-      console.log("Synced member to Sharetribe");
       return Response.json(sharetribeUser);
     }
 
