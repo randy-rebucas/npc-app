@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { redirect } from "next/navigation";
 import { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
     title: 'Dashboard',
@@ -69,9 +70,9 @@ export default async function Dashboard() {
 
                         <div className="mb-8">
                             <h2 className="text-2xl font-bold mb-6">What happens next?</h2>
-                            <button className="bg-blue-500 text-white px-6 py-2 rounded-full mb-4">
+                            <Link href="/dashboard/sign-pdf" className="bg-blue-500 text-white px-6 py-2 rounded-full mb-4">
                                 Sign Your Agreement
-                            </button>
+                            </Link>
                             <p className="text-gray-600">
                                 After approval, you will receive an email that links you to the agreement you&apos;ll need to sign before
                                 your profile is active on NP Collaborator. The email will also give you instructions on how to
