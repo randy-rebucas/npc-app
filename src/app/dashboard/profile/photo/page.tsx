@@ -1,26 +1,68 @@
-"use client"
+'use client';
 
-import { useState } from "react";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { IUserProfile } from "@/app/models/UserProfile";
-import { useToast } from "@/hooks/use-toast";
-import Image from "next/image";
-
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useToast } from '@/hooks/use-toast';
+import * as z from 'zod';
+import Image from 'next/image';
+import { PhotoSkeleton } from '@/components/skeletons';
 
 const formSchema = z.object({
     photo: z.instanceof(File).optional(),
 })
 
-export default function Photo({ photo }: { photo: Partial<IUserProfile> }) {
+export default function Photo() {
     const [photoUrl, setPhotoUrl] = useState('');
     const [isUploading, setIsUploading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const { toast } = useToast();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
     });
+
+    // Memoize the setValue function
+    const setValue = form.setValue;
+
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            try {
+                setIsLoading(true);
+                const userProfile = await fetch(`/api/profile`);
+
+                if (!userProfile.ok) {
+                    throw new Error(`Failed to fetch profile: ${userProfile.statusText}`);
+                }
+                const profileResponse = await userProfile.json();
+                setPhotoUrl(profileResponse?.profilePhotoPath || '');
+
+                const profile = {
+                    photo: profileResponse?.profilePhotoPath || '',
+                };
+
+                Object.entries(profile).forEach(([key, value]) => {
+                    setValue(key as keyof typeof profile, value);
+                });
+            } catch (error) {
+                toast({
+                    title: "Error",
+                    description: `Failed to load profile data: ${error}`,
+                    variant: "destructive",
+                });
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        fetchUserProfile();
+
+    }, [setValue, toast]);
+
+    if (isLoading) {
+        return <PhotoSkeleton />; 
+    }
+    
 
     const handleUpload = async (file: File) => {
         setIsUploading(true);
@@ -29,7 +71,7 @@ export default function Photo({ photo }: { photo: Partial<IUserProfile> }) {
             // Delete old file
             const deleteResponse = await fetch("/api/upload", {
                 method: "DELETE",
-                body: JSON.stringify({ path: photo.profilePhotoPath }),
+                body: JSON.stringify({ path: photoUrl }),
             });
 
             if (!deleteResponse.ok) {
@@ -50,7 +92,7 @@ export default function Photo({ photo }: { photo: Partial<IUserProfile> }) {
                 throw new Error('Upload failed');
             }
             const data = await response.json();
-            console.log(data);
+
             setPhotoUrl(data.url);
 
             if (data.url) {
@@ -92,21 +134,21 @@ export default function Photo({ photo }: { photo: Partial<IUserProfile> }) {
                     Please make sure your information is up to date.
                 </p>
             </div>
-            
+
             <div className="flex flex-col items-center gap-6">
                 {/* Profile Image */}
                 <div className="relative w-32 h-32 rounded-full overflow-hidden bg-gray-100">
-                    {(photoUrl || photo.profilePhotoPath) ? (
+                    {(photoUrl) ? (
                         <Image
-                            src={photoUrl || photo.profilePhotoPath || ''} 
-                            alt={`${photo.firstName ?? ''} ${photo.lastName ?? ''}`}
+                            src={photoUrl || ''}
+                            alt='avatar'
                             className="w-full h-full object-cover"
                             width={128}
                             height={128}
                         />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center text-2xl font-semibold text-gray-600">
-                            {(photo.firstName?.charAt(0) ?? '').toUpperCase() + (photo.lastName?.charAt(0) ?? '').toUpperCase()}
+                            {''}
                         </div>
                     )}
                 </div>

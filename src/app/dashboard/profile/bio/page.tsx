@@ -1,11 +1,12 @@
 'use client';
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { IUserProfile } from "@/app/models/UserProfile";
-import * as z from "zod";
-import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useToast } from '@/hooks/use-toast';
+import * as z from 'zod';
+import { BioSkeleton } from '@/components/skeletons';
+
 
 const bioFormSchema = z.object({
     description: z.string().min(1, "Background is required"),
@@ -15,18 +16,57 @@ const bioFormSchema = z.object({
 
 type BioFormValues = z.infer<typeof bioFormSchema>;
 
-export default function Bio({ bio }: { bio: Partial<IUserProfile> }) {
+export default function Bio() {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const { toast } = useToast();
 
     const form = useForm<BioFormValues>({
         resolver: zodResolver(bioFormSchema),
         defaultValues: {
-            description: bio.description || '',
-            boardCertification: bio.boardCertification || '',
-            linkedinProfile: bio.linkedinProfile || '',
+            description: '',
+            boardCertification: '',
+            linkedinProfile: '',
         },
     });
+
+    // Memoize the setValue function
+    const setValue = form.setValue;
+
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            try {
+                setIsLoading(true);
+                const userProfile = await fetch(`/api/profile`);
+
+                if (!userProfile.ok) {
+                    throw new Error(`Failed to fetch profile: ${userProfile.statusText}`);
+                }
+                const profileResponse = await userProfile.json();
+
+                const profile = {
+                    description: profileResponse?.description || '',
+                    boardCertification: profileResponse?.boardCertification || '',
+                    linkedinProfile: profileResponse?.linkedinProfile || '',
+                };
+
+                Object.entries(profile).forEach(([key, value]) => {
+                    setValue(key as keyof typeof profile, value);
+                });
+            } catch (error) {
+                toast({
+                    title: "Error",
+                    description: `Failed to load profile data: ${error}`,
+                    variant: "destructive",
+                });
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        fetchUserProfile();
+
+    }, [setValue, toast]);
 
     async function onSubmit(data: BioFormValues) {
         setIsSubmitting(true);
@@ -55,6 +95,10 @@ export default function Bio({ bio }: { bio: Partial<IUserProfile> }) {
         } finally {
             setIsSubmitting(false);
         }
+    }
+
+    if (isLoading) {
+        return <BioSkeleton />;
     }
 
     return (
