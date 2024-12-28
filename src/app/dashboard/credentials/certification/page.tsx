@@ -4,9 +4,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Plus, X } from "lucide-react";
-import { useState } from "react";
-import { Certification } from "@/lib/types/onboarding";
+import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { CertificationSkeleton } from "@/components/skeletons";
 
 const certificationFormSchema = z.object({
     boardCertifications: z.string(),
@@ -22,28 +22,57 @@ const certificationFormSchema = z.object({
 
 type CertificationFormValues = z.infer<typeof certificationFormSchema>;
 
-export default function Certifications({ boardCertification, additionalCertifications, npiNumber }: { 
-    boardCertification: string, 
-    additionalCertifications: Certification[], 
-    npiNumber: string 
-}) {
+export default function CertificationPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const { toast } = useToast();
 
     const form = useForm<CertificationFormValues>({
         resolver: zodResolver(certificationFormSchema),
         defaultValues: {
-            boardCertifications: boardCertification || "",
-            additionalCertifications: additionalCertifications.map(certification => ({
-                certification: certification.certification,
-                issueDate: certification.issueDate?.toISOString().split('T')[0] || "",
-                expirationDate: certification.expirationDate?.toISOString().split('T')[0] || "",
-                certificateUrl: certification.certificateUrl || "",
-                certificateNumber: certification.certificateNumber || "",
-            })),
-            npiNumber: npiNumber || "",
+            boardCertifications: "",
+            additionalCertifications: [],
+            npiNumber: "",
         },
     });
+
+    // Memoize the setValue function
+    const setValue = form.setValue;
+
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            try {
+                setIsLoading(true);
+                const userProfile = await fetch(`/api/profile`);
+
+                if (!userProfile.ok) {
+                    throw new Error(`Failed to fetch profile: ${userProfile.statusText}`);
+                }
+                const profileResponse = await userProfile.json();
+
+                const profile = {
+                    boardCertifications: profileResponse?.boardCertifications || "",
+                    additionalCertifications: profileResponse?.additionalCertifications || [],
+                    npiNumber: profileResponse?.npiNumber || "",
+                };
+
+                Object.entries(profile).forEach(([key, value]) => {
+                    setValue(key as keyof typeof profile, value);
+                });
+            } catch (error) {
+                toast({
+                    title: "Error",
+                    description: `Failed to load profile data: ${error}`,
+                    variant: "destructive",
+                });
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        fetchUserProfile();
+
+    }, [setValue, toast]);
 
     async function onSubmit(data: CertificationFormValues) {
         setIsSubmitting(true);
@@ -79,6 +108,10 @@ export default function Certifications({ boardCertification, additionalCertifica
         } finally {
             setIsSubmitting(false);
         }
+    }
+
+    if (isLoading) {
+        return <CertificationSkeleton />;
     }
 
     return (

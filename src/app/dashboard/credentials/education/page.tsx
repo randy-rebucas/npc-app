@@ -3,8 +3,9 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useToast } from "@/hooks/use-toast"
+import { EducationSkeleton } from "@/components/skeletons"
 
 export type Education = {
     undergrad?: string;
@@ -24,32 +25,77 @@ const educationFormSchema = z.object({
 
 type EducationFormValues = z.infer<typeof educationFormSchema>;
 
-export default function Education({
-    education = { undergrad: '', medical: '', residency: '' },
-    clinicalDegree = '',
-    practiceTypes = [],
-    practices = []
-}: {
-    education?: Education,
-    clinicalDegree?: string,
-    practiceTypes?: string[],
-    practices: string[]
-}) {
+// Add this type definition near the top with other types
+type PracticeType = string;
+
+export default function EducationPage() {
     const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [practices, setPractices] = useState<PracticeType[]>([]);
 
     const form = useForm<EducationFormValues>({
         resolver: zodResolver(educationFormSchema),
         defaultValues: {
-            clinicalDegree: clinicalDegree || "",
-            practiceTypes: practiceTypes || [],
+            clinicalDegree: "",
+            practiceTypes: [],
             education: {
-                undergrad: education.undergrad || "",
-                medical: education.medical || "",
-                residency: education.residency || "",
+                undergrad: "",
+                medical: "",
+                residency: "",
             },
         },
     })
+
+    // Memoize the setValue function
+    const setValue = form.setValue;
+
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            try {
+                setIsLoading(true);
+                const userProfile = await fetch(`/api/profile`);
+
+                if (!userProfile.ok) {
+                    throw new Error(`Failed to fetch profile: ${userProfile.statusText}`);
+                }
+                const profileResponse = await userProfile.json();
+
+                const profile = {
+                    clinicalDegree: profileResponse?.clinicalDegree || "",
+                    practiceTypes: profileResponse?.practiceTypes || [],
+                    education: profileResponse?.education || {},
+                };
+
+                Object.entries(profile).forEach(([key, value]) => {
+                    setValue(key as keyof typeof profile, value);
+                });
+            } catch (error) {
+                toast({
+                    title: "Error",
+                    description: `Failed to load profile data: ${error}`,
+                    variant: "destructive",
+                });
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        fetchUserProfile();
+
+    }, [setValue, toast]);
+
+    useEffect(() => {
+        const getPracticeTypes = async () => {
+            const response = await fetch(`/api/practicetypes`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch practice types');
+            }
+            const practicesData = await response.json();
+            setPractices(practicesData);
+        };
+        getPracticeTypes();
+    }, []);
 
     async function onSubmit(data: EducationFormValues) {
         setIsSubmitting(true);
@@ -80,6 +126,10 @@ export default function Education({
         } finally {
             setIsSubmitting(false);
         }
+    }
+
+    if (isLoading) {
+        return <EducationSkeleton />;
     }
 
     return (
@@ -135,8 +185,8 @@ export default function Education({
                         <option value="">Select practice types</option>
                         {practices
                             .filter(practice => !form.watch("practiceTypes").includes(practice))
-                            .map(type => (
-                                <option key={type} value={type}>{type}</option>
+                            .map((type, index) => (
+                                <option key={`practice-${index}-${type}`} value={type}>{type}</option>
                             ))
                         }
                     </select>
