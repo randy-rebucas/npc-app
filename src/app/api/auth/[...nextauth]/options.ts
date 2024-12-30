@@ -1,5 +1,9 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import LinkedInProvider, {
+  LinkedInProfile,
+} from "next-auth/providers/linkedin";
+import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcrypt";
 import connect from "@/lib/db";
 import User from "@/app/models/User";
@@ -42,6 +46,31 @@ export const authOptions: NextAuthOptions = {
         }
       },
     }),
+    LinkedInProvider({
+      clientId: process.env.LINKEDIN_CLIENT_ID as string,
+      clientSecret: process.env.LINKEDIN_CLIENT_SECRET as string,
+      authorization: {
+        params: {
+          scope: "openid profile email",
+        },
+      },
+      issuer: "https://www.linkedin.com",
+      wellKnown:
+        "https://www.linkedin.com/oauth/.well-known/openid-configuration",
+      async profile(profile: LinkedInProfile) {
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture,
+          role: "CUSTOMER",
+        };
+      },
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    }),
     {
       id: "logto",
       name: "Logto",
@@ -73,14 +102,11 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async signIn({ user, account }) {
-      if (account?.provider === "logto") {
+      if (account?.provider === "logto" || account?.provider === "linkedin" || account?.provider === "google") {
         try {
           await connect();
           const existingUser = await User.findOne({ email: user.email });
-          const hashedPassword = await bcrypt.hash(
-            'password',
-            10
-          );
+          const hashedPassword = await bcrypt.hash("password", 10);
 
           if (!existingUser) {
             const newUser = await User.create({
@@ -106,7 +132,7 @@ export const authOptions: NextAuthOptions = {
       await createEvent({
         user: user.id,
         email: user.email!,
-        type: 'logged-in'
+        type: "logged-in",
       });
       return true;
     },

@@ -113,10 +113,32 @@ export default function SignIn() {
                 type="button"
                 disabled={isLoading}
                 onClick={() => signIn("logto", { callbackUrl: "/dashboard" })}
-                className="w-full"
+                className="w-full mb-2"
               >
                 <Icons.logto className="mr-2 h-4 w-4" />
                 Logto
+              </Button>
+
+              <Button
+                variant="outline"
+                type="button"
+                disabled={isLoading}
+                onClick={() => signIn("linkedin", { callbackUrl: "/dashboard" })}
+                className="w-full mb-2"
+              >
+                <Icons.linkedin className="mr-2 h-4 w-4" />
+                LinkedIn
+              </Button>
+
+              <Button
+                variant="outline"
+                type="button"
+                disabled={isLoading}
+                onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+                className="w-full mb-2"
+              >
+                <Icons.google className="mr-2 h-4 w-4" />
+                Google
               </Button>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
