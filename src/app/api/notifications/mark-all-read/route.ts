@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import { Notification } from "@/app/models/notification";
+import Notification from "@/app/models/Notification";
 import connect from "@/lib/db";
 
 export async function POST() {

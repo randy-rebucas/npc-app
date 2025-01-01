@@ -1,4 +1,4 @@
-import { INotification } from '@/app/models/notification';
+import { INotification } from '@/app/models/Notification';
 import React, { useState } from 'react';
 
 export function Notifications({ 

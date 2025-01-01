@@ -1,5 +1,5 @@
 import connect from "@/lib/db";
-import { Notification } from "@/app/models/notification";
+import Notification from "@/app/models/Notification";
 
 export async function createNotification({
   userId,

@@ -1,6 +1,6 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { INotification } from "@/app/models/notification";
+import { INotification } from "@/app/models/Notification"; 
 
 type NotificationsContextType = {
   notifications: INotification[];
@@ -16,7 +16,7 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
   const { data: session } = useSession();
   const [notifications, setNotifications] = useState<INotification[]>([]);
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     if (!session?.user) return;
     
     try {
@@ -26,16 +26,15 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
     }
-  };
+  }, [session?.user]);
 
   useEffect(() => {
     if (session?.user) {
       fetchNotifications();
-      // Optional: Set up real-time updates using WebSocket or polling
-      const interval = setInterval(fetchNotifications, 30000); // Poll every 30 seconds
+      const interval = setInterval(fetchNotifications, 30000);
       return () => clearInterval(interval);
     }
-  }, [session]);
+  }, [session, fetchNotifications]);
 
   const markAsRead = async (id: string) => {
     try {

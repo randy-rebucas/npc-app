@@ -1,6 +1,6 @@
 'use client';
 
-import { INotification } from "@/app/models/notification";
+import { INotification } from "@/app/models/Notification";
 import Breadcrumbs from "./breadcrumbs";
 import { SignOut } from "./signout";
 import { Notifications } from "@/components/notifications";
