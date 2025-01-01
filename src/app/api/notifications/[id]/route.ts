@@ -19,7 +19,7 @@ export async function PATCH(
     await connect();
 
     const notification = await Notification.findOneAndUpdate(
-      { _id: id, userId: session.user.id },
+      { _id: id, user: session.user.id },
       { read: true },
       { new: true }
     );

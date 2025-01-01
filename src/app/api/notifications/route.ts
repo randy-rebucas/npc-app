@@ -12,9 +12,9 @@ export async function GET() {
     }
 
     await connect();
-    
+
     const notifications = await Notification.find({ 
-      userId: session.user.id 
+      user: session.user.id 
     }).sort({ createdAt: -1 });
 
     return NextResponse.json(notifications);

@@ -5,7 +5,7 @@ import { AuthProvider } from "@/providers/auth-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { getConfigValue } from "@/app/actions/config"
 import { NotificationsProvider } from "@/providers/notifications-provider";
-import { NotificationsList } from "@/components/notifications/notifications-list";
+
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -54,7 +54,6 @@ export default function RootLayout({
         <AuthProvider>
           <NotificationsProvider>
             {children}
-            <NotificationsList />
           </NotificationsProvider>
         </AuthProvider>
         <Toaster />

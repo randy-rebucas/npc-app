@@ -1,8 +1,9 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
+import { IUser } from "./User";
 
 export interface INotification {
   _id: string; // Add this line
-  userId: string;
+  user: Types.ObjectId | IUser; 
   title: string;
   message: string;
   read: boolean;
@@ -11,7 +12,7 @@ export interface INotification {
 }
 
 const notificationSchema = new Schema<INotification>({
-  userId: { type: String, required: true },
+  user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   title: { type: String, required: true },
   message: { type: String, required: true },
   read: { type: Boolean, default: false },

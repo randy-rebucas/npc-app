@@ -19,12 +19,12 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
   const [notifications, setNotifications] = useState<INotification[]>([]);
 
   const fetchNotifications = useCallback(async () => {
+    console.log("fetching notifications");
     if (!session?.user) return;
     
     try {
       const response = await fetch('/api/notifications');
       const data = await response.json();
-      console.log(data);
       setNotifications(data);
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
@@ -79,6 +79,7 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
 
 export const useNotifications = () => {
   const context = useContext(NotificationsContext);
+  console.log(context);
   if (context === undefined) {
     throw new Error('useNotifications must be used within a NotificationsProvider');
   }

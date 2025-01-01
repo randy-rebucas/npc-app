@@ -14,7 +14,7 @@ export async function POST() {
     await connect();
     
     await Notification.updateMany(
-      { userId: session.user.id, read: false },
+      { user: session.user.id, read: false },
       { read: true }
     );
 
