@@ -1,4 +1,5 @@
 import { INotification } from '@/app/models/Notification';
+import { useNotifications } from '@/providers/notifications-provider';
 import React, { useState } from 'react';
 
 export function Notifications({ 
@@ -9,7 +10,8 @@ export function Notifications({
   notifications?: INotification[] 
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  
+  const { markAsRead } = useNotifications();
+
   return (
     <div className="relative">
       <button 
@@ -34,6 +36,7 @@ export function Notifications({
             {notifications.slice(0, 5).map((notification) => (
               <div 
                 key={notification._id}
+                onClick={() => markAsRead(notification._id)}
                 className={`py-3 px-4 border-b border-gray-200 dark:border-gray-700 last:border-0 ${
                   !notification.read ? 'bg-blue-50 dark:bg-blue-900/20' : ''
                 }`}

@@ -1,3 +1,5 @@
+"use client";
+
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { INotification } from "@/app/models/Notification"; 
@@ -22,6 +24,7 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
     try {
       const response = await fetch('/api/notifications');
       const data = await response.json();
+      console.log(data);
       setNotifications(data);
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
