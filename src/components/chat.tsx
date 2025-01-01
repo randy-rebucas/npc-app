@@ -103,14 +103,13 @@ export function Chat() {
 
   return (
     <div className="relative">
-      <Button
-        variant="ghost"
-        size="icon"
+      <button
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Toggle chat"
+        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full relative"
       >
-        <MessageCircle className="h-5 w-5" />
-      </Button>
+        <MessageCircle className="h-6 w-6" />
+      </button>
 
       {isOpen && (
         <div 

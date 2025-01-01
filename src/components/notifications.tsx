@@ -2,6 +2,7 @@
 import { useNotifications } from '@/providers/notifications-provider';
 import React, { useState } from 'react';
 import { Button } from './ui/button';
+import { Bell } from 'lucide-react';
 
 export function Notifications() {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,14 +10,11 @@ export function Notifications() {
 
   return (
     <div className="relative">
-      <button
+      <button 
         onClick={() => setIsOpen(!isOpen)}
         className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full relative"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-          <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-        </svg>
+        <Bell className="h-6 w-6" />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
             {unreadCount > 99 ? '99+' : unreadCount}
