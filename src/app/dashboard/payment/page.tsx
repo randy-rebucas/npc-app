@@ -1,13 +1,13 @@
 "use client"
 
 import { useCallback, useEffect, useState } from 'react';
-import PaymentForm from '@/components/PaymentForm';
+// import PaymentForm from '@/components/PaymentForm';
 import Header from '@/components/header';
 import { IPayment } from '@/app/models/Payment';
 import { Button } from '@/components/ui/button';
 
 export default function PaymentPage() {
-  const [clientSecret, setClientSecret] = useState<string>('');
+  // const [clientSecret, setClientSecret] = useState<string>('');
   const [nextPayout, setNextPayout] = useState<{ amount: number; date: string } | null>(null);
   const [thisMonth, setThisMonth] = useState<{ amount: number; collaboratorCount: number } | null>(null);
   const [totalEarnings, setTotalEarnings] = useState<{ amount: number; monthlyData: number[] } | null>(null);
@@ -32,24 +32,24 @@ export default function PaymentPage() {
 
   useEffect(() => {
     // Create PaymentIntent as soon as the page loads
-    const fetchCreatePaymentIntent = async () => {
-      try {
-        const response = await fetch("/api/create-payment-intent", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount: 1000 }), // $10.00
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setClientSecret(data.clientSecret);
-      } catch (error) {
-        console.error("Error fetching payment intent:", error);
-      }
-    };
+    // const fetchCreatePaymentIntent = async () => {
+    //   try {
+    //     const response = await fetch("/api/create-payment-intent", {
+    //       method: "POST",
+    //       headers: { "Content-Type": "application/json" },
+    //       body: JSON.stringify({ amount: 1000 }), // $10.00
+    //     });
+    //     if (!response.ok) {
+    //       throw new Error(`HTTP error! status: ${response.status}`);
+    //     }
+    //     const data = await response.json();
+    //     setClientSecret(data.clientSecret);
+    //   } catch (error) {
+    //     console.error("Error fetching payment intent:", error);
+    //   }
+    // };
 
-    fetchCreatePaymentIntent();
+    // fetchCreatePaymentIntent();
 
     // New fetch for next payout information
     const fetchNextPayout = async () => {
@@ -229,11 +229,11 @@ export default function PaymentPage() {
               </div>
             </div>
 
-            {clientSecret && (
+            {/* {clientSecret && (
               <div className="mt-8">
                 <PaymentForm clientSecret={clientSecret} />
               </div>
-            )}
+            )} */}
           </>
         ) : (
           // TODO: Add a button to connect with Stripe
