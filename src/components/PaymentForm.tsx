@@ -1,27 +1,28 @@
 "use client"
 
 import { useState } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
-import {
-  Elements,
-  PaymentElement,
-  useStripe,
-  useElements,
-} from '@stripe/react-stripe-js';
+import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js';
 
+// Initialize Stripe
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
+// Checkout Form Component
 function CheckoutForm() {
   const stripe = useStripe();
   const elements = useElements();
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [processing, setProcessing] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!stripe || !elements) return;
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
 
-    setLoading(true);
+    if (!stripe || !elements) {
+      return;
+    }
+
+    setProcessing(true);
+
     const { error: submitError } = await stripe.confirmPayment({
       elements,
       confirmParams: {
@@ -31,29 +32,48 @@ function CheckoutForm() {
 
     if (submitError) {
       setError(submitError.message ?? 'An error occurred');
+      setProcessing(false);
     }
-    setLoading(false);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="">
+    <form onSubmit={handleSubmit} className="max-w-md mx-auto">
       <PaymentElement />
-      {error && <div className="text-red-500 mt-2">{error}</div>}
+      {error && (
+        <div className="text-red-500 text-sm mt-4">
+          {error}
+        </div>
+      )}
       <button
         type="submit"
-        disabled={!stripe || loading}
-        className="mt-4 w-full bg-primary-600 py-2 px-4 rounded-lg hover:bg-primary-700 disabled:opacity-50"
+        disabled={!stripe || processing}
+        className="mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
       >
-        {loading ? 'Processing...' : 'Pay Now'}
+        {processing ? 'Processing...' : 'Pay Now'}
       </button>
     </form>
   );
 }
 
-export default function PaymentForm({ clientSecret }: { clientSecret: string }) {
+// Main Payment Form Component
+interface PaymentFormProps {
+  clientSecret: string;
+}
+
+export default function PaymentForm({ clientSecret }: PaymentFormProps) {
+  const options = {
+    clientSecret,
+    appearance: {
+      theme: 'stripe',
+    },
+  };
+
   return (
-    <Elements stripe={stripePromise} options={{ clientSecret }}>
-      <CheckoutForm />
-    </Elements>
+    <div className="bg-white p-6 rounded-lg shadow">
+      <h2 className="text-lg font-medium mb-4">Payment Details</h2>
+      <Elements stripe={stripePromise} options={options as StripeElementsOptions}>
+        <CheckoutForm />
+      </Elements>
+    </div>
   );
 } 

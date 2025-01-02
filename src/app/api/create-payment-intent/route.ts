@@ -23,6 +23,7 @@ export async function POST(req: Request) {
         enabled: true,
       },
       metadata: {
+        integration_check: "accept_a_payment",
         userId: session?.user?.id,
       },
     });
