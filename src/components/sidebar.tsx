@@ -10,8 +10,6 @@ export async function AppSidebar() {
     const session = await getServerSession(authOptions)
     const user = session?.user?.email ? await getUserByEmail(session.user.email) : null
 
-    
-
     return (
         <aside className="flex h-screen w-72 flex-col bg-white/50 backdrop-blur-xl border-r border-gray-200/50 dark:bg-gray-900/50 dark:border-gray-800/50">
             {/* Header */}

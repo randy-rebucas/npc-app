@@ -31,6 +31,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "ms-application-assets.s3.amazonaws.com",
       },
+      {
+        protocol: "https",
+        hostname: "stripe.com",
+      },
     ],
   },
 };
