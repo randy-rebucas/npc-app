@@ -32,7 +32,8 @@ const userSchema = new Schema<IUser>(
 );
 
 const User =
-  mongoose.models.Users ?? mongoose.model<IUser>("Users", userSchema);
+  mongoose.models.User ??
+  mongoose.model<IUser>("User", userSchema); 
 
 export default User;
 

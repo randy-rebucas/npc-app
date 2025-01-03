@@ -6,9 +6,9 @@ export default function AttestationsLayout({
   modal: React.ReactNode;
 }) {
   return (
-    <>
+    <div className="bg-gray-50 min-h-screen w-full">
       {children}
       {modal}
-    </>
+    </div>
   );
 }

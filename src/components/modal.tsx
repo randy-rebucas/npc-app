@@ -7,7 +7,7 @@ export default function Modal({ children }: { children: React.ReactNode }) {
 
     return (
         <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center" onClick={() => router.back()}>
-            <div className="bg-white rounded-lg max-w-lg w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-white max-w-3xl mx-4 rounded-lg w-full" onClick={(e) => e.stopPropagation()}>
                 {children}
             </div>
         </div>

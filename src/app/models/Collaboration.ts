@@ -1,16 +1,32 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
+import { IUser } from "./User";
+
+export interface IActiveCollaboration {
+  _id: string;
+  npUser: Types.ObjectId | IUser;
+  physicianUser: Types.ObjectId | IUser;
+  startDate: Date;
+  status: "active" | "paused" | "terminated";
+  agreementSignedAt: Date;
+  lastAttestationDate: Date;
+  nextAttestationDue: Date;
+  monthlyRate: number;
+}
+
+export interface ICollaborationRequest {
+  _id: string;
+  npUser: Types.ObjectId | IUser;
+  physicianUser: Types.ObjectId | IUser;
+  status: "pending" | "accepted" | "rejected" | "cancelled";
+  requestedAt: Date;
+  message: string;
+  responseMessage: string;
+  respondedAt: Date;
+}
 
 const collaborationRequestSchema = new mongoose.Schema({
-  npUser: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  physicianUser: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
+  npUser: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  physicianUser: { type: Schema.Types.ObjectId, ref: "User", required: true },
   status: {
     type: String,
     enum: ["pending", "accepted", "rejected", "cancelled"],
@@ -26,16 +42,8 @@ const collaborationRequestSchema = new mongoose.Schema({
 });
 
 const activeCollaborationSchema = new mongoose.Schema({
-  npUser: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  physicianUser: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
+  npUser: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  physicianUser: { type: Schema.Types.ObjectId, ref: "User", required: true },
   startDate: {
     type: Date,
     required: true,
@@ -52,8 +60,14 @@ const activeCollaborationSchema = new mongoose.Schema({
 
 export const CollaborationRequest =
   mongoose.models.CollaborationRequest ||
-  mongoose.model("CollaborationRequest", collaborationRequestSchema);
+  mongoose.model<ICollaborationRequest>(
+    "CollaborationRequest",
+    collaborationRequestSchema
+  );
 
 export const ActiveCollaboration =
   mongoose.models.ActiveCollaboration ||
-  mongoose.model("ActiveCollaboration", activeCollaborationSchema);
+  mongoose.model<IActiveCollaboration>(
+    "ActiveCollaboration",
+    activeCollaborationSchema
+  );
