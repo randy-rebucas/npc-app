@@ -1,8 +1,8 @@
-
 import { useNotifications } from '@/providers/notifications-provider';
 import React, { useState } from 'react';
 import { Button } from './ui/button';
 import { Bell } from 'lucide-react';
+import Link from 'next/link';
 
 export function Notifications() {
   const [isOpen, setIsOpen] = useState(false);
@@ -48,17 +48,27 @@ export function Notifications() {
                   {notification.message}
                 </p>
                 {notification.link && (
-                  <a
+                  <Link
                     href={notification.link}
                     className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 mt-2 inline-block"
                   >
                     View details
-                  </a>
+                  </Link>
                 )}
               </div>
             ))}
             {notifications.length === 0 && (
               <p className="text-gray-500">No notifications</p>
+            )}
+            {notifications.length > 5 && (
+              <div className="pt-3 text-center border-t border-gray-200 dark:border-gray-700">
+                <Link
+                  href="/dashboard/notifications"
+                  className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                  Show all notifications
+                </Link>
+              </div>
             )}
           </div>
         </div>

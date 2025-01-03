@@ -1,37 +1,32 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/options";
+import { getServerSession } from "next-auth/next";
 import connect from "@/lib/db";
-import Message, { IMessage } from "@/app/models/Messsage";
+import Message from "@/app/models/Message";
+import { authOptions } from "../../auth/[...nextauth]/options";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return new NextResponse("Unauthorized", { status: 401 });
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const chatId = searchParams.get("chatId");
+
+    if (!chatId) {
+      return NextResponse.json({ error: 'Chat ID is required' }, { status: 400 });
     }
 
     await connect();
 
-    const userId = session?.user?.id;
+    const messages = await Message.find({ chatId })
+      .sort({ timestamp: 1 })
+      .lean();
 
-    const chatMessages = await Message.find({ user: userId })
-      .sort({ createdAt: 1 })
-      .limit(50);
-
-    return NextResponse.json({
-      messages: chatMessages.map((msg: IMessage) => ({
-        id: msg._id.toString(),
-        content: msg.content,
-        sender: msg.sender,
-        timestamp: msg.createdAt,
-      })),
-    });
+    return NextResponse.json({ messages });
   } catch (error) {
-    console.error("Chat History Error:", error);
-    return NextResponse.json(
-      { error: "Failed to load message history" },
-      { status: 500 }
-    );
+    console.error('Failed to fetch messages:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

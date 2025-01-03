@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from 'lucide-react'
-import { HelpCircle, Key, User, LayoutDashboard, MessageCircle, Settings, Bell, CreditCard, FileCheck } from "lucide-react"
+import { HelpCircle, Key, User, LayoutDashboard, Settings, CreditCard, FileCheck } from "lucide-react"
 
 // Add type for navigation items
 type NavItem = {
@@ -31,16 +31,6 @@ export default function Nav() {
             title: "Credentials",
             url: "/dashboard/credentials",
             icon: Key,
-        },
-        {
-            title: "Chat",
-            url: "/dashboard/chat",
-            icon: MessageCircle,
-        },
-        {
-            title: "Notifications",
-            url: "/dashboard/notifications",
-            icon: Bell,
         },
         {
             title: "Payment",
