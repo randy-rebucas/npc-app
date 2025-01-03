@@ -8,6 +8,7 @@ export interface IUser {
   password: string;
   onboardingStatus: "incomplete" | "completed";
   provider: string;
+  validated: boolean;
   role: "ADMIN" | "CUSTOMER";
   createdAt: Date;
   updatedAt: Date;
@@ -24,6 +25,7 @@ const userSchema = new Schema<IUser>(
       default: "incomplete",
     },
     provider: { type: String, required: true },
+    validated: { type: Boolean, default: false },
     role: { type: String, enum: ["ADMIN", "CUSTOMER"], default: "CUSTOMER" },
   },
   { timestamps: true }
