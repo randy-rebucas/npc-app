@@ -62,7 +62,6 @@ export default function PaymentPage() {
 
         if (!response.ok) {
           setNextPayout({ amount: 0, date: new Date().toLocaleDateString() });
-          throw new Error(`HTTP error! status: ${response.status} for ${response.url}`);
         }
         const data = await response.json();
         setNextPayout(data);
@@ -84,7 +83,6 @@ export default function PaymentPage() {
 
         if (!response.ok) {
           setThisMonth({ amount: 0, collaboratorCount: 0 });
-          throw new Error(`HTTP error! status: ${response.status} for ${response.url}`);
         }
         const data = await response.json();
         setThisMonth(data);
@@ -101,7 +99,6 @@ export default function PaymentPage() {
         const response = await fetch("/api/payment/get-total-earnings");
         if (!response.ok) {
           setTotalEarnings({ amount: 0, monthlyData: [] });
-          throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
         setTotalEarnings(data);
@@ -121,7 +118,10 @@ export default function PaymentPage() {
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status} for ${response.url}`);
+          console.log('Payments Response:', {
+            status: response.status,
+            url: response.url
+          });
         }
         const data = await response.json();
         setPayments(data);
