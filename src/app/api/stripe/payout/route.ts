@@ -1,9 +1,10 @@
-import { NextResponse } from "next/server";
 import StripeAccount from "@/app/models/StripeAccount";
-import { authOptions } from "../../auth/[...nextauth]/options";
 import { getServerSession } from "next-auth";
-import connect from "@/lib/db";
 import { stripe } from "@/utils/stripe";
+
+import { authOptions } from "../../auth/[...nextauth]/options";
+import { NextResponse } from "next/server";
+import connect from "@/lib/db";
 
 export async function GET() {
   try {
@@ -22,21 +23,17 @@ export async function GET() {
       return NextResponse.json({ account: null });
     }
 
-    // Fetch account details from Stripe
-    const account = await stripe.accounts.retrieve(user.stripeAccountId);
-    // console.log(account);
+    const payouts = await stripe.payouts.list({
+      stripeAccount: user.stripeAccountId,
+    });
+    console.log(payouts);
     return NextResponse.json({
-      account: {
-        id: account.id,
-        charges_enabled: account.charges_enabled,
-        payouts_enabled: account.payouts_enabled,
-        details_submitted: account.details_submitted,
-      },
+      payouts: payouts,
     });
   } catch (error) {
-    console.error("Error fetching Stripe status:", error);
+    console.error("Error fetching Stripe payouts:", error);
     return NextResponse.json(
-      { error: "Failed to fetch Stripe status" },
+      { error: "Failed to fetch Stripe payouts" },
       { status: 500 }
     );
   }

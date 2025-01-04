@@ -1,13 +1,9 @@
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
 import { authOptions } from '../../auth/[...nextauth]/options';
 import { getServerSession } from 'next-auth';
 import StripeAccount from '@/app/models/StripeAccount';
 import connect from "@/lib/db";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia',
-});
+import { stripe } from '@/utils/stripe';
 
 export async function POST() {
   try {
@@ -27,7 +23,7 @@ export async function POST() {
       { upsert: true, new: true }
     );
 
-    const accountLink = await stripe.accountLinks.create({
+    const accountLink = await stripe.accountLinks.create({ 
       account: account,
       refresh_url: `${process.env.NEXT_PUBLIC_URL}/dashboard/settings`,
       return_url: `${process.env.NEXT_PUBLIC_URL}/dashboard/settings`,

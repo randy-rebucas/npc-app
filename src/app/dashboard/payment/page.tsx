@@ -1,18 +1,16 @@
 "use client"
 
 import { useCallback, useEffect, useState } from 'react';
-// import PaymentForm from '@/components/PaymentForm';
 import Header from '@/components/header';
 import { IPayment } from '@/app/models/Payment';
 import { Button } from '@/components/ui/button';
 
 export default function PaymentPage() {
-  // const [clientSecret, setClientSecret] = useState<string>('');
   const [nextPayout, setNextPayout] = useState<{ amount: number; date: string } | null>(null);
   const [thisMonth, setThisMonth] = useState<{ amount: number; collaboratorCount: number } | null>(null);
   const [totalEarnings, setTotalEarnings] = useState<{ amount: number; monthlyData: number[] } | null>(null);
   const [payments, setPayments] = useState<IPayment[]>([]);
-  const [stripeConnected] = useState(false);
+  const [stripeConnected, setStripeConnected] = useState(false);
 
   const connectWithStripe = useCallback(async () => {
     try {
@@ -31,26 +29,28 @@ export default function PaymentPage() {
   }, []); // Empty dependency array since function doesn't depend on any props or state
 
   useEffect(() => {
-    // Create PaymentIntent as soon as the page loads
-    // const fetchCreatePaymentIntent = async () => {
-    //   try {
-    //     const response = await fetch("/api/create-payment-intent", {
-    //       method: "POST",
-    //       headers: { "Content-Type": "application/json" },
-    //       body: JSON.stringify({ amount: 1000 }), // $10.00
-    //     });
-    //     if (!response.ok) {
-    //       throw new Error(`HTTP error! status: ${response.status}`);
-    //     }
-    //     const data = await response.json();
-    //     setClientSecret(data.clientSecret);
-    //   } catch (error) {
-    //     console.error("Error fetching payment intent:", error);
-    //   }
-    // };
+    const fetchStripeStatus = async () => {
+      const response = await fetch("/api/stripe/status");
+      const data = await response.json();
+      console.log(data);
+      setStripeConnected(data.account !== null);
+    };
+    fetchStripeStatus();
 
-    // fetchCreatePaymentIntent();
+    const fetchPayouts = async () => {
+      const response = await fetch("/api/stripe/payout");
+      const data = await response.json();
+      console.log(data);
+    };
+    fetchPayouts();
 
+    const fetchEarnings = async () => {
+      const response = await fetch("/api/stripe/earning");
+      const data = await response.json();
+      console.log(data);
+    };
+    fetchEarnings();
+    
     // New fetch for next payout information
     const fetchNextPayout = async () => {
       try {
@@ -228,16 +228,8 @@ export default function PaymentPage() {
                 )}
               </div>
             </div>
-
-            {/* {clientSecret && (
-              <div className="mt-8">
-                <PaymentForm clientSecret={clientSecret} />
-              </div>
-            )} */}
           </>
         ) : (
-          // TODO: Add a button to connect with Stripe
-          // Stripe Connect section
           <div className="max-w-2xl mx-auto text-center bg-white p-8 rounded-lg shadow-sm">
             <div className="mb-6">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
