@@ -45,58 +45,56 @@ const timeline: TimelineItem[] = [
 export default function IntroPage() {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="max-w-7xl mx-auto p-6">
-                < div >
+            < div >
 
-                    <div className="text-left mb-12">
-                        <h1 className="text-4xl font-bold mb-4">Thank you for submitting your profile!</h1>
-                        <p className="text-gray-600">You will be notified within 2 business days when your profile has been approved.</p>
-                    </div>
-
-                    <div className="mb-8">
-                        <h2 className="text-2xl font-bold mb-6">What happens next?</h2>
-                        <Button asChild className="mb-8">
-                            <Link href="/">Sign Your Agreement</Link>
-                        </Button>
-                        <p className="text-gray-600">
-                            After approval, you will receive an email that links you to the agreement you&apos;ll need to sign before
-                            your profile is active on NP Collaborator. The email will also give you instructions on how to
-                            connect your calendar.
-                        </p>
-                    </div>
-
-
-
-
+                <div className="text-left mb-12">
+                    <h1 className="text-4xl font-bold mb-4">Thank you for submitting your profile!</h1>
+                    <p className="text-gray-600">You will be notified within 2 business days when your profile has been approved.</p>
                 </div>
 
-                <div className="space-y-6 relative">
-                    <div className="absolute left-4 top-0 bottom-0 w-[2px] bg-emerald-100" role="presentation" />
+                <div className="mb-8">
+                    <h2 className="text-2xl font-bold mb-6">What happens next?</h2>
+                    <Button asChild className="mb-8">
+                        <Link href="/">Sign Your Agreement</Link>
+                    </Button>
+                    <p className="text-gray-600">
+                        After approval, you will receive an email that links you to the agreement you&apos;ll need to sign before
+                        your profile is active on NP Collaborator. The email will also give you instructions on how to
+                        connect your calendar.
+                    </p>
+                </div>
 
-                    {timeline.map((item, index) => (
-                        <div
-                            key={index}
-                            className="flex items-start group"
-                            role="listitem"
-                            aria-label={`Timeline step ${index + 1}: ${item.title}`}
-                        >
-                            <div className="relative">
-                                <div
-                                    className="absolute left-3 top-[0.875rem] w-3 h-3 bg-white border-[3px] border-emerald-500 rounded-full z-10 shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:border-emerald-600"
-                                    role="presentation"
-                                />
-                            </div>
-                            <div className="flex-1 ml-12">
-                                <div className="bg-white/50 rounded-xl hover:bg-white/80 transition-all duration-300 p-4">
-                                    <h3 className="text-xl font-semibold mb-3 text-gray-900">{item.title}</h3>
-                                    <p className="text-gray-600 text-sm leading-relaxed">
-                                        {item.description}
-                                    </p>
-                                </div>
+
+
+
+            </div>
+
+            <div className="space-y-6 relative">
+                <div className="absolute left-4 top-0 bottom-0 w-[2px] bg-emerald-100" role="presentation" />
+
+                {timeline.map((item, index) => (
+                    <div
+                        key={index}
+                        className="flex items-start group"
+                        role="listitem"
+                        aria-label={`Timeline step ${index + 1}: ${item.title}`}
+                    >
+                        <div className="relative">
+                            <div
+                                className="absolute left-3 top-[0.875rem] w-3 h-3 bg-white border-[3px] border-emerald-500 rounded-full z-10 shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:border-emerald-600"
+                                role="presentation"
+                            />
+                        </div>
+                        <div className="flex-1 ml-12">
+                            <div className="bg-white/50 rounded-xl hover:bg-white/80 transition-all duration-300 p-4">
+                                <h3 className="text-xl font-semibold mb-3 text-gray-900">{item.title}</h3>
+                                <p className="text-gray-600 text-sm leading-relaxed">
+                                    {item.description}
+                                </p>
                             </div>
                         </div>
-                    ))}
-                </div>
+                    </div>
+                ))}
             </div>
         </div >
     );
