@@ -60,7 +60,7 @@ export default function PaymentLayout({
                         ))}
                     </div>
                 }
-                {!stripeConnected &&
+                {stripeConnected &&
                     <>
                         {children}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -99,7 +99,7 @@ export default function PaymentLayout({
                         </div>
                     </>
                 }
-                {stripeConnected &&
+                {!stripeConnected &&
                     connect
                 }
             </main>
