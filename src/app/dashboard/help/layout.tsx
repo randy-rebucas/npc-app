@@ -54,16 +54,16 @@ export default function HelpLayout({ children, modal }: { children: React.ReactN
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow">
-                        <nav className="flex border-b border-gray-200">
+                    <div className="border-b border-gray-200 mb-6">
+                        <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                             {tabs.map((tab) => (
                                 <Link
                                     key={tab}
                                     href={`/dashboard/help${tab.toLowerCase() === 'faq' ? '' : `/${tab.toLowerCase().replace(/\s+/g, '')}`}`}
                                     className={`
-                            flex-1 py-4 px-1 text-center border-b-2 
+                            whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
                             ${currentTab === tab.toLowerCase().replace(/\s+/g, '')
-                                            ? 'border-blue-500 text-blue-600 font-medium'
+                                            ? 'border-blue-500 text-blue-600'
                                             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}
                         `}
                                 >
@@ -71,13 +71,13 @@ export default function HelpLayout({ children, modal }: { children: React.ReactN
                                 </Link>
                             ))}
                         </nav>
-                        <div className="p-6">
-                            {children}
-                            {modal}
-                        </div>
+                    </div>
+                    <div className="border rounded-lg p-6">
+                        {children}
+                        {modal}
                     </div>
                 </div>
-            </main>   
+            </main>
         </div>
     );
 }

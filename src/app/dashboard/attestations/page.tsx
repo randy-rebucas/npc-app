@@ -76,12 +76,12 @@ export default function AttestationsPage() {
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
-                            <Link
+                            {/* <Link
                                 href="/dashboard/attestations/create"
                                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                             >
                                 Create Attestation
-                            </Link>
+                            </Link> */}
                         </div>
 
                         <div className="overflow-x-auto">
@@ -160,14 +160,14 @@ export default function AttestationsPage() {
                                                             ? "Try adjusting your search terms or clear the search"
                                                             : "Get started by creating your first attestation"}
                                                     </p>
-                                                    {!searchTerm && (
+                                                    {/* {!searchTerm && (
                                                         <Link
                                                             href="/dashboard/attestations/create"
                                                             className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                                                         >
                                                             Create Attestation
                                                         </Link>
-                                                    )}
+                                                    )} */}
                                                 </div>
                                             </td>
                                         </tr>
