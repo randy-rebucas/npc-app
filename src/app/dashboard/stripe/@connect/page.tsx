@@ -1,10 +1,13 @@
 "use client"
 
 import { Button } from "@/components/ui/button";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 export default function StripeConnectPage() {
+    const [isLoading, setIsLoading] = useState(false);
+
     const connectWithStripe = useCallback(async () => {
+        setIsLoading(true);
         try {
             const response = await fetch('/api/stripe/connect', {
                 method: 'POST',
@@ -15,6 +18,7 @@ export default function StripeConnectPage() {
             }
         } catch (error) {
             console.error('Error connecting to Stripe:', error);
+            setIsLoading(false); // Reset loading state on error
         }
     }, []); // Empty dependency array since function doesn't depend on any props or state
     
@@ -81,8 +85,9 @@ export default function StripeConnectPage() {
             <Button
                 onClick={connectWithStripe}
                 className="w-full sm:w-auto bg-blue-500 hover:bg-blue-600"
+                disabled={isLoading}
             >
-                Connect with Stripe
+                {isLoading ? "Connecting..." : "Connect with Stripe"}
             </Button>
 
             <p className="text-sm text-gray-500 mt-6">
