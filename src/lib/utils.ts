@@ -51,3 +51,10 @@ export const calculatePercentageChange = (previous: number, current: number) => 
   if (previous === 0) return 0;
   return ((current - previous) / previous) * 100;
 };
+
+export const formatCurrency = (amount: number, currency: string = 'USD'): string => {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currency,
+    }).format(amount / 100); // Stripe amounts are in cents
+};

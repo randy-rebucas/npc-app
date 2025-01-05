@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from 'lucide-react'
-import { HelpCircle, Key, User, LayoutDashboard, Settings, CreditCard, FileCheck } from "lucide-react"
+import { HelpCircle, Key, User, LayoutDashboard, Settings, FileCheck, CreditCardIcon } from "lucide-react"
 
 // Add type for navigation items
 type NavItem = {
@@ -33,9 +33,9 @@ export default function Nav() {
             icon: Key,
         },
         {
-            title: "Payment",
-            url: "/dashboard/payment",
-            icon: CreditCard,
+            title: "Stripe",
+            url: "/dashboard/stripe",
+            icon: CreditCardIcon,
         },
         {
             title: "Attestations",
