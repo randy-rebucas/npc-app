@@ -2,15 +2,18 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Header from '@/components/header';
-import { IPayment } from '@/app/models/Payment';
 import { Button } from '@/components/ui/button';
+import { IPayoutObject, IChargeObject, IBalance, IAccountObject } from '@/utils/stripe';
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function PaymentPage() {
-  const [nextPayout, setNextPayout] = useState<{ amount: number; date: string } | null>(null);
-  const [thisMonth, setThisMonth] = useState<{ amount: number; collaboratorCount: number } | null>(null);
-  const [totalEarnings, setTotalEarnings] = useState<{ amount: number; monthlyData: number[] } | null>(null);
-  const [payments, setPayments] = useState<IPayment[]>([]);
+  const [payouts, setPayouts] = useState<IPayoutObject[] | null>(null);
+  const [availableBalance, setAvailableBalance] = useState<IBalance[] | null>(null);
+  const [account, setAccount] = useState<IAccountObject | null>(null);
+  const [charges, setCharges] = useState<IChargeObject[] | null>(null);
   const [stripeConnected, setStripeConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const connectWithStripe = useCallback(async () => {
     try {
@@ -18,8 +21,6 @@ export default function PaymentPage() {
         method: 'POST',
       });
       const data = await response.json();
-      console.log(data);
-      // Redirect to Stripe Connect onboarding
       if (data.url) {
         window.location.href = data.url;
       }
@@ -29,108 +30,64 @@ export default function PaymentPage() {
   }, []); // Empty dependency array since function doesn't depend on any props or state
 
   useEffect(() => {
-    const fetchStripeStatus = async () => {
-      const response = await fetch("/api/stripe/status");
-      const data = await response.json();
-      console.log(data);
-      setStripeConnected(data.account !== null);
-    };
-    fetchStripeStatus();
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
 
-    const fetchPayouts = async () => {
-      const response = await fetch("/api/stripe/payout");
-      const data = await response.json();
-      console.log(data);
-    };
-    fetchPayouts();
-
-    const fetchEarnings = async () => {
-      const response = await fetch("/api/stripe/earning");
-      const data = await response.json();
-      console.log(data);
-    };
-    fetchEarnings();
-    
-    // New fetch for next payout information
-    const fetchNextPayout = async () => {
       try {
-        const response = await fetch("/api/payment/get-next-payout");
-        console.log('Next Payout Response:', {
-          status: response.status,
-          url: response.url
-        });
+        const [statusRes, payoutsRes, balanceRes, chargesRes] = await Promise.all([
+          fetch("/api/stripe/status"),
+          fetch("/api/stripe/payout"),
+          fetch("/api/stripe/balance/available"),
+          fetch("/api/stripe/charges")
+        ]);
 
-        if (!response.ok) {
-          setNextPayout({ amount: 0, date: new Date().toLocaleDateString() });
-        }
-        const data = await response.json();
-        setNextPayout(data);
-      } catch (error) {
-        console.error("Error fetching next payout:", error);
+        // Check if any response failed
+        // if (!statusRes.ok || !payoutsRes.ok || !balanceRes.ok || !chargesRes.ok) {
+        // const failedEndpoint = [
+        //   { res: statusRes, name: 'status' },
+        //   { res: payoutsRes, name: 'payout' },
+        //   { res: balanceRes, name: 'balance' },
+        //   { res: chargesRes, name: 'charges' }
+        // ].find(({ res }) => !res.ok);
+
+        // throw new Error(`API endpoint ${failedEndpoint?.name} failed with status ${failedEndpoint?.res.status}`);
+        // }
+
+        const [statusData, payoutsData, balanceData, chargesData] = await Promise.all([
+          statusRes.json(),
+          payoutsRes.json(),
+          balanceRes.json(),
+          chargesRes.json()
+        ]);
+
+        console.log(statusData);
+        console.log(payoutsData);
+        console.log(balanceData);
+        console.log(chargesData);
+
+        // Validate required data
+        // if (!statusData || !payoutsData?.payouts?.data || !balanceData?.available || !chargesData?.charges?.data) {
+        //   throw new Error('Received incomplete data from the API');
+        // }
+
+        setAccount(statusData);
+        setStripeConnected(statusData.account !== null);
+        setPayouts(payoutsData.data);
+        setAvailableBalance(balanceData.data);
+        setCharges(chargesData.data);
+      } catch (err) {
+        // const errorMessage = err instanceof Error ?
+        //   `Failed to load payment data: ${err.message}` :
+        //   "Failed to load payment data. Please try again later.";
+        // setError(errorMessage);
+        console.error(err);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchNextPayout();
-
-    // Add new fetch for this month's data
-    const fetchThisMonth = async () => {
-      try {
-        const response = await fetch("/api/payment/get-this-month");
-        console.log('This Month Response:', {
-          status: response.status,
-          url: response.url
-        });
-
-        if (!response.ok) {
-          setThisMonth({ amount: 0, collaboratorCount: 0 });
-        }
-        const data = await response.json();
-        setThisMonth(data);
-      } catch (error) {
-        console.error("Error fetching this month's data:", error);
-      }
-    };
-
-    fetchThisMonth();
-
-    // Add new fetch for total earnings
-    const fetchTotalEarnings = async () => {
-      try {
-        const response = await fetch("/api/payment/get-total-earnings");
-        if (!response.ok) {
-          setTotalEarnings({ amount: 0, monthlyData: [] });
-        }
-        const data = await response.json();
-        setTotalEarnings(data);
-      } catch (error) {
-        console.error("Error fetching total earnings:", error);
-      }
-    };
-
-    fetchTotalEarnings();
-
-    const fetchPayment = async () => {
-      try {
-        const response = await fetch("/api/payment");
-        console.log('Payments Response:', {
-          status: response.status,
-          url: response.url
-        });
-
-        if (!response.ok) {
-          console.log('Payments Response:', {
-            status: response.status,
-            url: response.url
-          });
-        }
-        const data = await response.json();
-        setPayments(data);
-      } catch (error) {
-        console.error("Error fetching payments:", error);
-        setPayments([]);
-      }
-    };
-    fetchPayment();
+    fetchData();
   }, []);
 
   const breadcrumbs = [
@@ -138,93 +95,98 @@ export default function PaymentPage() {
     { label: "Payment", href: "/dashboard/payment", active: true },
   ];
 
+  const renderStatCard = (icon: string, title: string, amount: string, subtitle: string) => (
+    <div className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+      <div className="flex items-center text-blue-500 text-sm font-medium mb-2">
+        <span className="mr-2">{icon}</span>
+        <span>{title}</span>
+      </div>
+      <div className="text-2xl font-bold mb-1">{amount}</div>
+      <div className="text-sm text-gray-500">{subtitle}</div>
+    </div>
+  );
+
+  const formatDate = (date: number | string) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  console.log(account);
   return (
     <div className="bg-gray-50 min-h-screen w-full">
       <Header breadcrumbs={breadcrumbs} />
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        {stripeConnected ? (
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md text-red-600">
+            {error}
+          </div>
+        )}
+
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white p-6 rounded-lg shadow">
+                <Skeleton className="h-4 w-24 mb-4" />
+                <Skeleton className="h-8 w-32 mb-2" />
+                <Skeleton className="h-4 w-40" />
+              </div>
+            ))}
+          </div>
+        ) : stripeConnected ? (
           <>
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-2xl font-bold">Payment Dashboard</h1>
-              <button
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                onClick={() => window.open('https://dashboard.stripe.com', '_blank')}
-              >
-                <span>Open Stripe Dashboard</span>
-                <svg className="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-              </button>
+              {account && (
+                <button
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                  onClick={() => window.open(`https://dashboard.stripe.com/${account.id}/dashboard`, '_blank')}
+                >
+                  <span>Open Stripe Dashboard</span>
+                  <svg className="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </button>
+              )}
             </div>
 
-
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-white p-6 rounded-lg shadow">
-                <div className="flex items-center text-blue-500 text-sm font-medium mb-2">
-                  <span className="mr-2">💰</span>
-                  <span>Next Payout</span>
-                </div>
-                <div className="text-2xl font-bold mb-1">
-                  {nextPayout ? new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'USD'
-                  }).format(nextPayout.amount) : 'Loading...'}
-                </div>
-                <div className="text-sm text-gray-500">
-                  {nextPayout ? `Scheduled for ${nextPayout.date}` : 'Calculating...'}
-                </div>
-              </div>
+              {renderStatCard('💰', 'Next Payout', payouts && payouts.length > 0 ? new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: payouts[0].currency
+              }).format(payouts[0].amount ?? 0) : 'Loading...', payouts && payouts.length > 0 ? `Scheduled for ${payouts[0].arrival_date}` : 'Calculating...')}
 
-              <div className="bg-white p-6 rounded-lg shadow">
-                <div className="flex items-center text-blue-500 text-sm font-medium mb-2">
-                  <span className="mr-2">📅</span>
-                  <span>This Month</span>
-                </div>
-                <div className="text-2xl font-bold mb-1">
-                  {thisMonth ? new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'USD'
-                  }).format(thisMonth.amount) : 'Loading...'}
-                </div>
-                <div className="text-sm text-gray-500">
-                  {thisMonth ? `From ${thisMonth.collaboratorCount} collaborators` : 'Calculating...'}
-                </div>
-              </div>
+              {renderStatCard('📅', 'This Month', availableBalance && availableBalance.length > 0 ? new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: availableBalance[0].currency
+              }).format(availableBalance[0].amount) : 'Loading...', availableBalance && availableBalance.length > 0 ? `From ${availableBalance[0].source_types} collaborators` : 'Calculating...')}
 
-              <div className="bg-white p-6 rounded-lg shadow">
-                <div className="flex items-center text-blue-500 text-sm font-medium mb-2">
-                  <span className="mr-2">💰</span>
-                  <span>Total Earnings</span>
-                </div>
-                <div className="text-2xl font-bold mb-1">
-                  {totalEarnings ? new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'USD'
-                  }).format(totalEarnings.amount) : 'Loading...'}
-                </div>
-                <div className="text-sm text-gray-500">Last 12 months</div>
-              </div>
+              {renderStatCard('💰', 'Total Earnings', availableBalance && availableBalance.length > 0 ? new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: availableBalance[0].currency
+              }).format(availableBalance[0].amount) : 'Loading...', 'Last 12 months')}
             </div>
 
             <div className="bg-white rounded-lg shadow">
               <div className="p-6 border-b border-gray-200">
-                <h2 className="text-lg font-medium">Recent Payments</h2>
+                <h2 className="text-lg font-medium">Recent Transactions</h2>
               </div>
               <div className="divide-y divide-gray-200">
-                {payments.map((payment, index) => (
+                {charges && charges.map((payment: IChargeObject, index: number) => (
                   <div key={index} className="p-6 flex items-center justify-between">
                     <div>
-                      <div className="font-medium">${payment.amount.toFixed(2)}</div>
-                      <div className="text-sm text-gray-500">{payment.createdAt.toLocaleDateString()}</div>
+                      <div className="font-medium">${payment.amount / 100}</div>
+                      <div className="text-sm text-gray-500">{formatDate(payment.created)}</div>
                     </div>
                     <span className="px-3 py-1 text-sm text-green-700 bg-green-100 rounded-full">
                       {payment.status}
                     </span>
                   </div>
                 ))}
-                {payments.length === 0 && (
-                  <div className="p-6 text-center text-gray-500">No payments found</div>
+                {charges && charges.length === 0 && (
+                  <div className="p-6 text-center text-gray-500">No transactions found</div>
                 )}
               </div>
             </div>
@@ -300,10 +262,8 @@ export default function PaymentPage() {
               By continuing, you agree to Stripe&apos;s terms of service and privacy policy.
             </p>
           </div>
-
         )}
-
       </main>
-    </div >
+    </div>
   );
 } 
