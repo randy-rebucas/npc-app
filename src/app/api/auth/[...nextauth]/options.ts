@@ -1,5 +1,4 @@
 import type { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
 import LinkedInProvider, {
   LinkedInProfile,
 } from "next-auth/providers/linkedin";
@@ -11,41 +10,6 @@ import { createEvent } from "@/app/actions/events";
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    CredentialsProvider({
-      name: "Credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
-        try {
-          await connect();
-          const user = await User.findOne({ email: credentials.email });
-          if (!user) {
-            return null;
-          }
-          const isPasswordValid = await bcrypt.compare(
-            credentials.password,
-            user.password
-          );
-          if (!isPasswordValid) {
-            return null;
-          }
-          return {
-            id: user._id.toString(),
-            email: user.email,
-            name: user.name,
-            role: user.role,
-          };
-        } catch (error) {
-          console.error("Auth error:", error);
-          return null;
-        }
-      },
-    }),
     LinkedInProvider({
       clientId: process.env.LINKEDIN_CLIENT_ID as string,
       clientSecret: process.env.LINKEDIN_CLIENT_SECRET as string,
@@ -98,36 +62,34 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/signin",
-    newUser: "/onboarding",
   },
   callbacks: {
     async signIn({ user, account }) {
-      if (account?.provider === "logto" || account?.provider === "linkedin" || account?.provider === "google") {
-        try {
-          await connect();
-          const existingUser = await User.findOne({ email: user.email });
-          const hashedPassword = await bcrypt.hash("password", 10);
+      try {
+        await connect();
+        const existingUser = await User.findOne({ email: user.email });
+        const hashedPassword = await bcrypt.hash("password", 10);
 
-          if (!existingUser) {
-            const newUser = await User.create({
-              email: user.email,
-              username: user.email?.split("@")[0],
-              password: hashedPassword,
-              role: "CUSTOMER",
-              // For social login, we don't store password
-              provider: account.provider,
-            });
-            user.id = newUser._id.toString();
-            user.role = "CUSTOMER";
-          } else {
-            user.id = existingUser._id.toString();
-            user.role = existingUser.role;
-          }
-        } catch (error) {
-          console.error("Error during social sign in:", error);
-          return false;
+        if (!existingUser) {
+          const newUser = await User.create({
+            email: user.email,
+            username: user.email?.split("@")[0],
+            password: hashedPassword,
+            role: "CUSTOMER",
+            // For social login, we don't store password
+            provider: account?.provider,
+          });
+          user.id = newUser._id.toString();
+          user.role = "CUSTOMER";
+        } else {
+          user.id = existingUser._id.toString();
+          user.role = existingUser.role;
         }
+      } catch (error) {
+        console.error("Error during social sign in:", error);
+        return false;
       }
+
       // Log the sign-in event
       await createEvent({
         user: user.id,

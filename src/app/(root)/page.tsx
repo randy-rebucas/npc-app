@@ -1,5 +1,4 @@
 import SignIn from "../../components/sign-in";
-import { Button } from "@/components/ui/button"
 
 
 export default async function Home() {
@@ -17,11 +16,6 @@ export default async function Home() {
           </p>
           <div className="space-x-4">
             <SignIn />
-            <Button variant="outline" asChild>
-              <a href="https://github.com/yourusername/yourrepo" target="_blank" rel="noreferrer">
-                GitHub
-              </a>
-            </Button>
           </div>
         </div>
       </main>

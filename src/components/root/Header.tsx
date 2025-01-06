@@ -23,9 +23,9 @@ export default async function Header() {
                     <Link href="/" className="text-black hover:text-gray-600">Home</Link>
                     <Link href="/nurse" className="text-black hover:text-gray-600">Nurse Practitioners</Link>
                     <Link href="/physician" className="text-black hover:text-gray-600">Physician Collaborators</Link>
-                    <button className="px-6 py-2 rounded-full border-2 border-black hover:bg-black hover:text-white transition-colors">
+                    {/* <button className="px-6 py-2 rounded-full border-2 border-black hover:bg-black hover:text-white transition-colors">
                         Signup
-                    </button>
+                    </button> */}
                 </nav>
             </div>
         </header>

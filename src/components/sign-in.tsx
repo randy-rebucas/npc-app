@@ -7,7 +7,7 @@ const SignIn = () => {
     return (
         <button
             onClick={() => {
-                router.push('/auth/signin');
+                router.push('/auth');
             }}
             className="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 
                 transition duration-200 text-lg font-medium"
