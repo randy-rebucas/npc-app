@@ -13,42 +13,34 @@ type Breadcrumb = {
     active?: boolean;  // Add optional active property
 };
 
-export default function HelpLayout({ children }: { children: React.ReactNode }) {
+export default function MiscellaneousLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const currentTab = pathname.split('/').pop();
   
-    const isFeatures = pathname.split('/').pop() === 'features';
-    const isEnquiries = pathname.split('/').pop() === 'enquiries';
-    const isIssues = pathname.split('/').pop() === 'issues';
+    const isMiscellaneous = pathname.split('/').pop() === 'miscellaneous';
+    const isLicenseStates = pathname.split('/').pop() === 'license-states';
+    const isPracticeTypes = pathname.split('/').pop() === 'practice-types';
 
-    const title = isFeatures ? 'Features' : isEnquiries ? 'Enquiries' : isIssues ? 'Issues' : 'Help';
+    const title = isMiscellaneous ? 'Miscellaneous' : isLicenseStates ? 'Medical License States' : isPracticeTypes ? 'Practice Types' : 'Miscellaneous';
 
     const breadcrumbs: Breadcrumb[] = [
         { label: 'Admin', href: '/admin' },
-        { label: 'Help', href: '/admin/dashboard/help' },
+        { label: 'Miscellaneous', href: '/admin/dashboard/miscellaneous', active: isMiscellaneous },
     ];
 
-    if (isFeatures) {
+    if (isLicenseStates) {
         breadcrumbs.push({
-            label: 'Features',
-            href: '/admin/dashboard/help/features',
-            active: isFeatures,
+            label: 'Medical License States',
+            href: '/admin/dashboard/miscellaneous/license-states',
+            active: isLicenseStates,
         });
     }
 
-    if (isIssues) {
+    if (isPracticeTypes) {
         breadcrumbs.push({
-            label: 'Issues',
-            href: '/admin/dashboard/help/issues',
-            active: isIssues,
-        });
-    }
-
-    if (isEnquiries) {
-        breadcrumbs.push({
-            label: 'Enquiries',
-            href: '/admin/dashboard/help/enquiries',
-            active: isEnquiries,
+            label: 'Practice Types',
+            href: '/admin/dashboard/miscellaneous/practice-types',
+            active: isPracticeTypes,
         });
     }
 
@@ -61,7 +53,7 @@ export default function HelpLayout({ children }: { children: React.ReactNode }) 
                     <div>
                         <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
                         <p className="text-muted-foreground">
-                            Manage your help and support requests
+                            Manage your miscellaneous settings
                         </p>
                     </div>
                 </div>
@@ -69,33 +61,26 @@ export default function HelpLayout({ children }: { children: React.ReactNode }) 
                 <Tabs defaultValue={currentTab} className="space-y-4">
                     <TabsList>
                         <TabsTrigger
-                            value="help"
+                            value="miscellaneous"
                             className={cn("w-[120px]")}
                             asChild
                         >
-                            <Link href="/admin/dashboard/help">Overview</Link>
+                            <Link href="/admin/dashboard/miscellaneous">Overview</Link>
                         </TabsTrigger>
                         <TabsTrigger
-                            value="features"
+                            value="license-states"
                             className={cn("w-[120px]")}
                             asChild
                         >
-                            <Link href="/admin/dashboard/help/features">Features</Link>
+                            <Link href="/admin/dashboard/miscellaneous/license-states">License States</Link>
                         </TabsTrigger>
                         <TabsTrigger
-                            value="webhook"
+                            value="practice-types"
                             className={cn("w-[120px]")}
                             asChild
                         >
-                            <Link href="/admin/dashboard/help/issues">Issues</Link>
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="enquiries"
-                            className={cn("w-[120px]")}
-                            asChild
-                        >
-                            <Link href="/admin/dashboard/help/enquiries">Enquiries</Link>
-                        </TabsTrigger>
+                            <Link href="/admin/dashboard/miscellaneous/practice-types">Practice Types</Link>
+                        </TabsTrigger>  
                     </TabsList>
                 </Tabs>
 

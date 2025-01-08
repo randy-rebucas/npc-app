@@ -45,7 +45,12 @@ export default async function AdminUserPage() {
                         ))}
                         {filteredUsers.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={4} className="text-center">No new users found</TableCell>
+                                <TableCell colSpan={4} className="text-center py-4">
+                                    <div className="flex flex-col items-center">
+                                        <span className="text-lg font-semibold">No new users found</span>
+                                        <p className="text-sm text-gray-500">Check back later for new user sign-ups.</p>
+                                    </div>
+                                </TableCell>
                             </TableRow>
                         )}
                     </TableBody>

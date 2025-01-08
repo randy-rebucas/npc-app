@@ -3,7 +3,6 @@ import LinkedInProvider, {
   LinkedInProfile,
 } from "next-auth/providers/linkedin";
 import GoogleProvider from "next-auth/providers/google";
-import bcrypt from "bcrypt";
 import connect from "@/lib/db";
 import User from "@/app/models/User";
 import { createEvent } from "@/app/actions/events";
@@ -27,7 +26,7 @@ export const authOptions: NextAuthOptions = {
           name: profile.name,
           email: profile.email,
           image: profile.picture,
-          role: "CUSTOMER",
+          role: "PHYSICIAN",
         };
       },
     }),
@@ -54,7 +53,7 @@ export const authOptions: NextAuthOptions = {
           name: profile.name ?? profile.username,
           email: profile.email,
           image: profile.picture,
-          role: "CUSTOMER",
+          role: "PHYSICIAN",
         };
       },
     },
@@ -68,19 +67,17 @@ export const authOptions: NextAuthOptions = {
       try {
         await connect();
         const existingUser = await User.findOne({ email: user.email });
-        const hashedPassword = await bcrypt.hash("password", 10);
 
         if (!existingUser) {
           const newUser = await User.create({
             email: user.email,
             username: user.email?.split("@")[0],
-            password: hashedPassword,
-            role: "CUSTOMER",
+            role: "PHYSICIAN",
             // For social login, we don't store password
             provider: account?.provider,
           });
           user.id = newUser._id.toString();
-          user.role = "CUSTOMER";
+          user.role = "PHYSICIAN";
         } else {
           user.id = existingUser._id.toString();
           user.role = existingUser.role;

@@ -4,6 +4,7 @@ export interface IFaq {
   id: string;
   question: string;
   answer: string;
+  createdAt: Date;
 }
 
 const faqSchema = new Schema<IFaq>(

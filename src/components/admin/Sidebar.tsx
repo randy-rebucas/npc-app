@@ -1,4 +1,4 @@
-import { GalleryVerticalEnd, LayoutDashboard, Settings, Users, List, HelpCircle } from "lucide-react"
+import { GalleryVerticalEnd } from "lucide-react"
 
 import {
     Sidebar,
@@ -16,6 +16,7 @@ import {
 import AdminNavUser from "@/components/admin/NavUser"
 
 import { getConfigValue } from "@/app/actions/config"
+import MenuItems from "./MenuItems"
 export async function AdminSidebar() {
 
     // Menu items.
@@ -23,32 +24,47 @@ export async function AdminSidebar() {
         {
             title: "Dashboard",
             url: "/admin/dashboard",
-            icon: LayoutDashboard,
+            icon: "dashboard",
         },
         {
             title: "Users",
             url: "/admin/dashboard/users",
-            icon: Users,
+            icon: "users",
         },
         {
             title: "Members",
             url: "/admin/dashboard/members",
-            icon: Users,
+            icon: "users",
         },
         {
             title: "Event Log",
             url: "/admin/dashboard/event-log",
-            icon: List,
+            icon: "list",
+        },
+        {
+            title: "FAQ",
+            url: "/admin/dashboard/faq",
+            icon: "faq",
         },
         {
             title: "Help",
             url: "/admin/dashboard/help",
-            icon: HelpCircle,
+            icon: "help",
+        },
+        {
+            title: "Transactions",
+            url: "/admin/dashboard/transactions",
+            icon: "transactions",
+        },
+        {
+            title: "Miscellaneous",
+            url: "/admin/dashboard/miscellaneous",
+            icon: "miscellaneous",
         },
         {
             title: "Settings",
             url: "/admin/dashboard/settings",
-            icon: Settings,
+            icon: "settings",
         },
     ]
 
@@ -75,18 +91,7 @@ export async function AdminSidebar() {
                 <SidebarGroup>
                     <SidebarGroupLabel>Navigation</SidebarGroupLabel>
                     <SidebarGroupContent>
-                        <SidebarMenu>
-                            {items.map((item) => (
-                                <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton asChild>
-                                        <a href={item.url}>
-                                            <item.icon />
-                                            <span>{item.title}</span>
-                                        </a>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
-                        </SidebarMenu>
+                        <MenuItems items={items} />
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>

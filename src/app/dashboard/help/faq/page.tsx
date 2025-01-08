@@ -2,7 +2,7 @@ import { getFaqs } from "@/app/actions/faq";
 
 export default async function FaqPage() {
 
-  const faqs = await getFaqs();
+  const { faqs } = await getFaqs({ page: 1, search: '', limit: 10000 });
   
   return (
     <div className="max-w-2xl mx-auto">

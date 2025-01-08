@@ -53,6 +53,7 @@ export default async function AdminUsers(props: {
     const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
     const endItem = Math.min(startItem + ITEMS_PER_PAGE - 1, total);
 
+    console.log(users);
     return (
         <SidebarInset>
             <AdminHeader breadcrumbs={[
