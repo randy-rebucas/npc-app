@@ -20,14 +20,67 @@ interface UserQuery {
   onboardingStatus?: string;
 }
 
+// export interface UserDocument {
+//   _id: string; // We'll cast this to string anyway
+//   username: string;
+//   email: string;
+//   role: string;
+//   provider: string;
+//   onboardingStatus: string;
+//   createdAt: Date;
+// }
+
 export interface UserDocument {
-  _id: string; // We'll cast this to string anyway
-  username: string;
+  _id: string;
   email: string;
-  role: "ADMIN" | "CUSTOMER";
+  username: string;
+  password: string;
+  onboardingStatus: string;
   provider: string;
-  onboardingStatus: "incomplete" | "completed";
+  role: string;
   createdAt: Date;
+  updatedAt: Date;
+  __v: number;
+  validated: boolean;
+  profile: {
+    _id: string;
+    user: string;
+    firstName: string;
+    lastName: string;
+    medicalLicenseStates: string[];
+    deaLicenseStates: string[];
+    practiceTypes: string[];
+    monthlyCollaborationRate: number;
+    additionalStateFee: number;
+    additionalNPFee: number;
+    controlledSubstancesMonthlyFee: number;
+    controlledSubstancesPerPrescriptionFee: number;
+    description: string;
+    boardCertification: string;
+    additionalCertifications: string[];
+    linkedinProfile: string;
+    profilePhotoPath: string;
+    governmentIdPath: string;
+    createdAt: Date;
+    updatedAt: Date;
+    __v: number;
+    address: string;
+    city: string;
+    phone: string;
+    state: string;
+    zip: string;
+    clinicalDegree: string;
+    education: string[];
+    npiNumber: string;
+  },
+  stripeaccount: {
+    _id: string;
+    user: string;
+    __v: number;
+    createdAt: Date;
+    stripeAccountId: string;
+    updatedAt: Date;
+  }
 }
 
 interface GetUsersResponse {
@@ -35,9 +88,9 @@ interface GetUsersResponse {
     id: string;
     username: string;
     email: string;
-    role: "ADMIN" | "CUSTOMER";
+    role: string;
     provider: string;
-    onboardingStatus: "incomplete" | "completed";
+    onboardingStatus: string;
     createdAt: Date;
   }[];
   total: number;
@@ -183,13 +236,59 @@ export async function getUsers({
     // Execute query with pagination
     const skip = (page - 1) * limit;
 
-    const [users, total] = await Promise.all([
-      User.find(query).skip(skip).limit(limit).sort({ createdAt: -1 }).lean(),
+    const [aggregatedUsers, total] = await Promise.all([
+      User.aggregate([
+        {
+          $match: query
+        },
+        {
+          $lookup: {
+            from: "userprofiles",
+            localField: "_id",
+            foreignField: "user",
+            as: "profile",
+          }
+        },
+        {
+          $unwind: "$profile"
+        },
+        {
+          $lookup: {
+            from: "stripeaccounts",
+            localField: "_id",
+            foreignField: "user",
+            as: "stripeaccount",
+          }
+        },
+        {
+          $unwind: "$stripeaccount"
+        },
+        {
+          $lookup: {
+            from: "stripeaccounts",
+            localField: "_id",
+            foreignField: "user",
+            as: "stripeaccount",
+          }
+        },
+        {
+          $unwind: "$stripeaccount"
+        },
+        {
+          $skip: skip,
+        },
+        {
+          $limit: limit,
+        },
+        {
+          $sort: { createdAt: -1 },
+        },
+      ]),
       User.countDocuments(query),
     ]);
 
     return {
-      users: (users as unknown as UserDocument[]).map((user) => ({
+      users: (aggregatedUsers as unknown as UserDocument[]).map((user) => ({
         id: user._id.toString(),
         username: user.username,
         email: user.email,
@@ -197,6 +296,9 @@ export async function getUsers({
         provider: user.provider,
         onboardingStatus: user.onboardingStatus,
         createdAt: user.createdAt,
+        validated: user.validated,
+        profile: user.profile,
+        stripeaccount: user.stripeaccount,
       })),
       total,
     };

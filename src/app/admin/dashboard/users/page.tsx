@@ -11,23 +11,30 @@ import {
 import Search from "@/components/ui/member/search";
 import { Button } from "@/components/ui/button";
 import { Metadata } from "next";
-import { UserActions } from "@/components/ui/user/actions";
 import { getUsers } from "@/app/actions/user";
 import Filter from "@/components/ui/member/filter";
 import Pagination from "@/components/ui/member/pagination";
 import { Suspense } from "react";
 import { MembersTableSkeleton } from "@/components/ui/skeletons";
 import { SearchParams } from "@/lib/types/search-params";
+import { IUserProfile } from "@/app/models/UserProfile";
+import { IStripeAccount } from "@/app/models/StripeAccount";
+import { formatDistanceToNow } from "date-fns";
+import { Badge } from "@/components/ui/badge";
 
-interface UserResponse {
+// Define a new type for the response from getUsers
+type SimplifiedUserResponse = {
     id: string;
     username: string;
     email: string;
-    role: "ADMIN" | "CUSTOMER";
+    role: string;
     provider: string;
-    onboardingStatus: "incomplete" | "completed";
+    onboardingStatus: string;
     createdAt: Date;
-}
+    validated?: boolean;
+    profile?: IUserProfile;
+    stripeaccount?: IStripeAccount;
+};
 
 export const metadata: Metadata = {
     title: 'Admin Users',
@@ -47,13 +54,20 @@ export default async function AdminUsers(props: {
     const onboardingStatus = String(params?.onboardingStatus || 'all');
 
     // get users
-    const { users, total } = await getUsers({ page: currentPage, search: query, role: role, onboardingStatus: onboardingStatus, limit: ITEMS_PER_PAGE });
+    const { users, total }: { users: SimplifiedUserResponse[], total: number } = await getUsers({
+        page: currentPage,
+        search: query,
+        role: role,
+        onboardingStatus: onboardingStatus,
+        limit: ITEMS_PER_PAGE
+    });
 
     const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
     const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
     const endItem = Math.min(startItem + ITEMS_PER_PAGE - 1, total);
 
     console.log(users);
+
     return (
         <SidebarInset>
             <AdminHeader breadcrumbs={[
@@ -81,31 +95,46 @@ export default async function AdminUsers(props: {
                             <Table>
                                 <TableHeader>
                                     <TableRow>
+                                        <TableHead>Full Name</TableHead>
                                         <TableHead>Username</TableHead>
                                         <TableHead>Email</TableHead>
                                         <TableHead>Role</TableHead>
                                         <TableHead>Provider</TableHead>
+                                        <TableHead>Stripe Account</TableHead>
                                         <TableHead>Onboarding</TableHead>
+                                        <TableHead>Validated</TableHead>
+                                        <TableHead>Created At</TableHead>
                                         <TableHead>Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {users.map((user: UserResponse) => (
+                                    {users.map((user) => (
                                         <TableRow key={user.id} className="group">
+                                            <TableCell>
+                                                {user.profile ? `${user.profile.firstName} ${user.profile.lastName}` : 'N/A'}
+                                            </TableCell>
                                             <TableCell>{user.username}</TableCell>
                                             <TableCell>{user.email}</TableCell>
                                             <TableCell>{user.role}</TableCell>
+                                            <TableCell>{user.provider}</TableCell>
                                             <TableCell>
-                                                {user.provider}
+                                                {user.stripeaccount ? user.stripeaccount.stripeAccountId : 'N/A'}
                                             </TableCell>
                                             <TableCell>
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.onboardingStatus === 'completed' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'
-                                                    }`}>
+                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.onboardingStatus === 'completed' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}`}>
                                                     {user.onboardingStatus}
                                                 </span>
                                             </TableCell>
                                             <TableCell>
-                                                <UserActions userId={user.id} />
+                                                <Badge variant={user.validated ? 'default' : 'destructive'}>
+                                                    {user.validated ? 'Validated' : 'Not Validated'}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Button variant="outline">View</Button>
                                             </TableCell>
                                         </TableRow>
                                     ))}

@@ -10,6 +10,7 @@ import Filter from "@/components/ui/member/filter";
 import { getTransactions } from "@/app/actions/transactions";
 import { formatDistanceToNow } from "date-fns";
 import { Box } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
     title: 'Admin Transactions',
@@ -59,6 +60,7 @@ export default async function TransactionsPage(props: {
                                     <TableHead>Currency</TableHead>
                                     <TableHead>Status</TableHead>
                                     <TableHead>Time</TableHead>
+                                    <TableHead>Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -71,6 +73,9 @@ export default async function TransactionsPage(props: {
                                                 <TableCell>{transaction.currency}</TableCell>
                                                 <TableCell>{transaction.status}</TableCell>
                                                 <TableCell>{formatDistanceToNow(new Date(transaction.createdAt), { addSuffix: true })}</TableCell>
+                                                <TableCell>
+                                                    <Button variant="outline">View</Button> 
+                                                </TableCell>
                                             </TableRow>
                                         );
                                     })
