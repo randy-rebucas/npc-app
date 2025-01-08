@@ -51,8 +51,6 @@
     "react-hook-form": "^7.54.1",
     "recharts": "^2.15.0",
     "sharetribe-flex-sdk": "^1.21.1",
-    "socket.io": "^4.8.1",
-    "socket.io-client": "^4.8.1",
     "stripe": "^17.5.0",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",

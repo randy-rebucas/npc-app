@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { INotification } from "@/app/models/Notification"; 
-// import io from 'socket.io-client';
+
 type NotificationsContextType = {
   notifications: INotification[];
   unreadCount: number;
@@ -17,18 +17,7 @@ const NotificationsContext = createContext<NotificationsContextType | undefined>
 export function NotificationsProvider({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();
   const [notifications, setNotifications] = useState<INotification[]>([]);
-  // useEffect(() => {
-  //   const socket = io();
 
-  //   socket.on('notification', (data) => {
-  //     console.log('Notification received:', data);
-  //     // Handle the notification (e.g., display it to the user)
-  //   });
-
-  //   return () => {
-  //     socket.disconnect();
-  //   };
-  // }, []);
   const fetchNotifications = useCallback(async () => {
     console.log("fetching notifications");
     if (!session?.user) return;
