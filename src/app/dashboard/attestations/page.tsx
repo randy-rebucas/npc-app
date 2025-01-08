@@ -91,12 +91,12 @@ export default function AttestationsPage() {
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Schema
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Recipient
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Attester
-                                        </th>
+                                        </th> */}
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Timestamp
                                         </th>
@@ -114,12 +114,12 @@ export default function AttestationsPage() {
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 {attestation.schema}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 {attestation.recipient}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 {attestation.attester}
-                                            </td>
+                                            </td> */}
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                 {attestation.timestamp}
                                             </td>

@@ -12,8 +12,8 @@ export default function HelpLayout({ children, modal }: { children: React.ReactN
     const isFaq = pathname.split('/').pop() === 'faq';
     const isContactUs = pathname.split('/').pop() === 'contactus';
 
-    const title = isFaq ? 'FAQ' : isContactUs ? 'Contact Us' : 'Help';
-    const tabs = ['FAQ', 'Contact Us'];
+    const title = isHelp ? 'Help' : isFaq ? 'FAQ' : isContactUs ? 'Contact Us' : 'Help';
+    const tabs = ['Help', 'FAQ', 'Contact Us'];
 
     const breadcrumbs = [
         { label: 'Dashboard', href: '/dashboard' },
@@ -59,14 +59,11 @@ export default function HelpLayout({ children, modal }: { children: React.ReactN
                             {tabs.map((tab) => (
                                 <Link
                                     key={tab}
-                                    href={`/dashboard/help${tab.toLowerCase() === 'faq' ? '' : `/${tab.toLowerCase().replace(/\s+/g, '')}`}`}
-                                    className={`
-                            whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
-                            ${currentTab === tab.toLowerCase().replace(/\s+/g, '')
+                                    href={`/dashboard/help${tab.toLowerCase() === 'help' ? '' : `/${tab.toLowerCase().replace(/\s+/g, '')}`}`}
+                                    className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
+                                            ${currentTab === tab.toLowerCase().replace(/\s+/g, '')
                                             ? 'border-blue-500 text-blue-600'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}
-                        `}
-                                >
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} `} >
                                     {tab}
                                 </Link>
                             ))}

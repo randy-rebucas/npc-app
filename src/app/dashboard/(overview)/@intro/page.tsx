@@ -55,7 +55,7 @@ export default function IntroPage() {
                 <div className="mb-8">
                     <h2 className="text-2xl font-bold mb-6">What happens next?</h2>
                     <Button asChild className="mb-8">
-                        <Link href="/">Sign Your Agreement</Link>
+                        <Link href="/dashboard/agreement">Sign Your Agreement</Link>
                     </Button>
                     <p className="text-gray-600">
                         After approval, you will receive an email that links you to the agreement you&apos;ll need to sign before

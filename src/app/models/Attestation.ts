@@ -3,22 +3,20 @@ import { IUser } from "./User";
 
 export interface IAttestation {
   _id: string; // Add this line
-  user: Types.ObjectId | IUser; 
   schema: string;
-  recipient: string;
-  attester: string;
+  recipient: Types.ObjectId | IUser; 
+  attester: Types.ObjectId | IUser; 
   timestamp: string;
   status: 'pending' | 'verified' | 'rejected';
   createdAt: Date;
 }
 
 const attestationSchema = new Schema<IAttestation>({
-  user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   schema: { type: String, required: true },
-  recipient: { type: String, required: true },
-  attester: { type: String, required: true },
+  recipient: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  attester: { type: Schema.Types.ObjectId, ref: "User", required: true },
   timestamp: { type: String, required: true },
-  status: { type: String, required: true },
+  status: { type: String, enum: ['pending', 'verified', 'rejected'], required: true },
   createdAt: { type: Date, default: Date.now },
 });
 
