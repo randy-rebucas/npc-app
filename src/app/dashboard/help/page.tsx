@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function HelpPage() {
     return (
-        <div className="max-w-2xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+        <div className="max-w-2xl mx-auto p-6 bg-white">
             <h1 className="text-4xl font-extrabold text-gray-800 mb-6">Help Center</h1>
             
             {/* Search Bar */}
