@@ -3,10 +3,10 @@ import Search from "@/components/ui/member/search";
 import Filter from "@/components/ui/member/filter";
 import { Table, TableHeader, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table";
 import { SearchParams } from '@/lib/types/search-params';
-import { getMedicalLicenseStatesPaginated } from '@/app/actions/medicallicensestates'; 
+import { deleteMedicalLicenseState, getMedicalLicenseStatesPaginated } from '@/app/actions/medicallicensestates'; 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { PencilIcon, TrashIcon } from "lucide-react";
 
 export default async function LicenseStatesPage(props: {
     searchParams: SearchParams
@@ -23,6 +23,12 @@ export default async function LicenseStatesPage(props: {
     const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
     const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
     const endItem = Math.min(currentPage * ITEMS_PER_PAGE, total);
+
+    const handleDelete = async (data: FormData) => {
+        "use server";
+        const itemId = data.get("itemId");
+        await deleteMedicalLicenseState(itemId as string);
+    };
 
     return (
         <div className="flex flex-1 flex-col gap-4 p-4">
@@ -45,7 +51,7 @@ export default async function LicenseStatesPage(props: {
                             <TableRow>
                                 <TableHead>Medical License State</TableHead>
                                 <TableHead>Enabled</TableHead>
-                                <TableHead>Action</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -60,8 +66,16 @@ export default async function LicenseStatesPage(props: {
                                             {medicalLicenseState.enabled ? 'Enabled' : 'Disabled'}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell>
-                                        <Button variant="outline">View</Button>
+                                    <TableCell className="flex items-center justify-end gap-2 p-3">
+                                        <Link href={`/admin/dashboard/miscellaneous/license-states/form/${medicalLicenseState._id}`} className="flex justify-center items-center">
+                                            <PencilIcon className="w-4 h-4" />
+                                        </Link>
+                                        <form action={handleDelete} className="flex justify-center items-center">
+                                            <input type="hidden" name="itemId" value={medicalLicenseState._id} />
+                                            <button type="submit" className="flex justify-center items-center">
+                                                <TrashIcon className="w-4 h-4 text-red-500" />
+                                            </button>
+                                        </form>
                                     </TableCell>
                                 </TableRow>
                             ))}

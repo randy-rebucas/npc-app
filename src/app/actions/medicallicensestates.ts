@@ -1,5 +1,6 @@
 import connect from "@/lib/db";
 import MedicalLicenseState, { IMedicalLicenseState } from "../models/MedicalLicenseState";
+import { revalidateTag } from "next/cache";
 
 export async function getMedicalLicenseStates() {
   await connect();
@@ -67,3 +68,19 @@ export async function getMedicalLicenseStatesPaginated({
     throw error;
   }
 }
+
+export async function deleteMedicalLicenseState(id: string) {
+
+  try {
+      await connect();
+      // Perform the deletion logic here, e.g., using a database call
+      await MedicalLicenseState.findByIdAndDelete(id);
+
+      revalidateTag('medical-license-states') // Update cached medicalLicenseStates
+      return { success: true };
+  } catch (error) {
+      console.error(error);
+      return { error: 'Failed to delete medical license state' };
+  }
+}
+  
