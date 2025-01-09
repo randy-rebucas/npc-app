@@ -1,5 +1,6 @@
 import connect from "@/lib/db";
 import PracticeType, { IPracticeType } from "../models/PracticeType";
+import { revalidateTag } from "next/cache";
 
 export async function getPracticeTypes() {
   await connect();
@@ -66,4 +67,19 @@ export async function getPracticeTypesPaginated({
     console.error("Error fetching practice types:", error);
     throw error;
   }
+}
+
+export async function deletePracticeType(id: string) {
+
+    try {
+        await connect();
+        // Perform the deletion logic here, e.g., using a database call
+        await PracticeType.findByIdAndDelete(id);
+
+        revalidateTag('practice-types') // Update cached practiceTypes
+        return { success: true };
+    } catch (error) {
+        console.error(error);
+        return { error: 'Failed to delete practice type' };
+    }
 }

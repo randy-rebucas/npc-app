@@ -6,6 +6,7 @@ import { SearchParams } from '@/lib/types/search-params';
 import { getMedicalLicenseStatesPaginated } from '@/app/actions/medicallicensestates'; 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default async function LicenseStatesPage(props: {
     searchParams: SearchParams
@@ -28,7 +29,9 @@ export default async function LicenseStatesPage(props: {
             <div className="mx-auto w-full space-y-4">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Medical License States</h1>
-                    <Button>Add Medical License State</Button>
+                    <Link href="/admin/dashboard/miscellaneous/license-states/form" className="bg-primary text-white px-4 py-2 rounded-md">
+                        Add Medical License State
+                    </Link>
                 </div>
 
                 <div className="flex items-center gap-4">
