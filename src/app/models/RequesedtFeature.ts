@@ -5,7 +5,7 @@ export interface IRequestedFeature {
   email: string;
   title: string;
   description: string;
-  status: "pending" | "resolved" | "closed";
+  status: "pending" | "resolved" | "closed" | "in_progress";
   createdAt: Date;
 }
 

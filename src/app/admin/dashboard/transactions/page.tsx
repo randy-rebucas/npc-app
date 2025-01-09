@@ -48,7 +48,7 @@ export default async function TransactionsPage(props: {
 
                     <div className="flex items-center gap-4">
                         <Search placeholder='Search transactions...' />
-                        <Filter target="status" options={[{ 'all': 'All' }, { 'pending': 'Pending' }, { 'completed': 'Completed' }, { 'failed': 'Failed' }]} placeholder="Status" defaultValue="all" />
+                        <Filter target="status" options={[{ 'pending': 'Pending' }, { 'completed': 'Completed' }, { 'failed': 'Failed' }]} placeholder="Status" defaultValue="all" />
                     </div>
 
                     <div className="rounded-md border">

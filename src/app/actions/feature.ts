@@ -2,6 +2,7 @@
 
 import connect from "@/lib/db";
 import RequestedFeature from "../models/RequesedtFeature";
+import { revalidateTag } from "next/cache";
 
 interface GetFeaturesParams {
   page: number;
@@ -84,5 +85,20 @@ export async function getFeatures({
   } catch (error) {
     console.error("Error fetching features:", error);
     throw error;
+  }
+}
+
+export async function deleteFeature(id: string) {
+
+  try {
+      await connect();
+      // Perform the deletion logic here, e.g., using a database call
+      await RequestedFeature.findByIdAndDelete(id);
+    
+      revalidateTag('features') // Update cached features
+      return { success: true };
+  } catch (error) {
+      console.error(error);
+      return { error: 'Failed to delete feature' };
   }
 }

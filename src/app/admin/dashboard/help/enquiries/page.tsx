@@ -4,11 +4,13 @@ import { SearchParams } from "@/lib/types/search-params";
 import Pagination from "@/components/ui/member/pagination";
 import Search from "@/components/ui/member/search";
 import { formatDistanceToNow } from "date-fns";
-import { getEnquiries } from "@/app/actions/enquiry";
+import { deleteEnquiry, getEnquiries } from "@/app/actions/enquiry";
 import { IEnquiry } from "@/app/models/Enquiry";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import Filter from "@/components/ui/member/filter";
+import { PencilIcon } from "lucide-react";
+import Link from "next/link";
+import { TrashIcon } from "lucide-react";
 
 export const metadata: Metadata = {
     title: 'Admin Enquiries',
@@ -31,6 +33,12 @@ export default async function EnquiriesPage(props: {
     const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
     const endItem = Math.min(currentPage * ITEMS_PER_PAGE, total);
 
+    const handleDelete = async (data: FormData) => {
+        "use server";
+        const itemId = data.get("itemId");
+        await deleteEnquiry(itemId as string);
+    };
+
     return (
         <div className="flex flex-1 flex-col gap-4 p-4">
             <div className="mx-auto w-full space-y-4">
@@ -51,7 +59,7 @@ export default async function EnquiriesPage(props: {
                                 <TableHead>Subject</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead>Time</TableHead>
-                                <TableHead>Actions</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -70,8 +78,16 @@ export default async function EnquiriesPage(props: {
                                         </Badge>
                                     </TableCell>
                                     <TableCell>{formatDistanceToNow(new Date(enquiry.createdAt), { addSuffix: true })}</TableCell>
-                                    <TableCell>
-                                        <Button variant="outline">View</Button>
+                                    <TableCell className="flex items-center justify-end gap-2 p-3">
+                                        <Link href={`/admin/dashboard/help/enquiries/form/${enquiry.id}`} className="flex justify-center items-center">
+                                            <PencilIcon className="w-4 h-4" />
+                                        </Link>
+                                        <form action={handleDelete} className="flex justify-center items-center">
+                                            <input type="hidden" name="itemId" value={enquiry.id} />
+                                            <button type="submit" className="flex justify-center items-center">
+                                                <TrashIcon className="w-4 h-4 text-red-500" />
+                                            </button>
+                                        </form>
                                     </TableCell>
                                 </TableRow>
                             ))}

@@ -2,6 +2,7 @@
 
 import connect from "@/lib/db";
 import ReportedIssue from "../models/ReportedIssue";
+import { revalidateTag } from "next/cache";
 
 interface GetIssuesParams {
   page: number;
@@ -61,12 +62,15 @@ export async function getIssues({
       query.status = status;
     }
 
-
     // Execute query with pagination
     const skip = (page - 1) * limit;
 
     const [issues, total] = await Promise.all([
-      ReportedIssue.find(query).skip(skip).limit(limit).sort({ createdAt: -1 }).lean(),
+      ReportedIssue.find(query)
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 })
+        .lean(),
       ReportedIssue.countDocuments(query),
     ]);
 
@@ -84,5 +88,19 @@ export async function getIssues({
   } catch (error) {
     console.error("Error fetching issues:", error);
     throw error;
+  }
+}
+
+export async function deleteIssue(id: string) {
+  try {
+    await connect();
+    // Perform the deletion logic here, e.g., using a database call
+    await ReportedIssue.findByIdAndDelete(id);
+
+    revalidateTag("issues"); // Update cached issues
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { error: "Failed to delete issue" };
   }
 }

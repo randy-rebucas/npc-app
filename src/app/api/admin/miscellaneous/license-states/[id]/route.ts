@@ -29,7 +29,6 @@ export async function PUT(
   try {
     await connect();
     const data = await request.json();
-    console.log(data);
     const licenseState = await MedicalLicenseState.findByIdAndUpdate(id, data, {
       new: true,
     });

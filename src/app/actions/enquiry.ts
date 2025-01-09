@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidateTag } from "next/cache";
 import Enquiry from "../models/Enquiry";
 import connect from "@/lib/db";
 
@@ -84,5 +85,19 @@ export async function getEnquiries({
   } catch (error) {
     console.error("Error fetching enquiries:", error);
     throw error;
+  }
+}
+
+export async function deleteEnquiry(id: string) {
+  try {
+    await connect();
+    // Perform the deletion logic here, e.g., using a database call
+    await Enquiry.findByIdAndDelete(id);
+
+    revalidateTag("enquiries"); // Update cached enquiries
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { error: "Failed to delete enquiry" };
   }
 }

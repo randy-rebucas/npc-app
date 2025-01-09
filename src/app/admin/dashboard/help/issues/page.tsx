@@ -8,7 +8,9 @@ import { getIssues } from "@/app/actions/issue";
 import { IReportedIssue } from "@/app/models/ReportedIssue";
 import Filter from "@/components/ui/member/filter";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { TrashIcon, PencilIcon } from "lucide-react";
+import Link from "next/link";
+import { deleteIssue } from "@/app/actions/issue";
 
 export const metadata: Metadata = {
     title: 'Admin Reported Issues',
@@ -31,6 +33,12 @@ export default async function IssuesPage(props: {
     const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
     const endItem = Math.min(currentPage * ITEMS_PER_PAGE, total);
 
+    const handleDelete = async (data: FormData) => {
+        "use server";
+        const itemId = data.get("itemId");
+        await deleteIssue(itemId as string);
+    };
+
     return (
 
         <div className="flex flex-1 flex-col gap-4 p-4">
@@ -52,7 +60,7 @@ export default async function IssuesPage(props: {
                                 <TableHead>Reported By</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead>Reported</TableHead>
-                                <TableHead>Actions</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -71,8 +79,16 @@ export default async function IssuesPage(props: {
                                         </Badge>
                                     </TableCell>
                                     <TableCell>{formatDistanceToNow(new Date(issue.createdAt), { addSuffix: true })}</TableCell>
-                                    <TableCell>
-                                        <Button variant="outline">View</Button>
+                                    <TableCell className="flex items-center justify-end gap-2 p-3">
+                                        <Link href={`/admin/dashboard/help/issues/form/${issue.id}`} className="flex justify-center items-center">
+                                            <PencilIcon className="w-4 h-4" />
+                                        </Link>
+                                        <form action={handleDelete} className="flex justify-center items-center">
+                                            <input type="hidden" name="itemId" value={issue.id} />
+                                            <button type="submit" className="flex justify-center items-center">
+                                                <TrashIcon className="w-4 h-4 text-red-500" />
+                                            </button>
+                                        </form>
                                     </TableCell>
                                 </TableRow>
                             ))}

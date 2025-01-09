@@ -3,11 +3,12 @@ import { Metadata } from "next";
 import { SearchParams } from "@/lib/types/search-params";
 import Pagination from "@/components/ui/member/pagination";
 import Search from "@/components/ui/member/search";
-import { getFeatures } from "@/app/actions/feature";
+import { deleteFeature, getFeatures } from "@/app/actions/feature";
 import { formatDistanceToNow } from "date-fns";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Filter from "@/components/ui/member/filter";
+import { PencilIcon, TrashIcon } from "lucide-react";
+import Link from "next/link";
 
 export const metadata: Metadata = {
     title: 'Admin Requested Features',
@@ -29,6 +30,12 @@ export default async function FeaturesPage(props: {
     const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
     const endItem = Math.min(currentPage * ITEMS_PER_PAGE, total);
 
+    const handleDelete = async (data: FormData) => {
+        "use server";
+        const itemId = data.get("itemId");
+        await deleteFeature(itemId as string);
+    };
+
     return (
 
         <div className="flex flex-1 flex-col gap-4 p-4">
@@ -39,7 +46,7 @@ export default async function FeaturesPage(props: {
 
                 <div className="flex items-center gap-4">
                     <Search placeholder='Search features...' />
-                    <Filter target="status" options={[{ 'pending': 'Pending' }, { 'resolved': 'Resolved' }, { 'closed': 'Closed' }]} placeholder="Filter by status" defaultValue="all" />
+                    <Filter target="status" options={[{ 'pending': 'Pending' }, { 'resolved': 'Resolved' }, { 'closed': 'Closed' }, { 'in_progress': 'In Progress' }]} placeholder="Filter by status" defaultValue="all" />
                 </div>
 
                 <div className="rounded-md border">
@@ -50,7 +57,7 @@ export default async function FeaturesPage(props: {
                                 <TableHead>Requested By</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead>Requested Date</TableHead>
-                                <TableHead>Action</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -65,12 +72,20 @@ export default async function FeaturesPage(props: {
                                                     feature.status === 'closed' ? 'secondary' :
                                                         'outline'
                                         }>
-                                            {feature.status}
+                                            {feature.status.charAt(0).toUpperCase() + feature.status.slice(1)}
                                         </Badge>
                                     </TableCell>
                                     <TableCell>{formatDistanceToNow(new Date(feature.createdAt), { addSuffix: true })}</TableCell>
-                                    <TableCell>
-                                        <Button variant="outline">View</Button>
+                                    <TableCell className="flex items-center justify-end gap-2 p-3">
+                                        <Link href={`/admin/dashboard/help/features/form/${feature.id}`} className="flex justify-center items-center">
+                                            <PencilIcon className="w-4 h-4" />
+                                        </Link>
+                                        <form action={handleDelete} className="flex justify-center items-center">
+                                            <input type="hidden" name="itemId" value={feature.id} />
+                                            <button type="submit" className="flex justify-center items-center">
+                                                <TrashIcon className="w-4 h-4 text-red-500" />
+                                            </button>
+                                        </form>
                                     </TableCell>
                                 </TableRow>
                             ))}
