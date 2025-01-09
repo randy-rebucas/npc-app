@@ -21,6 +21,7 @@ import { IUserProfile } from "@/app/models/UserProfile";
 import { IStripeAccount } from "@/app/models/StripeAccount";
 import { formatDistanceToNow } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import Sync from "@/components/ui/member/sync";
 
 // Define a new type for the response from getUsers
 type SimplifiedUserResponse = {
@@ -134,7 +135,7 @@ export default async function AdminUsers(props: {
                                                 {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}
                                             </TableCell>
                                             <TableCell>
-                                                <Button variant="outline">View</Button>
+                                                <Sync id={user.id} /> 
                                             </TableCell>
                                         </TableRow>
                                     ))}

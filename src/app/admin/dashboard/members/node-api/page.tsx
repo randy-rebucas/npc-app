@@ -1,12 +1,13 @@
 import { MemberstackAdminService } from "@/utils/memberstack-admin";
 import { Metadata } from "next";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Pagination from "@/components/ui/member/pagination";
 import Search from "@/components/ui/member/search";
 import { Suspense } from "react";
 import { MembersTableSkeleton } from "@/components/ui/skeletons";
 import { SearchParams } from "@/lib/types/search-params";
+import { EyeIcon } from "lucide-react";
+import Link from "next/link";
 
 interface Member {
     id: string
@@ -41,6 +42,7 @@ export default async function Page(props: {
     const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
     const endItem = Math.min(currentPage * ITEMS_PER_PAGE, count);
 
+
     return (
         <div className="mx-auto w-full space-y-4">
             <div className="flex items-center gap-4">
@@ -53,26 +55,23 @@ export default async function Page(props: {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Avatar</TableHead>
                                 <TableHead>Email</TableHead>
                                 <TableHead>Verified</TableHead>
                                 <TableHead>Created At</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {members.map((member: Member) => (
                                 <TableRow key={member.id}>
-                                    <TableCell className="flex items-center gap-2">
-                                        <Avatar>
-                                            <AvatarImage src={member.profileImage} />
-                                            <AvatarFallback>
-                                                {member.auth.email.substring(0, 2).toUpperCase()}
-                                            </AvatarFallback>
-                                        </Avatar>
-                                    </TableCell>
                                     <TableCell>{member.auth.email}</TableCell>
                                     <TableCell>{member.verified ? 'Yes' : 'No'}</TableCell>
                                     <TableCell>{new Date(member.createdAt).toLocaleDateString()}</TableCell>
+                                    <TableCell className="flex items-center justify-end gap-2 p-3">
+                                        <Link href={`/admin/dashboard/members/node-api/${member.id}`} className="flex justify-center items-center">
+                                            <EyeIcon className="w-4 h-4" />
+                                        </Link>
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
