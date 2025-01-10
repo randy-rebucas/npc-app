@@ -2,6 +2,7 @@
 
 import User, { IUser } from "@/app/models/User";
 import connect from "@/lib/db";
+import mongoose from "mongoose";
 
 interface GetUsersParams {
   page: number;
@@ -138,8 +139,54 @@ export async function getUserByEmail(email: string) {
 
 export async function getUserById(id: string) {
   await connect();
-  const user = await User.findById(id);
-  return user;
+  const user = await User.aggregate([
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(id)
+      }
+    },
+    {
+      $lookup: {
+        from: "userprofiles",
+        localField: "_id",
+        foreignField: "user",
+        as: "profile",
+      }
+    },
+    {
+      $unwind: "$profile"
+    },
+    {
+      $lookup: {
+        from: "stripeaccounts",
+        localField: "_id",
+        foreignField: "user",
+        as: "stripeaccount",
+      }
+    },
+    {
+      $unwind: "$stripeaccount"
+    },
+    {
+      $lookup: {
+        from: "stripeaccounts",
+        localField: "_id",
+        foreignField: "user",
+        as: "stripeaccount",
+      }
+    },
+    {
+      $unwind: "$stripeaccount"
+    },
+    {
+      $limit: 1,
+    },
+    {
+      $sort: { createdAt: -1 },
+    },
+  ]);
+
+  return user[0];
 }
 
 export async function getOnboardingStatus(id: string) {

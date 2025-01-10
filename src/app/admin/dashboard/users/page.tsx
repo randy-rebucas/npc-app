@@ -21,7 +21,8 @@ import { IUserProfile } from "@/app/models/UserProfile";
 import { IStripeAccount } from "@/app/models/StripeAccount";
 import { formatDistanceToNow } from "date-fns";
 import { Badge } from "@/components/ui/badge";
-import Sync from "@/components/ui/member/sync";
+import Link from "next/link";
+import { EyeIcon } from "lucide-react";
 
 // Define a new type for the response from getUsers
 type SimplifiedUserResponse = {
@@ -105,7 +106,7 @@ export default async function AdminUsers(props: {
                                         <TableHead>Onboarding</TableHead>
                                         <TableHead>Validated</TableHead>
                                         <TableHead>Created At</TableHead>
-                                        <TableHead>Actions</TableHead>
+                                        <TableHead className="text-right">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -134,8 +135,10 @@ export default async function AdminUsers(props: {
                                             <TableCell>
                                                 {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}
                                             </TableCell>
-                                            <TableCell>
-                                                <Sync id={user.id} /> 
+                                            <TableCell className="flex items-center justify-end gap-2 p-3">
+                                                <Link href={`/admin/dashboard/users/${user.id}`}>
+                                                    <EyeIcon className="w-4 h-4" /> 
+                                                </Link>
                                             </TableCell>
                                         </TableRow>
                                     ))}
