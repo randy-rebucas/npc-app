@@ -14,15 +14,7 @@ interface Member {
     createdAt?: string;
     lastLogin?: string;
     customFields: {
-        'active-license-states': string;
-        'base-rate': string;
-        'control-fee': string;
-        'controlled-substances-needed': string;
-        'launch-eta': string;
-        'multi-np-fee': string;
-        'practice-types': string;
-        'state-fee': string;
-        'other-skills': string;
+        [key: string]: string;
     };
     verified: boolean;
     loginRedirect: string | null;
@@ -87,7 +79,7 @@ export default async function DetailPage({
                         {Object.entries(typedMember.customFields).map(([key, value]) => (
                             <div key={key} className="py-2 flex justify-between">
                                 <dt className="font-medium text-gray-500">{key.replace(/-/g, ' ')}</dt>
-                                <dd className="text-gray-900">{value}</dd>
+                                <dd className="text-gray-900 break-words">{value}</dd>
                             </div>
                         ))}
                         <div className="py-2 flex justify-between">
