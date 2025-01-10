@@ -2,11 +2,46 @@
 
 import Member from "../models/Member";
 import connect from "@/lib/db";
-import User, { IUser } from "../models/User";
+import { MemberstackAdminService } from "@/utils/memberstack-admin";
 
 interface CountMemberQuery {
   createdAt?: { $lte: Date };
   accountSynced?: string;
+}
+
+export async function syncMember(id: string) {
+  try {
+    await connect();
+    const member = await Member.findById(id).exec();
+    if (!member) {
+      return false;
+    }
+    const sharetribeUser = await MemberstackAdminService.getMemberById(member.payload.auth.id);
+    console.log(sharetribeUser);
+
+    // const customFields = {
+    //   firstName: member.payload.customFields["first-name"] || "User",
+    //   lastName: member.payload.customFields["last-name"] || "Name",
+    //   displayName: member.payload.customFields["display-name"],
+    // };
+
+    // const sharetribePayload = {
+    //   email: member.payload.auth.email,
+    //   password: generatePassword(),
+    //   firstName: customFields.firstName,
+    //   lastName: customFields.lastName,
+    //   displayName:
+    //     customFields.displayName ||
+    //     `${customFields.firstName} ${customFields.lastName}`,
+    //   protectedData: {},
+    //   publicData: {},
+    // };
+    console.log(member);
+    return member;
+  } catch (error) {
+    console.error("Error syncing member:", error);
+    throw new Error("Failed to sync member");
+  }
 }
 
 export async function countMembers(date?: Date, sync?: string) {
@@ -17,32 +52,6 @@ export async function countMembers(date?: Date, sync?: string) {
   }
   const count = await Member.countDocuments(query).exec();
   return count;
-}
-
-export async function getUserByEmail(email: string) {
-  connect();
-  const user = await User.findOne({ email: email }).exec();
-  return user;
-}
-
-export async function createUser(user: IUser) {
-  connect();
-  const newUser = await User.create(user);
-  return newUser;
-}
-
-export async function updateUser(id: string, user: IUser) {
-  connect();
-  const updatedUser = await User.findByIdAndUpdate(id, user, {
-    new: true,
-  }).exec();
-  return updatedUser;
-}
-
-export async function deleteUser(id: string) {
-  connect();
-  const deletedUser = await User.findByIdAndDelete(id).exec();
-  return deletedUser;
 }
 
 interface GetMembersParams {
@@ -66,6 +75,7 @@ export interface MemberDocument {
     auth: {
       email: string;
     };
+    id: string;
   };
   accountSynced: boolean;
   createdAt: Date;
@@ -84,7 +94,7 @@ interface GetMembersResponse {
   total: number;
 }
 
-export async function getMembers({ 
+export async function getMembers({
   page = 1,
   search = "",
   accountSynced = "all",
@@ -96,15 +106,12 @@ export async function getMembers({
     const query: MemberQuery = {};
 
     if (search) {
-      query.$or = [
-        { event: { $regex: search, $options: "i" } },
-      ];
+      query.$or = [{ event: { $regex: search, $options: "i" } }];
     }
 
     if (accountSynced !== "all") {
       query.accountSynced = accountSynced;
     }
-
 
     // Execute query with pagination
     const skip = (page - 1) * limit;
@@ -119,6 +126,7 @@ export async function getMembers({
         id: member._id.toString(),
         event: member.event,
         email: member.payload.auth.email,
+        memberstackId: member.payload.id,
         accountSynced: member.accountSynced,
         createdAt: member.createdAt,
         updatedAt: member.updatedAt,
