@@ -44,7 +44,7 @@ export default async function Page(props: {
 
 
     return (
-        <div className="mx-auto w-full space-y-4">
+        <>
             <div className="flex items-center gap-4">
                 <Search placeholder='Search members...' />
             </div>
@@ -68,7 +68,7 @@ export default async function Page(props: {
                                     <TableCell>{member.verified ? 'Yes' : 'No'}</TableCell>
                                     <TableCell>{new Date(member.createdAt).toLocaleDateString()}</TableCell>
                                     <TableCell className="flex items-center justify-end gap-2 p-3">
-                                        <Link href={`/admin/dashboard/members/${member.id}`} className="flex justify-center items-center">
+                                        <Link href={`/admin/dashboard/members/node-api/${member.id}`} className="flex justify-center items-center">
                                             <EyeIcon className="w-4 h-4" />
                                         </Link>
                                     </TableCell>
@@ -79,6 +79,6 @@ export default async function Page(props: {
                 </Suspense>
             </div>
             <Pagination totalPages={totalPages} currentPage={currentPage} totalItems={count} startItem={startItem} endItem={endItem} query={''} />
-        </div>
+        </>
     );
 }
