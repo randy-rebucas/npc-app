@@ -80,20 +80,6 @@ export default function RateMatrixForm({ form }: FormStepProps) {
           </FormItem>
         )}
       />
-
-      <FormField
-        control={form.control}
-        name="controlledSubstancesPerPrescriptionFee"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Controlled Substances Per Prescription Fee ($)</FormLabel>
-            <FormControl>
-              <Input type="number" {...field} value={onBoarding.controlledSubstancesPerPrescriptionFee} onChange={e => updateFields({ controlledSubstancesPerPrescriptionFee: parseFloat(e.target.value) })} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
     </>
   );
 }

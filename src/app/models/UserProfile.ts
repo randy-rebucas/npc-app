@@ -20,7 +20,6 @@ export interface IUserProfile {
   additionalStateFee: number;
   additionalNPFee: number;
   controlledSubstancesMonthlyFee: number;
-  controlledSubstancesPerPrescriptionFee: number;
 
   // Step 5: Background & Certifications
   description: string;
@@ -92,7 +91,6 @@ const userProfileSchema = new Schema<IUserProfile>(
     additionalStateFee: { type: Number, required: true },
     additionalNPFee: { type: Number, required: true },
     controlledSubstancesMonthlyFee: { type: Number, required: true },
-    controlledSubstancesPerPrescriptionFee: { type: Number, required: true },
 
     description: { type: String, required: true },
     boardCertification: { type: String, required: true },

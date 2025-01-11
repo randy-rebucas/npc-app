@@ -90,8 +90,7 @@ export default async function DetailPage({
                 </CardContent>
                 <CardFooter>
                     <div className="flex justify-end space-x-2">
-                        <Button>Edit</Button>
-                        <Button>Delete</Button>
+                        <Button>Migrate</Button>
                     </div>
                 </CardFooter>
             </Card>

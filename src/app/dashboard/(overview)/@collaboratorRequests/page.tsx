@@ -47,7 +47,7 @@ export default function CollaboratorRequestsPage() {
                                     <div className="w-12 h-12 bg-gray-200 rounded-full" />
                                     <div>
                                         <h3 className="font-semibold">{request.npUser.username}</h3>
-                                        <p className="text-sm text-gray-600">{request.npUser.onboardingStatus || 'New Graduate'}</p>
+                                        <p className="text-sm text-gray-600">{request.npUser.metaData?.onboardingStatus || 'New Graduate'}</p>
                                     </div>
                                 </div>
                                 <Link   

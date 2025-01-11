@@ -13,7 +13,7 @@ import { Switch } from "@/components/ui/switch"
 
 const formSchema = z.object({
     state: z.string().min(2, "State must be at least 2 characters"),
-    enabled: z.boolean().default(true),
+    enabled: z.boolean().default(false),
 });
 
 export default function MedicalLicenseStateForm({ id }: { id: string | null }) {
@@ -25,7 +25,7 @@ export default function MedicalLicenseStateForm({ id }: { id: string | null }) {
         resolver: zodResolver(formSchema),
         defaultValues: {
             state: "",
-            enabled: true,
+            enabled: false,
         },
     });
 
@@ -35,7 +35,7 @@ export default function MedicalLicenseStateForm({ id }: { id: string | null }) {
             const data = await practiceType.json();
             console.log(data)
             form.setValue("state", data?.state || "");
-            form.setValue("enabled", data?.enabled || true);
+            form.setValue("enabled", data?.enabled || false);
 
 
             console.log(form.getValues())

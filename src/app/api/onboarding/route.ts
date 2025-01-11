@@ -24,7 +24,6 @@ export async function POST(request: Request) {
       additionalStateFee: body.additionalStateFee,
       additionalNPFee: body.additionalNPFee,
       controlledSubstancesMonthlyFee: body.controlledSubstancesMonthlyFee,
-      controlledSubstancesPerPrescriptionFee: body.controlledSubstancesPerPrescriptionFee,
       description: body.description,
       boardCertification: body.boardCertification,
       additionalCertifications: body.additionalCertifications || [],
@@ -36,7 +35,9 @@ export async function POST(request: Request) {
 
     const userProfileResponse = await userProfile.save();
 
-    await User.findByIdAndUpdate(userId, { onboardingStatus: "completed" });
+    await User.findByIdAndUpdate(userId, {
+      metaData: { onboardingStatus: "completed" },
+    });
 
     return Response.json({ userProfileResponse });
   } catch (error) {

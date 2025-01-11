@@ -8,7 +8,6 @@ interface GetUsersParams {
   page: number;
   search?: string;
   role?: string;
-  onboardingStatus?: string;
   limit?: number;
 }
 
@@ -18,31 +17,19 @@ interface UserQuery {
     email?: { $regex: string; $options: string } | string;
   }[];
   role?: string;
-  onboardingStatus?: string;
 }
-
-// export interface UserDocument {
-//   _id: string; // We'll cast this to string anyway
-//   username: string;
-//   email: string;
-//   role: string;
-//   provider: string;
-//   onboardingStatus: string;
-//   createdAt: Date;
-// }
 
 export interface UserDocument {
   _id: string;
   email: string;
   username: string;
-  password: string;
-  onboardingStatus: string;
   provider: string;
   role: string;
   createdAt: Date;
   updatedAt: Date;
-  __v: number;
-  validated: boolean;
+  metaData?: {
+    [key: string]: string;
+  };
   profile: {
     _id: string;
     user: string;
@@ -91,8 +78,10 @@ interface GetUsersResponse {
     email: string;
     role: string;
     provider: string;
-    onboardingStatus: string;
     createdAt: Date;
+    metaData?: {
+      [key: string]: string;
+    };
   }[];
   total: number;
 }
@@ -257,7 +246,6 @@ export async function getUsers({
   page = 1,
   search = "",
   role = "all",
-  onboardingStatus = "all",
   limit = 10,
 }: GetUsersParams): Promise<GetUsersResponse> {
   try {
@@ -274,10 +262,6 @@ export async function getUsers({
 
     if (role !== "all") {
       query.role = role;
-    }
-
-    if (onboardingStatus !== "all") {
-      query.onboardingStatus = onboardingStatus;
     }
 
     // Execute query with pagination
@@ -341,9 +325,8 @@ export async function getUsers({
         email: user.email,
         role: user.role,
         provider: user.provider,
-        onboardingStatus: user.onboardingStatus,
         createdAt: user.createdAt,
-        validated: user.validated,
+        metaData: user.metaData,
         profile: user.profile,
         stripeaccount: user.stripeaccount,
       })),

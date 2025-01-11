@@ -12,8 +12,7 @@ const ratesSchema = z.object({
     monthlyCollaborationRate: z.number().min(0, "Base rate must be positive"),
     additionalStateFee: z.number().min(0, "State rate must be positive"),
     additionalNPFee: z.number().min(0, "NP rate must be positive"),
-    controlledSubstancesMonthlyFee: z.number().nullable(),
-    controlledSubstancesPerPrescriptionFee: z.number().nullable(),
+    controlledSubstancesMonthlyFee: z.number().nullable()
 });
 
 type RatesFormValues = z.infer<typeof ratesSchema>;
@@ -29,8 +28,7 @@ export default function Rates() {
             monthlyCollaborationRate: 0,
             additionalStateFee: 0,
             additionalNPFee: 0,
-            controlledSubstancesMonthlyFee: 0,
-            controlledSubstancesPerPrescriptionFee: 0,
+            controlledSubstancesMonthlyFee: 0
         },
     });
 
@@ -52,8 +50,7 @@ export default function Rates() {
                     monthlyCollaborationRate: profileResponse?.monthlyCollaborationRate || 0,
                     additionalStateFee: profileResponse?.additionalStateFee || 0,
                     additionalNPFee: profileResponse?.additionalNPFee || 0,
-                    controlledSubstancesMonthlyFee: profileResponse?.controlledSubstancesMonthlyFee || 0,
-                    controlledSubstancesPerPrescriptionFee: profileResponse?.controlledSubstancesPerPrescriptionFee || 0,
+                    controlledSubstancesMonthlyFee: profileResponse?.controlledSubstancesMonthlyFee || 0
                 };
 
                 Object.entries(profile).forEach(([key, value]) => {
@@ -161,12 +158,6 @@ export default function Rates() {
                     label="Additional Nurse Practitioner Fee"
                     name="additionalNPFee"
                     tooltip="Fee for multi-NP practices"
-                />
-
-                <InputField
-                    label="Controlled Substances Fee (per prescription)"
-                    name="controlledSubstancesPerPrescriptionFee"
-                    tooltip="Optional fee per controlled substance prescription"
                 />
 
                 <InputField
