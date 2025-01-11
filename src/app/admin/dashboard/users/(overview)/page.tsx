@@ -7,7 +7,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 import Search from "@/components/ui/member/search";
 import Filter from "@/components/ui/member/filter";
 import Pagination from "@/components/ui/member/pagination";
@@ -69,13 +69,13 @@ export default async function AdminUsers(props: {
         <>
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-bold">Users</h1>
-                <Button>Add User</Button>
+                {/* <Button>Add User</Button> */}
             </div>
 
             <div className="flex items-center gap-4">
                 <Search placeholder='Search users...' />
                 <Filter target="role" options={[{ 'ADMIN': 'Admin' }, { 'CUSTOMER': 'Customer' }]} placeholder="Role" defaultValue="all" />
-                <Filter target="onboardingStatus" options={[{ 'incomplete': 'Incomplete' }, { 'completed': 'Completed' }]} placeholder="Status" defaultValue="all" />
+                {/* <Filter target="onboardingStatus" options={[{ 'incomplete': 'Incomplete' }, { 'completed': 'Completed' }]} placeholder="Status" defaultValue="all" /> */}
             </div>
 
             <div className="rounded-md border">

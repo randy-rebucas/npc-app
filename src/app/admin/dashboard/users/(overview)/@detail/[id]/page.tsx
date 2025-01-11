@@ -1,7 +1,7 @@
 import { getUserById } from "@/app/actions/user";
 import { IUserProfile } from "@/app/models/UserProfile";
 import { formatDistanceToNow } from "date-fns";
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon } from "lucide-react"; //DownloadIcon
 import Link from "next/link";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -78,7 +78,10 @@ export default async function Page({
 
                     {user.metaData && (
                         <div>
-                            <h2 className="text-xl font-semibold">Metadata</h2>
+                            <h2 className="text-xl font-semibold">
+                                Metadata 
+                                <Button variant="outline">Edit</Button>
+                            </h2>
                             <dl className="divide-y divide-gray-200">
                                 {Object.entries(user.metaData).map(([key, value]) => (
                                     <div key={key} className="py-2 flex justify-between">
@@ -177,7 +180,26 @@ export default async function Page({
                             </div>
                             <div className="py-2 flex justify-between">
                                 <dt className="font-medium text-gray-500">Government ID Path</dt>
-                                <dd className="text-gray-900">{user.profile?.governmentIdPath}</dd>
+                                <dd className="text-gray-900 flex items-center gap-2">
+                                    {user.profile?.governmentIdPath}
+                                    {/* {user.profile?.governmentIdPath && (
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            asChild
+                                            className="h-8 w-8"
+                                        >
+                                            <Link
+                                                href={{ pathname: '/admin/dashboard/users/download-file/[path]', query: { path: user.profile?.governmentIdPath } }}
+                                                download
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                <DownloadIcon className="h-4 w-4" />
+                                            </Link>
+                                        </Button>
+                                    )} */}
+                                </dd>
                             </div>
                             <div className="py-2 flex justify-between">
                                 <dt className="font-medium text-gray-500">NPI Number</dt>
