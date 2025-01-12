@@ -4,7 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from 'lucide-react'
-import { HelpCircle, Key, User, LayoutDashboard, Settings, FileCheck, CreditCardIcon } from "lucide-react"
+import { Key, User, LayoutDashboard, Shield, HelpCircle, CreditCardIcon, FileCheck, Settings } from "lucide-react"
+import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
 
 // Add type for navigation items
 type NavItem = {
@@ -14,9 +16,9 @@ type NavItem = {
 }
 
 export default function Nav() {
-    const pathname = usePathname()
-
-    const items: NavItem[] = [
+    const pathname = usePathname();
+    const { data: session } = useSession();
+    const [items, setItems] = useState<NavItem[]>([
         {
             title: "Dashboard",
             url: "/dashboard",
@@ -33,26 +35,55 @@ export default function Nav() {
             icon: Key,
         },
         {
-            title: "Stripe",
-            url: "/dashboard/stripe",
-            icon: CreditCardIcon,
-        },
-        {
-            title: "Attestations",
-            url: "/dashboard/attestations",
-            icon: FileCheck,
-        },
-        {
-            title: "Settings",
-            url: "/dashboard/settings",
-            icon: Settings,
-        },
-        {
             title: "Help",
             url: "/dashboard/help",
             icon: HelpCircle,
         }
-    ]
+    ]);
+
+    // Use useEffect to fetch user data and update items once when component mounts
+    useEffect(() => {
+        const fetchUser = async () => {
+            if (!session?.user?.id) return;
+
+            const response = await fetch(`/api/user/${session.user.id}`);
+            const user = await response.json();
+            console.log(user);
+            if (user?.metaData?.validated === true) {
+                setItems(currentItems => [
+                    ...currentItems,
+                    {
+                        title: "Stripe",
+                        url: "/dashboard/stripe",
+                        icon: CreditCardIcon,
+                    },
+                    {
+                        title: "Attestations",
+                        url: "/dashboard/attestations",
+                        icon: FileCheck,
+                    },
+                    {
+                        title: "Settings",
+                        url: "/dashboard/settings",
+                        icon: Settings,
+                    }
+                ]);
+            }
+
+            if (user?.role === "ADMIN") {
+                setItems(currentItems => [
+                    ...currentItems,
+                    {
+                        title: "Admin",
+                        url: "/dashboard/admin",
+                        icon: Shield,
+                    }
+                ]);
+            }
+        };
+
+        fetchUser();
+    }, [session?.user?.id]); // Only re-run if user ID changes
 
     return (
         <nav className="flex-1 space-y-6 overflow-y-auto p-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-800">

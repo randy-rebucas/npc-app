@@ -217,6 +217,7 @@ export default function ProfilePage() {
                                 toast({
                                     title: "Coming Soon",
                                     description: "Email change functionality will be available soon.",
+                                    variant: "destructive",
                                 });
                             }}
                             className="px-4 py-2 border rounded-md hover:bg-gray-50"

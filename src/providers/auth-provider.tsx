@@ -12,7 +12,7 @@ function OnboardingCheck({ children }: { children: React.ReactNode }) {
         return async (userId: string) => {
             const response = await fetch(`/api/user/${userId}`);
             const user = await response.json();
-            if (user?.onboardingStatus === "incomplete") {
+            if (user?.metaData?.onboardingStatus === "incomplete") {
                 router.push("/onboarding");
             }
         };
