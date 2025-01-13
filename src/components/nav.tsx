@@ -48,7 +48,6 @@ export default function Nav() {
 
             const response = await fetch(`/api/user/${session.user.id}`);
             const user = await response.json();
-            console.log(user);
             if (user?.metaData?.validated === true) {
                 setItems(currentItems => [
                     ...currentItems,

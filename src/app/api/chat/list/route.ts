@@ -14,9 +14,11 @@ export async function GET() {
     await connect();
 
     const chats = await Chat.find({
-      participants: { $in: [session.user.id] }
+      $or: [{ customerId: session.user.id }, { agentId: session.user.id }]
     })
-      .sort({ timestamp: -1 })
+      .populate('customerId', 'username')
+      .populate('agentId', 'username')
+      .sort({ lastActivity: -1 })
       .lean();
 
     return NextResponse.json({ chats });

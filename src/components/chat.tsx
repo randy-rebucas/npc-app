@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { MessageCircle, Send, Loader2 } from 'lucide-react';
-import Link from 'next/link';
+// import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 
 interface Message {
   sender: string;
@@ -25,8 +26,8 @@ interface Chat {
 }
 
 export function Chat() {
+  const { data: session } = useSession(); 
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -37,47 +38,20 @@ export function Chat() {
   useEffect(() => {
     const loadChat = async () => {
       try {
-        const response = await fetch('/api/chat/session');
+        const response = await fetch(`/api/chat/session?chatId=${session?.user.id}`);
         const data = await response.json();
-        console.log(data);
         setChat(data.chat);
       } catch (err) {
         console.error('Failed to load chat:', err);
       }
     };
 
-    if (isOpen) {
+    if (isOpen && session?.user.id) {
       loadChat();
     }
-  }, [isOpen]);
+  }, [isOpen, session]);
 
-  const handleSendMessage = async () => {
-    // if (!newMessage.trim() || isLoading || !chat) return;
-    setIsLoading(true);
-    console.log(newMessage);
-    try {
-      const response = await fetch('/api/chat/message', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          // chatId: chat._id,
-          content: newMessage,
-          isCustomerTyping: false
-        }),
-      });
-
-      if (!response.ok) throw new Error(`Error: ${response.status}`);
-      const data = await response.json();
-      setChat(data.chat);
-      setNewMessage('');
-    } catch (err) {
-      console.error('Chat Error:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Handle typing indicator
+  // Updated typing indicator logic
   useEffect(() => {
     const updateTypingStatus = async (isTyping: boolean) => {
       if (!chat?._id) return;
@@ -95,15 +69,46 @@ export function Chat() {
       }
     };
 
+    if (newMessage && !isTyping) {
+      setIsTyping(true);
+      updateTypingStatus(true);
+    }
+
     const typingTimeout = setTimeout(() => {
       if (isTyping) {
         setIsTyping(false);
         updateTypingStatus(false);
       }
-    }, 1000);
+    }, 1000) as unknown as NodeJS.Timeout;
 
     return () => clearTimeout(typingTimeout);
   }, [newMessage, chat, isTyping]);
+
+  // Updated message sending logic
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || isLoading || !chat) return;
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/chat/message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          chatId: chat._id,
+          content: newMessage,
+          isCustomerTyping: false
+        }),
+      });
+
+      if (!response.ok) throw new Error(`Error: ${response.status}`);
+      const data = await response.json();
+      setChat(data.chat);
+      setNewMessage('');
+    } catch (err) {
+      console.error('Chat Error:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Add click outside handler
   useEffect(() => {
@@ -120,35 +125,15 @@ export function Chat() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Load previous messages
-  useEffect(() => {
-    const loadMessages = async () => {
-      try {
-        const response = await fetch('/api/chat/history');
-        console.log(response);
-        // if (!response.ok) throw new Error('Failed to load messages');
-        const data = await response.json();
-        setMessages(data.messages);
-      } catch (err) {
-        console.error('Failed to load messages:', err);
-        // setError('Failed to load message history');
-      }
-    };
-
-    if (isOpen) {
-      loadMessages();
-    }
-  }, [isOpen]);
-
   // Add this useEffect to update unread count
   useEffect(() => {
-    if (messages && messages.length > 0) {
-      const newUnreadCount = messages.filter(
+    if (chat?.messages && chat.messages.length > 0) {
+      const newUnreadCount = chat.messages.filter(
         msg => msg.sender === 'assistant' && !isOpen
       ).length;
       setUnreadCount(newUnreadCount);
     }
-  }, [messages, isOpen]);
+  }, [chat, isOpen]);
 
   return (
     <div className="relative">
@@ -176,12 +161,12 @@ export function Chat() {
           <div className="flex flex-col h-[400px]">
             <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
               <h3 className="font-semibold">Chat</h3>
-              <Link
+              {/* <Link
                 href="/dashboard/chat"
                 className="text-sm text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
               >
                 Open in page
-              </Link>
+              </Link> */}
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4">

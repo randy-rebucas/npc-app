@@ -1,7 +1,8 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Types } from "mongoose";
+import { IUser } from "./User";
 
-interface IMessage {
-  sender: mongoose.Types.ObjectId;
+export interface IMessage {
+  sender: Types.ObjectId | IUser;
   content: string;
   timestamp: Date;
   isAgent: boolean;
@@ -9,8 +10,9 @@ interface IMessage {
 }
 
 export interface IChat extends Document {
-  customerId: mongoose.Types.ObjectId;
-  agentId: mongoose.Types.ObjectId;
+  _id: string;
+  customerId: Types.ObjectId | IUser;
+  agentId: Types.ObjectId | IUser;
   messages: IMessage[];
   status: 'active' | 'resolved' | 'waiting';
   lastActivity: Date;
