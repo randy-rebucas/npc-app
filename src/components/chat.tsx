@@ -7,10 +7,21 @@ import { MessageCircle, Send, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 interface Message {
-  id: string;
+  sender: string;
   content: string;
-  sender: 'user' | 'assistant';
   timestamp: Date;
+  isAgent: boolean;
+  isRead: boolean;
+}
+
+interface Chat {
+  _id: string;
+  customerId: string;
+  agentId: string;
+  messages: Message[];
+  status: 'active' | 'resolved' | 'waiting';
+  isAgentTyping: boolean;
+  isCustomerTyping: boolean;
 }
 
 export function Chat() {
@@ -19,53 +30,80 @@ export function Chat() {
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [chat, setChat] = useState<Chat | null>(null);
+  const [isTyping, setIsTyping] = useState(false);
 
-  const handleSendMessage = async () => {
-    if (!newMessage.trim() || isLoading) return;
-
-    setIsLoading(true);
-
-    // Add user message
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      content: newMessage,
-      sender: 'user',
-      timestamp: new Date(),
+  // Load or create chat session
+  useEffect(() => {
+    const loadChat = async () => {
+      try {
+        const response = await fetch('/api/chat/session');
+        const data = await response.json();
+        console.log(data);
+        setChat(data.chat);
+      } catch (err) {
+        console.error('Failed to load chat:', err);
+      }
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setNewMessage('');
+    if (isOpen) {
+      loadChat();
+    }
+  }, [isOpen]);
 
+  const handleSendMessage = async () => {
+    // if (!newMessage.trim() || isLoading || !chat) return;
+    setIsLoading(true);
+    console.log(newMessage);
     try {
-      const response = await fetch('/api/chat', {
+      const response = await fetch('/api/chat/message', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: newMessage }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          // chatId: chat._id,
+          content: newMessage,
+          isCustomerTyping: false
+        }),
       });
 
-      // if (!response.ok) {
-      //   throw new Error('Failed to send message');
-      // }
-
+      if (!response.ok) throw new Error(`Error: ${response.status}`);
       const data = await response.json();
-
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: data.message,
-        sender: 'assistant',
-        timestamp: new Date(),
-      };
-
-      setMessages(prev => [...prev, assistantMessage]);
+      setChat(data.chat);
+      setNewMessage('');
     } catch (err) {
-      // setError('Failed to send message. Please try again.');
       console.error('Chat Error:', err);
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Handle typing indicator
+  useEffect(() => {
+    const updateTypingStatus = async (isTyping: boolean) => {
+      if (!chat?._id) return;
+      try {
+        await fetch('/api/chat/typing', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            chatId: chat._id,
+            isCustomerTyping: isTyping 
+          }),
+        });
+      } catch (err) {
+        console.error('Failed to update typing status:', err);
+      }
+    };
+
+    const typingTimeout = setTimeout(() => {
+      if (isTyping) {
+        setIsTyping(false);
+        updateTypingStatus(false);
+      }
+    }, 1000);
+
+    return () => clearTimeout(typingTimeout);
+  }, [newMessage, chat, isTyping]);
 
   // Add click outside handler
   useEffect(() => {
@@ -87,6 +125,7 @@ export function Chat() {
     const loadMessages = async () => {
       try {
         const response = await fetch('/api/chat/history');
+        console.log(response);
         // if (!response.ok) throw new Error('Failed to load messages');
         const data = await response.json();
         setMessages(data.messages);
@@ -146,25 +185,27 @@ export function Chat() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages && messages.length > 0 && messages.map((message) => (
+              {chat?.messages.map((message) => (
                 <div
-                  key={message.id}
-                  className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'
-                    }`}
+                  key={message.timestamp.toString()}
+                  className={`flex ${!message.isAgent ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-lg p-2 ${message.sender === 'user'
+                    className={`max-w-[80%] rounded-lg p-2 ${
+                      !message.isAgent
                         ? 'bg-blue-500 text-white'
                         : 'bg-gray-100 dark:bg-gray-700'
-                      }`}
+                    }`}
                   >
                     {message.content}
                   </div>
                 </div>
               ))}
-              {isLoading && (
-                <div className="flex justify-center">
-                  <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
+              {(chat?.isAgentTyping || isTyping) && (
+                <div className="flex justify-start">
+                  <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  </div>
                 </div>
               )}
             </div>
