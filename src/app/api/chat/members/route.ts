@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/options";
 import connect from "@/lib/db";
-import Chat, { IChat } from "@/app/models/Chat";
+import Chat from "@/app/models/Chat";
 import User from "@/app/models/User";
 
 export async function GET(request: Request) {
@@ -25,14 +25,15 @@ export async function GET(request: Request) {
     await connect();
 
     const chatParticipants = await Chat.findById(chatId)
-      .populate("participants", "name email image")
+      .populate("customerId", "name email image")
+      .populate("agentId", "name email image")
       .lean();
 
     if (!chatParticipants) {
       return NextResponse.json({ error: "Chat not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ members: chatParticipants.map((participant: IChat) => participant.participants) });
+    return NextResponse.json({ members: chatParticipants });
   } catch (error) {
     console.error("Failed to fetch members:", error);
     return NextResponse.json(
