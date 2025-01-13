@@ -1,5 +1,5 @@
 import { useNotifications } from '@/providers/notifications-provider';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from './ui/button';
 import { Bell } from 'lucide-react';
 import Link from 'next/link';
@@ -7,7 +7,21 @@ import Link from 'next/link';
 export function Notifications() {
   const [isOpen, setIsOpen] = useState(false);
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  // Add click outside handler
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const notificationsElement = document.getElementById('notifications-container');
+      const target = event.target as Node;
 
+      if (notificationsElement && !notificationsElement.contains(target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+  
   return (
     <div className="relative">
       <button 
@@ -23,7 +37,7 @@ export function Notifications() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+        <div id="notifications-container" className="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
           <div className="p-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold mb-2">Notifications</h3>
