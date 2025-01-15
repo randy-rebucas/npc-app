@@ -6,7 +6,10 @@ import { Metadata } from "next";
 import { SearchParams } from "@/lib/types/search-params";
 import Pagination from "@/components/ui/member/pagination";
 import Search from "@/components/ui/member/search";
-import { getFaqs } from "@/app/actions/faq";
+import { deleteFaq, getFaqs } from "@/app/actions/faq";
+import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
     title: 'Admin FAQ',
@@ -27,6 +30,12 @@ export default async function FAQPage(props: {
     const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
     const endItem = Math.min(currentPage * ITEMS_PER_PAGE, total);
 
+    const handleDelete = async (data: FormData) => {
+        "use server";
+        const itemId = data.get("itemId");
+        await deleteFaq(itemId as string); 
+    };
+
     return (
         <SidebarInset>
             <AdminHeader breadcrumbs={[
@@ -38,6 +47,12 @@ export default async function FAQPage(props: {
                 <div className="mx-auto w-full space-y-4">
                     <div className="flex items-center justify-between">
                         <h1 className="text-2xl font-bold">FAQ</h1>
+                        <Button asChild>
+                            <Link href="/admin/dashboard/faq/new">
+                                <PlusIcon className="w-4 h-4" />
+                                Add Faq
+                            </Link>
+                        </Button>
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -50,6 +65,7 @@ export default async function FAQPage(props: {
                                 <TableRow>
                                     <TableHead>Question</TableHead>
                                     {/* <TableHead>Answer</TableHead> */}
+                                    <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -58,6 +74,17 @@ export default async function FAQPage(props: {
                                         <TableRow key={faq._id}>
                                             <TableCell className="text-sm font-medium text-gray-900 truncate">{faq.question}</TableCell>
                                             {/* <TableCell>{faq.answer}</TableCell> */}
+                                            <TableCell className="flex items-center justify-end gap-2 p-3">
+                                                <Link href={`/admin/dashboard/faq/${faq._id}`}>
+                                                    <PencilIcon className="w-4 h-4" />
+                                                </Link>
+                                                <form action={handleDelete} className="flex justify-center items-center">
+                                                    <input type="hidden" name="itemId" value={faq._id} />
+                                                    <button type="submit" className="flex justify-center items-center">
+                                                        <TrashIcon className="w-4 h-4 text-red-500" /> 
+                                                    </button>
+                                                </form>
+                                            </TableCell>
                                         </TableRow>
                                     );
                                 })}

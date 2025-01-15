@@ -1,5 +1,6 @@
 import connect from "@/lib/db";
 import Faq from "../models/Faq";
+import { revalidateTag } from "next/cache";
 
 interface GetFaqsParams {
   page: number;
@@ -57,5 +58,17 @@ export async function getFaqs({
   } catch (error) {
     console.error("Error fetching faqs:", error);
     throw error;
+  }
+}
+
+export async function deleteFaq(id: string) {
+  try {
+    await connect();
+    await Faq.findByIdAndDelete(id);
+    revalidateTag('faqs') // Update cached faqs
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { error: 'Failed to delete faq' };
   }
 }
