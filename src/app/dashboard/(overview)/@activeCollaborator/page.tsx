@@ -61,7 +61,7 @@ export default function ActiveCollaboratorPage() {
                                         </Link>
                                     </td>
                                     <td className="py-3 px-4">{collab.npUser.email}</td>
-                                    <td className="py-3 px-4">{collab.npUser.metaData?.onboardingStatus}</td>
+                                    <td className="py-3 px-4"></td>
                                     <td className="py-3 px-4">${collab.monthlyRate}</td>
                                     <td className="py-3 px-4">{new Date(collab.startDate).toLocaleDateString()}</td>
                                     <td className="py-3 px-4">
