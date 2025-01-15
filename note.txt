@@ -96,3 +96,28 @@ https://app.npcollaborator.com/privacy-policy
 
 
 https://63avs0.logto.app/sign-in?app_id=5x9rvkqv2ybx2yp7s4fp8
+
+Logto OpenID Connect
+Phase 1: Physician Submission
+    Needs to complete the onboarding form
+
+Phase 2: Admin Review and Approval
+
+    submissionStatus = ["PENDING", "APPROVED", "REJECTED", "INCOMPLETE", "INCORRECT"]
+
+    if some information is missing, submissionStatus = "INCOMPLETE"
+    if some information is incorrect, submissionStatus = "INCORRECT"
+    if all information is correct and validated, submissionStatus = "APPROVED"
+
+    send email to the physician with the submissionStatus and provide instructions for the next step.
+
+Phase 3: Contract Signing
+    if submissionStatus = "APPROVED", then send email to the physician with the instructions to sign the contract.
+
+Phase 4: Post-Approval Setup
+    enable google calendar sync and availability
+    enable stripe connect
+    profile activation
+
+on metaData
+	•	Phone Number: Add to the Essential Information step. It ensures physicians can be reached directly if admin issues arise.

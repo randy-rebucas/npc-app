@@ -6,8 +6,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-// import { Button } from "@/components/ui/button";
+
 import Search from "@/components/ui/member/search";
 import Filter from "@/components/ui/member/filter";
 import Pagination from "@/components/ui/member/pagination";
@@ -36,6 +35,7 @@ type SimplifiedUserResponse = {
     };
     profile?: IUserProfile;
     stripeaccount?: IStripeAccount;
+    submissionStatus: string;
 };
 
 export const metadata: Metadata = {
@@ -93,7 +93,7 @@ export default async function AdminUsers(props: {
                                 <TableHead>Provider</TableHead>
                                 <TableHead>Stripe Account</TableHead>
                                 <TableHead>Onboarding</TableHead>
-                                <TableHead>Validated</TableHead>
+                                <TableHead>Submission Status</TableHead>
                                 <TableHead>Created At</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
@@ -112,15 +112,19 @@ export default async function AdminUsers(props: {
                                         {user.metaData?.stripeAccountId ? user.metaData?.stripeAccountId : 'N/A'}
                                     </TableCell>
                                     <TableCell>
-                                        {user.onBoardingStatus && <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.metaData?.onboardingStatus === 'completed' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                                            {user.onBoardingStatus}
-                                        </span>}
-                                        {!user.onBoardingStatus && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Incomplete</span>}
+                                        {user.onBoardingStatus === 'COMPLETED' && (
+                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800`}>
+                                                {user.onBoardingStatus}
+                                            </span>
+                                        )}
+                                        {user.onBoardingStatus === 'INCOMPLETE' && (
+                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                {user.onBoardingStatus}
+                                            </span>
+                                        )}
                                     </TableCell>
                                     <TableCell>
-                                        <Badge variant={user.metaData?.validated === 'yes' ? 'default' : 'destructive'}>
-                                            {user.metaData?.validated === 'yes' ? 'Validated' : 'Not Validated'}
-                                        </Badge>
+                                        {user.submissionStatus}
                                     </TableCell>
                                     <TableCell>
                                         {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}

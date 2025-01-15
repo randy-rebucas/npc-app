@@ -9,6 +9,7 @@ export interface IUser {
   createdAt: Date;
   updatedAt: Date;
   onBoardingStatus: "COMPLETED" | "INCOMPLETE";
+  submissionStatus: "PENDING" | "APPROVED" | "REJECTED" | "INCOMPLETE" | "INCORRECT";
   metaData: Map<string, string>;
   stripeAccountId: string;
 }
@@ -23,6 +24,11 @@ const userSchema = new Schema<IUser>(
       type: String,
       enum: ["COMPLETED", "INCOMPLETE"],
       default: "INCOMPLETE",
+    },
+    submissionStatus: {
+      type: String,
+      enum: ["PENDING", "APPROVED", "REJECTED", "INCOMPLETE", "INCORRECT"],
+      default: "PENDING",
     },
     stripeAccountId: { type: String, default: "" },
     metaData: {
