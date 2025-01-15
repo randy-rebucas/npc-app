@@ -179,7 +179,7 @@ export default function UserForm({ id }: { id: string | null }) {
                                             <FormItem>
                                                 <FormLabel className="text-sm">Key</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="Enter key" {...field} {...(index === 0 ? { readOnly: true } : {})} />
+                                                    <Input placeholder="Enter key" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -192,7 +192,7 @@ export default function UserForm({ id }: { id: string | null }) {
                                             <FormItem>
                                                 <FormLabel className="text-sm">Value</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="Enter value" {...field} {...(index === 0 ? { readOnly: true } : {})} />
+                                                    <Input placeholder="Enter value" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
