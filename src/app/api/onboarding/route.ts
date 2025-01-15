@@ -33,13 +33,13 @@ export async function POST(request: Request) {
       user: userId,
     });
 
-    const userProfileResponse = await userProfile.save();
+    await userProfile.save();
+    const user = await User.findOneAndUpdate(
+      { _id: userId },
+      { $set: { metaData: { onboardingStatus: "completed" } } }
+    );
 
-    await User.findByIdAndUpdate(userId, {
-      metaData: { onboardingStatus: "completed" },
-    });
-
-    return Response.json({ userProfileResponse });
+    return Response.json({ user });
   } catch (error) {
     console.error("Error in onboarding:", error);
     return Response.json({ error: "Internal Server Error" }, { status: 500 });

@@ -8,9 +8,7 @@ export interface IUser {
   role: "ADMIN" | "PHYSICIAN";
   createdAt: Date;
   updatedAt: Date;
-  metaData?: {
-    [key: string]: string; // This will be used to store any additional metadata about the user such validated, submited, signed agreement, etc.
-  };
+  metaData: Map<string, string>;
 }
 
 const userSchema = new Schema<IUser>(
@@ -19,7 +17,10 @@ const userSchema = new Schema<IUser>(
     username: { type: String, required: true, unique: true },
     provider: { type: String, required: true },
     role: { type: String, enum: ["ADMIN", "PHYSICIAN"], default: "PHYSICIAN" },
-    metaData: { type: Object, default: {} },
+    metaData: {
+      type: Map,
+      of: String,
+    },
   },
   { timestamps: true }
 );

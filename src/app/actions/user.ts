@@ -61,14 +61,6 @@ export interface UserDocument {
     education: string[];
     npiNumber: string;
   },
-  stripeaccount: {
-    _id: string;
-    user: string;
-    __v: number;
-    createdAt: Date;
-    stripeAccountId: string;
-    updatedAt: Date;
-  }
 }
 
 interface GetUsersResponse {
@@ -144,28 +136,6 @@ export async function getUserById(id: string) {
     },
     {
       $unwind: "$profile"
-    },
-    {
-      $lookup: {
-        from: "stripeaccounts",
-        localField: "_id",
-        foreignField: "user",
-        as: "stripeaccount",
-      }
-    },
-    {
-      $unwind: "$stripeaccount"
-    },
-    {
-      $lookup: {
-        from: "stripeaccounts",
-        localField: "_id",
-        foreignField: "user",
-        as: "stripeaccount",
-      }
-    },
-    {
-      $unwind: "$stripeaccount"
     },
     {
       $limit: 1,
@@ -284,28 +254,6 @@ export async function getUsers({
           $unwind: "$profile"
         },
         {
-          $lookup: {
-            from: "stripeaccounts",
-            localField: "_id",
-            foreignField: "user",
-            as: "stripeaccount",
-          }
-        },
-        {
-          $unwind: "$stripeaccount"
-        },
-        {
-          $lookup: {
-            from: "stripeaccounts",
-            localField: "_id",
-            foreignField: "user",
-            as: "stripeaccount",
-          }
-        },
-        {
-          $unwind: "$stripeaccount"
-        },
-        {
           $skip: skip,
         },
         {
@@ -328,7 +276,6 @@ export async function getUsers({
         createdAt: user.createdAt,
         metaData: user.metaData,
         profile: user.profile,
-        stripeaccount: user.stripeaccount,
       })),
       total,
     };

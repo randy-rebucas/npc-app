@@ -117,8 +117,8 @@ export default async function AdminUsers(props: {
                                         {!user.metaData?.onboardingStatus && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Incomplete</span>}
                                     </TableCell>
                                     <TableCell>
-                                        <Badge variant={user.metaData?.validated ? 'default' : 'destructive'}>
-                                            {user.metaData?.validated ? 'Validated' : 'Not Validated'}
+                                        <Badge variant={user.metaData?.validated === 'yes' ? 'default' : 'destructive'}>
+                                            {user.metaData?.validated === 'yes' ? 'Validated' : 'Not Validated'}
                                         </Badge>
                                     </TableCell>
                                     <TableCell>

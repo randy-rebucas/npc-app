@@ -74,7 +74,7 @@ export default function Nav() {
                     ...currentItems,
                     {
                         title: "Admin",
-                        url: "/dashboard/admin",
+                        url: "/admin/dashboard",
                         icon: Shield,
                     }
                 ]);
@@ -90,9 +90,9 @@ export default function Nav() {
                 <h2 className="mb-4 px-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Navigation
                 </h2>
-                {items.map((item) => (
+                {items.map((item, index) => (
                     <Link
-                        key={item.title}
+                        key={index}
                         href={item.url}
                         className={cn("group relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 transition-all duration-300 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800/50", pathname === item.url && "bg-gray-100 dark:bg-gray-800/50")}
                     >

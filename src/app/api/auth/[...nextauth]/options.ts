@@ -75,10 +75,9 @@ export const authOptions: NextAuthOptions = {
             role: "PHYSICIAN",
             // For social login, we don't store password
             provider: account?.provider,
-            metaData: {
-              onboardingStatus: "incomplete",
-            },
+            metaData: new Map([["onboardingStatus", "incomplete"]]),
           });
+          
           user.id = newUser._id.toString();
           user.role = "PHYSICIAN";
         } else {

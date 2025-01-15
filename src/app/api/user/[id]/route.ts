@@ -12,6 +12,7 @@ export async function GET(
   try {
     await connect();
     const user = await User.findById(id);
+    console.log(user)
     return NextResponse.json(user);
   } catch (error) {
     console.error("Error in user:", error);

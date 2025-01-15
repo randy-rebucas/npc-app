@@ -1,7 +1,7 @@
 import { getUserById } from "@/app/actions/user";
 import { IUserProfile } from "@/app/models/UserProfile";
 import { formatDistanceToNow } from "date-fns";
-import { ArrowLeftIcon } from "lucide-react"; //DownloadIcon
+import { ArrowLeftIcon, PencilIcon } from "lucide-react"; //DownloadIcon
 import Link from "next/link";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,9 +39,12 @@ export default async function Page({
                             {user?.email}
                         </CardTitle>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <Button>Update</Button>
-                        <Button variant="outline">Actions</Button>
+                    <div className="flex items-center justify-between gap-2">
+                        <Button variant="ghost" size="icon" asChild>
+                            <Link href={`/admin/dashboard/users/${id}/edit`}>
+                                <PencilIcon className="w-4 h-4" />
+                            </Link>
+                        </Button>
                     </div>
                 </CardHeader>
                 <CardContent>
@@ -78,9 +81,8 @@ export default async function Page({
 
                     {user.metaData && (
                         <div>
-                            <h2 className="text-xl font-semibold">
-                                Metadata 
-                                <Button variant="outline">Edit</Button>
+                            <h2 className=" font-semibold text-xl">
+                                Metadata
                             </h2>
                             <dl className="divide-y divide-gray-200">
                                 {Object.entries(user.metaData).map(([key, value]) => (

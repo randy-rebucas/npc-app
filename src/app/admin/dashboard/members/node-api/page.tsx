@@ -8,6 +8,7 @@ import { MembersTableSkeleton } from "@/components/ui/skeletons";
 import { SearchParams } from "@/lib/types/search-params";
 import { EyeIcon } from "lucide-react";
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 
 interface Member {
     id: string
@@ -65,7 +66,12 @@ export default async function Page(props: {
                             {members.map((member: Member) => (
                                 <TableRow key={member.id}>
                                     <TableCell>{member.auth.email}</TableCell>
-                                    <TableCell>{member.verified ? 'Yes' : 'No'}</TableCell>
+                                    <TableCell>
+                                        {/* {member.verified ? <Badge variant="default">Yes</Badge> : <Badge variant="destructive">No</Badge>} */}
+                                        <Badge variant={member.verified ? 'default' : 'destructive'}>
+                                            {member.verified ? 'Validated' : 'Not Validated'}
+                                        </Badge>
+                                    </TableCell>
                                     <TableCell>{new Date(member.createdAt).toLocaleDateString()}</TableCell>
                                     <TableCell className="flex items-center justify-end gap-2 p-3">
                                         <Link href={`/admin/dashboard/members/node-api/${member.id}`} className="flex justify-center items-center">

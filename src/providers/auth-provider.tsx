@@ -10,9 +10,10 @@ function OnboardingCheck({ children }: { children: React.ReactNode }) {
 
     const fetchUser = useMemo(() => {
         return async (userId: string) => {
-            const response = await fetch(`/api/user/${userId}`);
-            const user = await response.json();
-            if (user?.metaData?.onboardingStatus === "incomplete") {
+            const response = await fetch(`/api/user/${userId}/status`);
+            const { status } = await response.json();
+
+            if (status === "incomplete") {
                 router.push("/onboarding");
             }
         };
