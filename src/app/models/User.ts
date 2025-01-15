@@ -8,7 +8,9 @@ export interface IUser {
   role: "ADMIN" | "PHYSICIAN";
   createdAt: Date;
   updatedAt: Date;
+  onBoardingStatus: "COMPLETED" | "INCOMPLETE";
   metaData: Map<string, string>;
+  stripeAccountId: string;
 }
 
 const userSchema = new Schema<IUser>(
@@ -17,6 +19,12 @@ const userSchema = new Schema<IUser>(
     username: { type: String, required: true, unique: true },
     provider: { type: String, required: true },
     role: { type: String, enum: ["ADMIN", "PHYSICIAN"], default: "PHYSICIAN" },
+    onBoardingStatus: {
+      type: String,
+      enum: ["COMPLETED", "INCOMPLETE"],
+      default: "INCOMPLETE",
+    },
+    stripeAccountId: { type: String, default: "" },
     metaData: {
       type: Map,
       of: String,

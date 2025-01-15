@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { authOptions } from '../../auth/[...nextauth]/options';
 import { getServerSession } from 'next-auth';
-import StripeAccount from '@/app/models/StripeAccount';
 import connect from "@/lib/db";
 import { stripe } from '@/utils/stripe';
 import User from '@/app/models/User';
@@ -18,13 +17,7 @@ export async function POST() {
     const account = await createStripeAccount();
 
     // Store Stripe account ID in MongoDB
-    await StripeAccount.findOneAndUpdate(
-      { user: userId },
-      { stripeAccountId: account },
-      { upsert: true, new: true }
-    );
-
-    await User.findByIdAndUpdate(userId, { metaData: { stripeAccountId: account } }, { new: true });
+    await User.findByIdAndUpdate(userId, { stripeAccountId: account }, { new: true });
 
     const accountLink = await stripe.accountLinks.create({ 
       account: account,

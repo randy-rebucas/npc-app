@@ -16,7 +16,7 @@ export async function GET(
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
-        const status = user.metaData.onboardingStatus;
+        const status = user.onBoardingStatus;
         return NextResponse.json({ status });
     } catch (error) {
         console.error("Error in user:", error);

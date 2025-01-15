@@ -36,7 +36,7 @@ export async function POST(request: Request) {
     await userProfile.save();
     const user = await User.findOneAndUpdate(
       { _id: userId },
-      { $set: { metaData: { onboardingStatus: "completed" } } }
+      { $set: { onBoardingStatus: "COMPLETED" } }
     );
 
     return Response.json({ user });

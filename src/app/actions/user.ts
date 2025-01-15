@@ -27,6 +27,7 @@ export interface UserDocument {
   role: string;
   createdAt: Date;
   updatedAt: Date;
+  onBoardingStatus: string;
   metaData?: {
     [key: string]: string;
   };
@@ -71,6 +72,7 @@ interface GetUsersResponse {
     role: string;
     provider: string;
     createdAt: Date;
+    onBoardingStatus: string;
     metaData?: {
       [key: string]: string;
     };
@@ -274,6 +276,7 @@ export async function getUsers({
         role: user.role,
         provider: user.provider,
         createdAt: user.createdAt,
+        onBoardingStatus: user.onBoardingStatus,
         metaData: user.metaData,
         profile: user.profile,
       })),

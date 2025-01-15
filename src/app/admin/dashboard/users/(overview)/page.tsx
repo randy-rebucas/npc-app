@@ -30,6 +30,7 @@ type SimplifiedUserResponse = {
     role: string;
     provider: string;
     createdAt: Date;
+    onBoardingStatus: string;
     metaData?: {
         [key: string]: string;
     };
@@ -111,10 +112,10 @@ export default async function AdminUsers(props: {
                                         {user.metaData?.stripeAccountId ? user.metaData?.stripeAccountId : 'N/A'}
                                     </TableCell>
                                     <TableCell>
-                                        {user.metaData?.onboardingStatus && <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.metaData?.onboardingStatus === 'completed' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                                            {user.metaData?.onboardingStatus}
+                                        {user.onBoardingStatus && <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.metaData?.onboardingStatus === 'completed' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                            {user.onBoardingStatus}
                                         </span>}
-                                        {!user.metaData?.onboardingStatus && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Incomplete</span>}
+                                        {!user.onBoardingStatus && <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Incomplete</span>}
                                     </TableCell>
                                     <TableCell>
                                         <Badge variant={user.metaData?.validated === 'yes' ? 'default' : 'destructive'}>
