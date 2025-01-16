@@ -51,52 +51,58 @@ export default async function IssuesPage(props: {
                     <Search placeholder='Search issues...' />
                     <Filter target="status" options={[{ 'pending': 'Pending' }, { 'resolved': 'Resolved' }, { 'closed': 'Closed' }]} placeholder="Filter by status" defaultValue="all" />
                 </div>
-
-                <div className="rounded-md border">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Title</TableHead>
-                                <TableHead>Reported By</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Reported</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {issues.map((issue: IReportedIssue) => (
-                                <TableRow key={issue.id}>
-                                    <TableCell>{issue.title}</TableCell>
-                                    <TableCell>{issue.email}</TableCell>
-                                    <TableCell>
-                                        <Badge variant={
-                                            issue.status === 'pending' ? 'destructive' :
-                                                issue.status === 'resolved' ? 'default' :
-                                                    issue.status === 'closed' ? 'secondary' :
-                                                        'outline'
-                                        }>
-                                            {issue.status}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell>{formatDistanceToNow(new Date(issue.createdAt), { addSuffix: true })}</TableCell>
-                                    <TableCell className="flex items-center justify-end gap-2 p-3">
-                                        <Link href={`/admin/dashboard/help/issues/form/${issue.id}`} className="flex justify-center items-center">
-                                            <PencilIcon className="w-4 h-4" />
-                                        </Link>
-                                        <form action={handleDelete} className="flex justify-center items-center">
-                                            <input type="hidden" name="itemId" value={issue.id} />
-                                            <button type="submit" className="flex justify-center items-center">
-                                                <TrashIcon className="w-4 h-4 text-red-500" />
-                                            </button>
-                                        </form>
-                                    </TableCell>
+                {issues.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center rounded-md border p-8">
+                        <p className="text-lg text-muted-foreground">No issues found</p>
+                        <p className="text-sm text-muted-foreground">Try adjusting your search or filter criteria</p>
+                    </div>
+                ) : (
+                    <div className="rounded-md border">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Title</TableHead>
+                                    <TableHead>Reported By</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Reported</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </div>
+                            </TableHeader>
+                            <TableBody>
+                                {issues.map((issue: IReportedIssue) => (
+                                    <TableRow key={issue.id}>
+                                        <TableCell>{issue.title}</TableCell>
+                                        <TableCell>{issue.email}</TableCell>
+                                        <TableCell>
+                                            <Badge variant={
+                                                issue.status === 'pending' ? 'destructive' :
+                                                    issue.status === 'resolved' ? 'default' :
+                                                        issue.status === 'closed' ? 'secondary' :
+                                                            'outline'
+                                            }>
+                                                {issue.status}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>{formatDistanceToNow(new Date(issue.createdAt), { addSuffix: true })}</TableCell>
+                                        <TableCell className="flex items-center justify-end gap-2 p-3">
+                                            <Link href={`/admin/dashboard/help/issues/form/${issue.id}`} className="flex justify-center items-center">
+                                                <PencilIcon className="w-4 h-4" />
+                                            </Link>
+                                            <form action={handleDelete} className="flex justify-center items-center">
+                                                <input type="hidden" name="itemId" value={issue.id} />
+                                                <button type="submit" className="flex justify-center items-center">
+                                                    <TrashIcon className="w-4 h-4 text-red-500" />
+                                                </button>
+                                            </form>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                )}
 
-                <Pagination
+                {issues.length > 0 && (<Pagination
                     startItem={startItem}
                     endItem={endItem}
                     totalItems={total}
@@ -104,6 +110,7 @@ export default async function IssuesPage(props: {
                     query={query}
                     totalPages={totalPages}
                 />
+                )}
             </div>
         </div>
     );

@@ -19,7 +19,9 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
+import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select"
 
+const submissionStatus = ["INCOMPLETE", "INCORRECT", "APPROVED", "REJECTED", "PENDING"];
 // Define form schema
 const formSchema = z.object({
     username: z.string().min(2, {
@@ -28,12 +30,13 @@ const formSchema = z.object({
     email: z.string().email({
         message: "Please enter a valid email address.",
     }),
+    role: z.string().optional(),
+    submissionStatus: z.string().optional(),
     metaData: z.array(z.object({
         key: z.string(),
         value: z.string()
     }))
 })
-
 
 export default function UserForm({ id }: { id: string | null }) {
     const router = useRouter();
@@ -46,6 +49,8 @@ export default function UserForm({ id }: { id: string | null }) {
         defaultValues: {
             username: "",
             email: "",
+            role: "",
+            submissionStatus: "",
             metaData: [{ key: "", value: "" }]
         },
     })
@@ -105,8 +110,11 @@ export default function UserForm({ id }: { id: string | null }) {
             const getUser = async () => {
                 const user = await fetch(`/api/user/${id}`)
                 const data = await user.json();
+                console.log(data);
                 form.setValue("username", data?.username || "");
                 form.setValue("email", data?.email || "");
+                form.setValue("role", data?.role || "");
+                form.setValue("submissionStatus", data?.submissionStatus || "");
                 form.setValue("metaData", Object.keys(data?.metaData || {}).map(key => ({ key, value: data?.metaData[key] })) || [{ key: "", value: "" }]);
             }
             getUser()
@@ -152,6 +160,51 @@ export default function UserForm({ id }: { id: string | null }) {
                                     This is the email of the user and its only editable if you are the owner of the account.
                                 </FormDescription>
                                 <FormMessage> {form.formState.errors.email?.message} </FormMessage>
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="role"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Role</FormLabel>
+                                <FormControl>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select a role" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="PHYSICIAN">Physician</SelectItem>
+                                            <SelectItem value="ADMIN">Admin</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                                <FormMessage> {form.formState.errors.role?.message} </FormMessage>
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="submissionStatus"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Submission Status</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a status" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {Object.values(submissionStatus).map((status) => (
+                                            <SelectItem key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage> {form.formState.errors.submissionStatus?.message} </FormMessage>
                             </FormItem>
                         )}
                     />

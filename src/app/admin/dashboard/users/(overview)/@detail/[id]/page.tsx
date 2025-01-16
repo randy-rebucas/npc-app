@@ -17,6 +17,8 @@ type SimplifiedUserResponse = {
         [key: string]: string;
     };
     profile?: IUserProfile;
+    submissionStatus: string;
+    onBoardingStatus: string;
 };
 
 export default async function Page({
@@ -71,6 +73,14 @@ export default async function Page({
                             <div className="py-2 flex justify-between">
                                 <dt className="font-medium text-gray-500">Provider</dt>
                                 <dd className="text-gray-900">{user.provider}</dd>
+                            </div>
+                            <div className="py-2 flex justify-between">
+                                <dt className="font-medium text-gray-500">Submission Status</dt>
+                                <dd className="text-gray-900">{user.submissionStatus}</dd>
+                            </div>
+                            <div className="py-2 flex justify-between">
+                                <dt className="font-medium text-gray-500">Onboarding Status</dt>
+                                <dd className="text-gray-900">{user.onBoardingStatus}</dd>
                             </div>
                             <div className="py-2 flex justify-between">
                                 <dt className="font-medium text-gray-500">Created At</dt>

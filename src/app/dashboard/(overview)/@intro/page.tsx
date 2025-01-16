@@ -1,4 +1,8 @@
+import { getUserByEmail } from "@/app/actions/user";
+import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { Button } from "@/components/ui/button";
+import { Calendar, CheckCircle } from "lucide-react";
+import { getServerSession } from "next-auth";
 import Link from "next/link";
 
 interface TimelineItem {
@@ -42,19 +46,44 @@ const timeline: TimelineItem[] = [
     },
 ]
 
-export default function IntroPage() {
+export default async function IntroPage() {
+    const session = await getServerSession(authOptions);
+
+    const user = await getUserByEmail(session?.user.email);
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            < div >
-
-                <div className="text-left mb-12">
-                    <h1 className="text-4xl font-bold mb-4">Thank you for submitting your profile!</h1>
-                    <p className="text-gray-600">You will be notified within 2 business days when your profile has been approved.</p>
+            <div>
+                <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-green-900 mb-8">
+                    <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2">
+                            <CheckCircle className="h-4 w-4" />
+                            <h3 className="font-medium">Information</h3>
+                        </div>
+                    </div>
+                    <div className="mt-2 text-sm">
+                        Your profile is currently in review. You will be notified within 2 business days when your profile has been approved.
+                    </div>
+                </div>
+                <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-blue-900 mb-8">
+                    <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4" />
+                            <h3 className="font-medium">Current Status</h3>
+                        </div>
+                        <p className="text-blue-700 font-medium">
+                            {user.submissionStatus}
+                        </p>
+                    </div>
+                    <div className="mt-2 text-sm">
+                        Last updated: {new Date().toLocaleDateString()}
+                    </div>
                 </div>
 
-                <div className="mb-8">
+                {/* Timeline information and guides */}
+                <div className="mb-8 bg-white rounded-lg shadow-sm border p-6">
                     <h2 className="text-2xl font-bold mb-6">What happens next?</h2>
-                    <Button asChild className="mb-8">
+                    <Button asChild className="mb-8 w-full sm:w-auto">
                         <Link href="/dashboard/agreement">Sign Your Agreement</Link>
                     </Button>
                     <p className="text-gray-600">
@@ -63,10 +92,6 @@ export default function IntroPage() {
                         connect your calendar.
                     </p>
                 </div>
-
-
-
-
             </div>
 
             <div className="space-y-6 relative">

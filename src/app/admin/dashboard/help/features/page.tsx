@@ -49,58 +49,67 @@ export default async function FeaturesPage(props: {
                     <Filter target="status" options={[{ 'pending': 'Pending' }, { 'resolved': 'Resolved' }, { 'closed': 'Closed' }, { 'in_progress': 'In Progress' }]} placeholder="Filter by status" defaultValue="all" />
                 </div>
 
-                <div className="rounded-md border">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Feature</TableHead>
-                                <TableHead>Requested By</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Requested Date</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {features.map((feature) => (
-                                <TableRow key={feature.id}>
-                                    <TableCell>{feature.title}</TableCell>
-                                    <TableCell>{feature.email}</TableCell>
-                                    <TableCell>
-                                        <Badge variant={
-                                            feature.status === 'pending' ? 'destructive' :
-                                                feature.status === 'resolved' ? 'default' :
-                                                    feature.status === 'closed' ? 'secondary' :
-                                                        'outline'
-                                        }>
-                                            {feature.status.charAt(0).toUpperCase() + feature.status.slice(1)}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell>{formatDistanceToNow(new Date(feature.createdAt), { addSuffix: true })}</TableCell>
-                                    <TableCell className="flex items-center justify-end gap-2 p-3">
-                                        <Link href={`/admin/dashboard/help/features/form/${feature.id}`} className="flex justify-center items-center">
-                                            <PencilIcon className="w-4 h-4" />
-                                        </Link>
-                                        <form action={handleDelete} className="flex justify-center items-center">
-                                            <input type="hidden" name="itemId" value={feature.id} />
-                                            <button type="submit" className="flex justify-center items-center">
-                                                <TrashIcon className="w-4 h-4 text-red-500" />
-                                            </button>
-                                        </form>
-                                    </TableCell>
+                {features.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center rounded-md border p-8">
+                        <p className="text-lg text-muted-foreground">No features found</p>
+                        <p className="text-sm text-muted-foreground">Try adjusting your search or filter criteria</p>
+                    </div>
+                ) : (
+                    <div className="rounded-md border">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Feature</TableHead>
+                                    <TableHead>Requested By</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Requested Date</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </div>
+                            </TableHeader>
+                            <TableBody>
+                                {features.map((feature) => (
+                                    <TableRow key={feature.id}>
+                                        <TableCell>{feature.title}</TableCell>
+                                        <TableCell>{feature.email}</TableCell>
+                                        <TableCell>
+                                            <Badge variant={
+                                                feature.status === 'pending' ? 'destructive' :
+                                                    feature.status === 'resolved' ? 'default' :
+                                                        feature.status === 'closed' ? 'secondary' :
+                                                            'outline'
+                                            }>
+                                                {feature.status.charAt(0).toUpperCase() + feature.status.slice(1)}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>{formatDistanceToNow(new Date(feature.createdAt), { addSuffix: true })}</TableCell>
+                                        <TableCell className="flex items-center justify-end gap-2 p-3">
+                                            <Link href={`/admin/dashboard/help/features/form/${feature.id}`} className="flex justify-center items-center">
+                                                <PencilIcon className="w-4 h-4" />
+                                            </Link>
+                                            <form action={handleDelete} className="flex justify-center items-center">
+                                                <input type="hidden" name="itemId" value={feature.id} />
+                                                <button type="submit" className="flex justify-center items-center">
+                                                    <TrashIcon className="w-4 h-4 text-red-500" />
+                                                </button>
+                                            </form>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                )}
 
-                <Pagination
-                    startItem={startItem}
-                    endItem={endItem}
-                    totalItems={total}
-                    currentPage={currentPage}
-                    query={query}
-                    totalPages={totalPages}
-                />
+                {features.length > 0 && (
+                    <Pagination
+                        startItem={startItem}
+                        endItem={endItem}
+                        totalItems={total}
+                        currentPage={currentPage}
+                        query={query}
+                        totalPages={totalPages}
+                    />
+                )}
             </div>
         </div>
 

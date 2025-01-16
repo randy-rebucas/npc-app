@@ -156,7 +156,7 @@ export function Chat() {
       {isOpen && (
         <div
           id="chat-container"
-          className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700"
+          className="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-[9999]"
         >
           <div className="flex flex-col h-[400px]">
             <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">

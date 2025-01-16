@@ -33,11 +33,6 @@ export default function Nav() {
             title: "Credentials",
             url: "/dashboard/credentials",
             icon: Key,
-        },
-        {
-            title: "Help",
-            url: "/dashboard/help",
-            icon: HelpCircle,
         }
     ]);
 
@@ -48,7 +43,7 @@ export default function Nav() {
 
             const response = await fetch(`/api/user/${session.user.id}`);
             const user = await response.json();
-            if (user?.metaData?.validated === true) {
+            if (user?.submissionStatus === "APPROVED") {
                 setItems(currentItems => [
                     ...currentItems,
                     {
@@ -66,6 +61,17 @@ export default function Nav() {
                         url: "/dashboard/settings",
                         icon: Settings,
                     }
+                ]);
+            }
+
+            if (user?.submissionStatus === "INCOMPLETE" || user?.submissionStatus === "INCORRECT" || user?.submissionStatus === "APPROVED") {
+                setItems(currentItems => [
+                    ...currentItems,
+                    {
+                        title: "Help",
+                        url: "/dashboard/help",
+                        icon: HelpCircle,
+                    },
                 ]);
             }
 

@@ -24,12 +24,13 @@ export default async function DashboardLayout({ children, intro, stats, collabor
             <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-1 flex-col space-y-8 p-8">
 
-                    {children}
-                    {!user.validated && (
+
+                    {(user.submissionStatus === "INCOMPLETE" || user.submissionStatus === "INCORRECT" || user.submissionStatus === "PENDING") && (
                         intro
                     )}
-                    {user.validated && (
+                    {user.submissionStatus === "APPROVED" && (
                         <>
+                            {children}
                             {stats}
                             {collaboratorRequests}
                             {activeCollaborator}
