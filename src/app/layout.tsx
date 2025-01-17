@@ -6,6 +6,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { getConfigValue } from "@/app/actions/config"
 import { NotificationsProvider } from "@/providers/notifications-provider";
 import { MessagingProvider } from "@/providers/messaging-provider";
+import { SupportChatProvider } from "@/providers/support-chat-provider";
+import { SupportChat } from "@/components/support/SupportChat";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -54,7 +56,10 @@ export default function RootLayout({
         <AuthProvider>
           <MessagingProvider>
             <NotificationsProvider>
-              {children}
+              <SupportChatProvider>
+                {children}
+                <SupportChat />
+              </SupportChatProvider>
             </NotificationsProvider>
           </MessagingProvider>
         </AuthProvider>

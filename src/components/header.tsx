@@ -3,7 +3,8 @@
 import Breadcrumbs from "./breadcrumbs";
 import { SignOut } from "./signout";
 import { Notifications } from "@/components/notifications";
-import { Chat } from "@/components/chat";
+import { HelpMenu } from "@/components/help-menu";
+// import { Chat } from "@/components/chat";
 
 interface Breadcrumb {
   label: string;
@@ -19,7 +20,8 @@ export default function Header({ breadcrumbs }: { breadcrumbs: Breadcrumb[] }) {
           <Breadcrumbs breadcrumbs={breadcrumbs} />
 
           <div className="flex items-center gap-4">
-            <Chat />
+            {/* <Chat /> */}
+            <HelpMenu />
             <Notifications />
             <SignOut />
           </div>
