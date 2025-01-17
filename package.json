@@ -47,6 +47,8 @@
     "next-auth": "^4.24.11",
     "openai": "^4.77.0",
     "pdf-lib": "^1.17.1",
+    "pusher": "^5.2.0",
+    "pusher-js": "^8.4.0-rc2",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",

@@ -121,3 +121,13 @@ Phase 4: Post-Approval Setup
 
 on metaData
 	•	Phone Number: Add to the Essential Information step. It ensures physicians can be reached directly if admin issues arise.
+  =================
+
+messages
+accept bids
+proposals 
+-
+
+V1 = Add Controlled Substance Fee,   + Add Additional States (based on filter selections)
+V2 = allow to add additional Nurse Practitioners, factor in any Special Fee per State (example - a specific state that a MD wants to charge extra for ‘controlled substance’,     or a specific state where a ‘general’ additional fee (Restricted state fee)
+

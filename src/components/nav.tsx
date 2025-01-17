@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from 'lucide-react'
-import { Key, User, LayoutDashboard, Shield, HelpCircle, CreditCardIcon, FileCheck, Settings } from "lucide-react"
+import { Key, User, LayoutDashboard, Shield, HelpCircle, CreditCardIcon, FileCheck, Settings, MessageCircle } from "lucide-react"
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 
@@ -46,6 +46,11 @@ export default function Nav() {
             if (user?.submissionStatus === "APPROVED") {
                 setItems(currentItems => [
                     ...currentItems,
+                    {
+                        title: "Messages",
+                        url: "/dashboard/messages",
+                        icon: MessageCircle,
+                    },
                     {
                         title: "Stripe",
                         url: "/dashboard/stripe",
