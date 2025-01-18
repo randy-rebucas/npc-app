@@ -3,10 +3,16 @@
 import { IUser } from '@/app/models/User';
 import { useMessaging } from '@/providers/messaging-provider';
 import { useSession } from 'next-auth/react';
-import Link from 'next/link';
+// import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { Button } from '../ui/button';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-export function ConversationList() {
+export function ConversationList({ receiverId }: { receiverId: string | null }) {
+    console.log(receiverId);
+    const searchParams = useSearchParams();
+    const { replace } = useRouter();
+    const pathname = usePathname();
     const { data: session } = useSession();
     const [users, setUsers] = useState<IUser[]>([]);
     const { messages } = useMessaging();
@@ -49,6 +55,16 @@ export function ConversationList() {
             .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
     };
 
+    const getMessageThread = (userId: string) => {
+        const params = new URLSearchParams(searchParams);
+        if (userId) {
+            params.set('receiverId', userId);
+        } else {
+            params.delete('receiverId');
+        }
+        replace(`${pathname}?${params.toString()}`);
+    };
+
     return (
         <div className="border-r h-full bg-white">
             <div className="py-6 px-4">
@@ -65,28 +81,46 @@ export function ConversationList() {
                         users.map(user => {
                             const lastMessage = getLastMessage(user._id as string);
                             return (
-                                <Link
+                                <Button
                                     key={user._id as string}
-                                    href={`/dashboard/messages/${user._id}`}
-                                    className="block w-full p-4 text-left rounded-lg hover:bg-gray-50 transition-colors duration-200 border border-gray-100 hover:border-gray-200"
+                                    onClick={() => getMessageThread(user._id as string)}
+                                    className={`block w-full px-4 py-2.5 text-left rounded-lg transition-colors duration-200 hover:bg-gray-50 h-[72px] ${
+                                        user._id === receiverId ? 'bg-gray-50 border-primary' : 'border-gray-100'
+                                    } border`}
+                                    variant="ghost"
                                 >
-                                    <div className="flex justify-between items-start">
-                                        <div>
-                                            <p className="font-semibold text-gray-900">{user.username}</p>
-                                            <p className="text-sm text-gray-600">{user.role}</p>
-                                        </div>
-                                        {lastMessage && (
-                                            <span className="text-xs text-gray-500">
-                                                {new Date(lastMessage.timestamp).toLocaleDateString()}
+                                    <div className="flex items-start gap-3 h-full">
+                                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                            <span className="text-sm font-medium text-primary">
+                                                {user.username.charAt(0).toUpperCase()}
                                             </span>
-                                        )}
+                                        </div>
+                                        
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex justify-between items-center mb-1">
+                                                <p className="font-medium text-gray-900 truncate">{user.username}</p>
+                                                {lastMessage && (
+                                                    <span className="text-xs text-gray-500 flex-shrink-0">
+                                                        {new Date(lastMessage.timestamp).toLocaleDateString()}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            
+                                            <div className="flex justify-between items-center">
+                                                {lastMessage ? (
+                                                    <p className="text-sm text-gray-600 truncate">
+                                                        {lastMessage.content}
+                                                    </p>
+                                                ) : (
+                                                    <p className="text-sm text-gray-400 italic">
+                                                        No messages yet
+                                                    </p>
+                                                )}
+                                                <span className="text-xs text-gray-500 ml-2">{user.role}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    {lastMessage && (
-                                        <p className="text-sm text-gray-600 truncate mt-2">
-                                            {lastMessage.content}
-                                        </p>
-                                    )}
-                                </Link>
+                                </Button>
                             );
                         })
                     )}
