@@ -68,7 +68,7 @@ export function ConversationList() {
                                 <Link
                                     key={user._id as string}
                                     href={`/dashboard/messages/${user._id}`}
-                                    className="w-full p-3 text-left hover:bg-gray-100 rounded-lg"
+                                    className="w-full p-3 text-left rounded-lg"
                                 >
                                     <div className="flex justify-between items-start">
                                         <div>
