@@ -29,7 +29,7 @@ export default function AuthPage() {
                     <Button
                         variant="outline"
                         type="button"
-                        onClick={() => signIn("logto", { callbackUrl: "/dashboard" })}
+                        onClick={() => signIn("logto", { callbackUrl: "/np" })}
                         className="w-full hover:bg-primary hover:text-primary-foreground transition-colors"
                     >
                         <Icons.logto className="mr-2 h-5 w-5" />
@@ -39,7 +39,7 @@ export default function AuthPage() {
                     <Button
                         variant="outline"
                         type="button"
-                        onClick={() => signIn("linkedin", { callbackUrl: "/dashboard" })}
+                        onClick={() => signIn("linkedin", { callbackUrl: "/np" })}
                         className="w-full hover:bg-[#0A66C2] hover:text-white transition-colors"
                     >
                         <Icons.linkedin className="mr-2 h-5 w-5" />
@@ -49,7 +49,7 @@ export default function AuthPage() {
                     <Button
                         variant="outline"
                         type="button"
-                        onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+                        onClick={() => signIn("google", { callbackUrl: "/np" })}
                         className="w-full hover:bg-[#4285F4] hover:text-white transition-colors"
                     >
                         <Icons.google className="mr-2 h-5 w-5" />

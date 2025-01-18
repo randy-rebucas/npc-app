@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from 'lucide-react'
-import { Key, User, LayoutDashboard, Shield, HelpCircle, CreditCardIcon, FileCheck, Settings, MessageCircle } from "lucide-react"
+import { Key, User, Shield, HelpCircle, CreditCardIcon, FileCheck, Settings, MessageCircle } from "lucide-react"
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 
@@ -20,18 +20,13 @@ export default function Nav() {
     const { data: session } = useSession();
     const [items, setItems] = useState<NavItem[]>([
         {
-            title: "Dashboard",
-            url: "/dashboard",
-            icon: LayoutDashboard,
-        },
-        {
             title: "Profile",
-            url: "/dashboard/profile",
+            url: "/np/profile",
             icon: User,
         },
         {
             title: "Credentials",
-            url: "/dashboard/credentials",
+            url: "/np/credentials",
             icon: Key,
         }
     ]);
@@ -48,22 +43,22 @@ export default function Nav() {
                     ...currentItems,
                     {
                         title: "Messages",
-                        url: "/dashboard/messages",
+                        url: "/np/messages",
                         icon: MessageCircle,
                     },
                     {
                         title: "Stripe",
-                        url: "/dashboard/stripe",
+                        url: "/np/stripe",
                         icon: CreditCardIcon,
                     },
                     {
                         title: "Attestations",
-                        url: "/dashboard/attestations",
+                        url: "/np/attestations",
                         icon: FileCheck,
                     },
                     {
                         title: "Settings",
-                        url: "/dashboard/settings",
+                        url: "/np/settings",
                         icon: Settings,
                     }
                 ]);
@@ -74,7 +69,7 @@ export default function Nav() {
                     ...currentItems,
                     {
                         title: "Help",
-                        url: "/dashboard/help",
+                        url: "/np/help",
                         icon: HelpCircle,
                     },
                 ]);
