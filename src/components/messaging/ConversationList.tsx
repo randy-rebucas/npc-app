@@ -3,13 +3,11 @@
 import { IUser } from '@/app/models/User';
 import { useMessaging } from '@/providers/messaging-provider';
 import { useSession } from 'next-auth/react';
-// import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Button } from '../ui/button';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 export function ConversationList({ receiverId }: { receiverId: string | null }) {
-    console.log(receiverId);
     const searchParams = useSearchParams();
     const { replace } = useRouter();
     const pathname = usePathname();
