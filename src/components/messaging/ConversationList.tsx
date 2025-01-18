@@ -50,14 +50,14 @@ export function ConversationList() {
     };
 
     return (
-        <div className="border-r h-full">
-            <div className="py-4 px-2">
-                <h2 className="text-lg font-semibold mb-4">Conversations</h2>
-                <div className="space-y-2">
+        <div className="border-r h-full bg-white">
+            <div className="py-6 px-4">
+                <h2 className="text-xl font-bold mb-6 text-gray-800">Conversations</h2>
+                <div className="space-y-3">
                     {users.length === 0 ? (
-                        <div className="text-center py-8">
-                            <p className="text-gray-500">No conversations available</p>
-                            <p className="text-sm text-gray-400 mt-1">
+                        <div className="text-center py-12 bg-gray-50 rounded-lg">
+                            <p className="text-gray-600 font-medium">No conversations available</p>
+                            <p className="text-sm text-gray-500 mt-2">
                                 There are no other users available to message at this time
                             </p>
                         </div>
@@ -68,21 +68,21 @@ export function ConversationList() {
                                 <Link
                                     key={user._id as string}
                                     href={`/dashboard/messages/${user._id}`}
-                                    className="w-full p-3 text-left rounded-lg"
+                                    className="block w-full p-4 text-left rounded-lg hover:bg-gray-50 transition-colors duration-200 border border-gray-100 hover:border-gray-200"
                                 >
                                     <div className="flex justify-between items-start">
                                         <div>
-                                            <p className="font-medium">{user.username}</p>
-                                            <p className="text-sm text-gray-500">{user.role}</p>
+                                            <p className="font-semibold text-gray-900">{user.username}</p>
+                                            <p className="text-sm text-gray-600">{user.role}</p>
                                         </div>
                                         {lastMessage && (
-                                            <span className="text-xs text-gray-400">
+                                            <span className="text-xs text-gray-500">
                                                 {new Date(lastMessage.timestamp).toLocaleDateString()}
                                             </span>
                                         )}
                                     </div>
                                     {lastMessage && (
-                                        <p className="text-sm text-gray-600 truncate mt-1">
+                                        <p className="text-sm text-gray-600 truncate mt-2">
                                             {lastMessage.content}
                                         </p>
                                     )}
