@@ -35,8 +35,9 @@ export default function PaymentLayout({
             const accountStatus = await fetch("/api/stripe/status");
 
             const { account } = await accountStatus.json();
-
-            setStripeConnected(account.charges_enabled && account.payouts_enabled ? true : false);
+            if (account) {
+                setStripeConnected(account.charges_enabled && account.payouts_enabled ? true : false);
+            }
         };
         fetchAccount();
     }, []);

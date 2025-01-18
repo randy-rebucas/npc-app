@@ -14,7 +14,7 @@ export default function CredentialsLayout({ children }: { children: React.ReactN
     const isGovid = pathname.split('/').pop() === 'govid';
     const isCertification = pathname.split('/').pop() === 'certification';
 
-    const title = isCredentials ? 'Credentials' : isEducation ? 'Education' : isGovid ? 'Govid' : isCertification ? 'Certification' : 'Credentials';
+    // const title = isCredentials ? 'Credentials' : isEducation ? 'Education' : isGovid ? 'Govid' : isCertification ? 'Certification' : 'Credentials';
     const tabs = ['Credentials', 'Education', 'Govid', 'Certification'];
 
     const breadcrumbs = [
@@ -54,37 +54,28 @@ export default function CredentialsLayout({ children }: { children: React.ReactN
         <div className="bg-gray-50 min-h-screen w-full">
             <Header breadcrumbs={breadcrumbs} />
             <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                <div className="flex flex-1 flex-col space-y-8 p-8">
-                    <div className="flex items-center justify-between space-y-2">
-                        <div>
-                            <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
-                            <p className="text-muted-foreground">
-                                Manage your profile settings and preferences
-                            </p>
-                        </div>
-                    </div>
+                <div className="flex flex-1 flex-col">
 
-                    <div className="bg-white rounded-lg shadow">
-                        <nav className="flex border-b border-gray-200">
+                    <div className="border-b border-gray-200">
+                        <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                             {tabs.map((tab) => (
                                 <Link
                                     key={tab}
                                     href={`/dashboard/credentials${tab.toLowerCase() === 'credentials' ? '' : `/${tab.toLowerCase()}`}`}
-                                    className={`
-                            flex-1 py-4 px-1 text-center border-b-2 
+                                    className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
                             ${currentTab === tab.toLowerCase()
-                                            ? 'border-blue-500 text-blue-600 font-medium'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}
-                        `}
+                                            ? 'border-blue-500 text-blue-600'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
                                 >
                                     {tab}
                                 </Link>
                             ))}
                         </nav>
-                        <div className="p-6">
-                            {children}
-                        </div>
                     </div>
+                    <div className="rounded-lg p-6">
+                        {children}
+                    </div>
+
                 </div>
             </main>
         </div>

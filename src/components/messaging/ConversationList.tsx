@@ -83,7 +83,7 @@ export function ConversationList({ receiverId }: { receiverId: string | null }) 
                                     key={user._id as string}
                                     onClick={() => getMessageThread(user._id as string)}
                                     className={`block w-full px-4 py-2.5 text-left rounded-lg transition-colors duration-200 hover:bg-gray-50 h-[72px] ${
-                                        user._id === receiverId ? 'bg-gray-50 border-primary' : 'border-gray-100'
+                                        user._id === receiverId ? 'bg-gray-50' : 'border-gray-100'
                                     } border`}
                                     variant="ghost"
                                 >

@@ -139,7 +139,7 @@ export default function CredentialsPage() {
     }
 
     return (
-        <div className="p-6 max-w-2xl mx-auto">
+        <div className="bg-white max-w-2xl mx-auto p-6">
             <div className="mb-6">
                 <h2 className="text-xl font-semibold">License Information</h2>
                 <p className="text-gray-600 mt-2">

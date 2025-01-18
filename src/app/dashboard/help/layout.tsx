@@ -12,7 +12,7 @@ export default function HelpLayout({ children, modal }: { children: React.ReactN
     const isFaq = pathname.split('/').pop() === 'faq';
     const isContactUs = pathname.split('/').pop() === 'contact-us';
 
-    const title = isHelp ? 'Help' : isFaq ? 'FAQ' : isContactUs ? 'Contact Us' : 'Help';
+    // const title = isHelp ? 'Help' : isFaq ? 'FAQ' : isContactUs ? 'Contact Us' : 'Help';
     const tabs = ['Help', 'FAQ', 'Contact Us'];
 
     const breadcrumbs = [
@@ -44,17 +44,8 @@ export default function HelpLayout({ children, modal }: { children: React.ReactN
         <div className="bg-gray-50 min-h-screen w-full">
             <Header breadcrumbs={breadcrumbs} />
             <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                <div className="flex flex-1 flex-col space-y-8 p-8">
-                    <div className="flex items-center justify-between space-y-2">
-                        <div>
-                            <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
-                            <p className="text-muted-foreground">
-                                Get help with your account and features
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="border-b border-gray-200 mb-6">
+                <div className="flex flex-1 flex-col">
+                    <div className="border-b border-gray-200">
                         <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                             {tabs.map((tab) => (
                                 <Link
@@ -69,7 +60,7 @@ export default function HelpLayout({ children, modal }: { children: React.ReactN
                             ))}
                         </nav>
                     </div>
-                    <div className="border rounded-lg p-6">
+                    <div className="rounded-lg p-6">
                         {children}
                         {modal}
                     </div>

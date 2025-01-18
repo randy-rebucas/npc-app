@@ -115,7 +115,7 @@ export default function CertificationPage() {
     }
 
     return (
-        <div className="p-6 max-w-2xl mx-auto">
+        <div className="bg-white max-w-2xl mx-auto p-6">
             {/* Header Section */}
             <div className="p-6 border-b border-gray-200">
                 <h2 className="text-2xl font-bold text-gray-900">Certifications</h2>

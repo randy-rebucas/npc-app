@@ -131,7 +131,7 @@ export default function GovidPage() {
     }
 
     return (
-        <div className="p-6 max-w-2xl mx-auto">
+        <div className="bg-white max-w-2xl mx-auto p-6">
             <div className="mb-6">
                 <h2 className="text-2xl font-bold text-gray-800">Government ID</h2>
                 <p className="text-gray-600 mt-1">

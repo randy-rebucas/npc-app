@@ -102,7 +102,7 @@ export default function Bio() {
     }
 
     return (
-        <div className="p-6 max-w-2xl mx-auto">
+        <div className="bg-white max-w-2xl mx-auto p-6">
             <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900">Bio</h2>
                 <p className="text-sm text-gray-600 mt-1">

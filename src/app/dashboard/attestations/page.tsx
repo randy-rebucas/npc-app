@@ -56,16 +56,7 @@ export default function AttestationsPage() {
         <div className="bg-gray-50 min-h-screen w-full">
             <Header breadcrumbs={breadcrumbs} />
             <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                <div className="flex flex-1 flex-col space-y-8 p-8">
-                    <div className="flex items-center justify-between space-y-2">
-                        <div>
-                            <h2 className="text-2xl font-bold tracking-tight">Attestations</h2>
-                            <p className="text-muted-foreground">
-                                Manage your attestations here!
-                            </p>
-                        </div>
-                    </div>
-
+                <div className="flex flex-1 flex-col space-y-8">
 
                     <div className="space-y-6">
                         <div className="mb-4 flex justify-between items-center">

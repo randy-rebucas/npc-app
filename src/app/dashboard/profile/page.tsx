@@ -119,7 +119,7 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="p-6 max-w-2xl mx-auto">
+        <div className="bg-white max-w-2xl mx-auto p-6">
             <div className="mb-6">
                 <h2 className="text-xl font-semibold">Profile Information</h2>
                 <p className="text-sm text-gray-500">
