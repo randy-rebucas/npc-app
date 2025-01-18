@@ -1,29 +1,22 @@
 'use client';
 
+import { IUser } from '@/app/models/User';
 import { useMessaging } from '@/providers/messaging-provider';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
-
-interface User {
-  id: string;
-  name: string;
-  role: 'PHYSICIAN' | 'NURSE_PRACTITIONER';
-}
-
 
 export function ConversationList() {
     const { data: session } = useSession();
-    const [users, setUsers] = useState<User[]>([]);
+    const [users, setUsers] = useState<IUser[]>([]);
     const { messages } = useMessaging();
-    const router = useRouter();
 
     useEffect(() => {
         const fetchUsers = async () => {
             try {
                 const response = await fetch('/api/messages/users');
                 const data = await response.json();
-                console.log('Users:', data);
+
                 // Check if data is empty
                 if (Object.keys(data).length === 0) {
                     console.warn('No users returned from API');
@@ -38,7 +31,7 @@ export function ConversationList() {
                     return;
                 }
 
-                setUsers(data.filter((u: User) => u.id !== session?.user?.id));
+                setUsers(data.filter((u: IUser) => u.id !== session?.user?.id));
             } catch (error) {
                 console.error('Error fetching users:', error);
                 setUsers([]);
@@ -56,11 +49,6 @@ export function ConversationList() {
             .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
     };
 
-    const onSelectUser = (user: User) => {
-        console.log('Selected user:', user);
-        router.push(`/dashboard/messages/${user.id}`);
-    };
-
     return (
         <div className="border-r h-full">
             <div className="py-4 px-2">
@@ -75,16 +63,16 @@ export function ConversationList() {
                         </div>
                     ) : (
                         users.map(user => {
-                            const lastMessage = getLastMessage(user.id);
+                            const lastMessage = getLastMessage(user._id as string);
                             return (
-                                <button
-                                    key={user.id}
-                                    onClick={() => onSelectUser(user)}
+                                <Link
+                                    key={user._id as string}
+                                    href={`/dashboard/messages/${user._id}`}
                                     className="w-full p-3 text-left hover:bg-gray-100 rounded-lg"
                                 >
                                     <div className="flex justify-between items-start">
                                         <div>
-                                            <p className="font-medium">{user.name}</p>
+                                            <p className="font-medium">{user.username}</p>
                                             <p className="text-sm text-gray-500">{user.role}</p>
                                         </div>
                                         {lastMessage && (
@@ -98,7 +86,7 @@ export function ConversationList() {
                                             {lastMessage.content}
                                         </p>
                                     )}
-                                </button>
+                                </Link>
                             );
                         })
                     )}

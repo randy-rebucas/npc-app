@@ -1,11 +1,18 @@
 'use client';
 
 import { useMessaging } from '@/providers/messaging-provider';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 export function MessageThread({ receiverId }: { receiverId: string }) {
   const { messages, sendMessage } = useMessaging();
   const [newMessage, setNewMessage] = useState('');
+
+  // Memoize filtered messages to prevent unnecessary recalculations
+  const filteredMessages = useMemo(() => {
+    return messages.filter(m => 
+      (m.senderId.toString() === receiverId) || (m.receiverId.toString() === receiverId)
+    );
+  }, [messages, receiverId]);
 
   const handleSend = async () => {
     if (!newMessage.trim()) return;
@@ -16,21 +23,17 @@ export function MessageThread({ receiverId }: { receiverId: string }) {
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages
-          .filter(m => 
-            (m.senderId.toString() === receiverId) || (m.receiverId.toString() === receiverId)
-          )
-          .map(message => (
-            <div
-              key={message.id}
-              className={`p-3 rounded-lg ${
-                message.senderId.toString() === receiverId
-                  ? 'bg-gray-100 mr-auto'
-                  : 'bg-blue-500 text-white ml-auto'
-              }`} >
-              {message.content}
-            </div>
-          ))}
+        {filteredMessages.map(message => (
+          <div
+            key={message._id as string}
+            className={`p-3 rounded-lg ${
+              message.senderId.toString() === receiverId
+                ? 'bg-gray-100 mr-auto'
+                : 'bg-blue-500 text-white ml-auto'
+            }`} >
+            {message.content}
+          </div>
+        ))}
       </div>
       <div className="border-t p-4">
         <div className="flex gap-2">

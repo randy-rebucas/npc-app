@@ -14,16 +14,11 @@ export async function GET() {
     await connect();
 
     const messages = await Message.find({ 
-      where: {
-        OR: [
-          { senderId: session.user.id },
-          { receiverId: session.user.id }
-        ]
-      },
-      orderBy: {
-        timestamp: 'desc'
-      }
-    });
+      $or: [
+        { senderId: session.user.id },
+        { receiverId: session.user.id }
+      ]
+    }).sort({ timestamp: -1 });
 
     return NextResponse.json(messages);
   } catch (error) {

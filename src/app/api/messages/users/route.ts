@@ -15,9 +15,8 @@ export async function GET() {
 
     const users = await User.find(
       { _id: { $ne: session.user.id } },
-      'name role'
+      'username role'
     );
-    console.log('Users:', users);
 
     return NextResponse.json(users);
   } catch (error) {
