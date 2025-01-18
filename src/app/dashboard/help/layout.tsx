@@ -10,7 +10,7 @@ export default function HelpLayout({ children, modal }: { children: React.ReactN
 
     const isHelp = pathname.split('/').pop() === 'help';
     const isFaq = pathname.split('/').pop() === 'faq';
-    const isContactUs = pathname.split('/').pop() === 'contactus';
+    const isContactUs = pathname.split('/').pop() === 'contact-us';
 
     const title = isHelp ? 'Help' : isFaq ? 'FAQ' : isContactUs ? 'Contact Us' : 'Help';
     const tabs = ['Help', 'FAQ', 'Contact Us'];
@@ -35,7 +35,7 @@ export default function HelpLayout({ children, modal }: { children: React.ReactN
     if (isContactUs) {
         breadcrumbs.push({
             label: 'Contact Us',
-            href: '/dashboard/help/contactus',
+            href: '/dashboard/help/contact-us',
             active: isContactUs,
         });
     }
@@ -59,9 +59,9 @@ export default function HelpLayout({ children, modal }: { children: React.ReactN
                             {tabs.map((tab) => (
                                 <Link
                                     key={tab}
-                                    href={`/dashboard/help${tab.toLowerCase() === 'help' ? '' : `/${tab.toLowerCase().replace(/\s+/g, '')}`}`}
+                                    href={`/dashboard/help${tab.toLowerCase() === 'help' ? '' : `/${tab.toLowerCase().replace(/\s+/g, '-')}`}`}
                                     className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
-                                            ${currentTab === tab.toLowerCase().replace(/\s+/g, '')
+                                            ${currentTab === tab.toLowerCase().replace(/\s+/g, '-')
                                             ? 'border-blue-500 text-blue-600'
                                             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} `} >
                                     {tab}

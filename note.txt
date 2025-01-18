@@ -131,3 +131,42 @@ proposals
 V1 = Add Controlled Substance Fee,   + Add Additional States (based on filter selections)
 V2 = allow to add additional Nurse Practitioners, factor in any Special Fee per State (example - a specific state that a MD wants to charge extra for ‘controlled substance’,     or a specific state where a ‘general’ additional fee (Restricted state fee)
 
+Menu
+  Find Contractor
+    Search for a [Nurse Practitioner, Physician, Pharmacist]
+    Saved Searches
+    Proposals and Offers
+  Work History
+    Active Collaborations
+    My Collaborations
+  Manage Finances
+    Your Reports
+    Attestations
+    Billings and Earnings
+    Transactions and Invoices
+    Payments
+      Payouts
+      Payouts History
+  Messages
+  Search
+    Search for a [Nurse Practitioner, Physician, Pharmacist]
+  Help
+    FAQs
+    Contact Us
+    Terms of Service
+    Privacy Policy
+    About Us
+    Blog
+    Support
+  Notifications
+    Your Notifications
+    Mark as Read
+  Profile
+    Account Settings
+    User Settings
+      Contact Information
+      Profile Information
+      Payment Information
+      Notifications
+      Security
+

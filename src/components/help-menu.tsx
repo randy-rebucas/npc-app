@@ -6,8 +6,8 @@ import { CircleHelp } from 'lucide-react';
 
 const helpItems = [
   { name: 'Documentation', href: '/docs' },
-  { name: 'FAQs', href: '/faqs' },
-  { name: 'Support', href: '/support' },
+  { name: 'FAQs', href: '/dashboard/help/faq' },
+  { name: 'Support', href: '/dashboard/help/contact-us' },
 ];
 
 export function HelpMenu() {

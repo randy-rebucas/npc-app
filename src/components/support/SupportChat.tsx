@@ -92,13 +92,13 @@ export function SupportChat() {
 
                         {/* Messages */}
                         <ScrollArea className="flex-1 p-4">
-                            {messages.length === 0 ? (
+                            {messages?.length === 0 ? (
                                 <div className="flex h-full items-center justify-center text-muted-foreground">
                                     <p>No messages yet. Start a conversation!</p>
                                 </div>
                             ) : (
                                 <>
-                                    {messages.map((message) => (
+                                    {Array.isArray(messages) && messages.map((message) => (
                                         <div
                                             key={message.id}
                                             className={cn(
