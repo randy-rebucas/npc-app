@@ -72,16 +72,16 @@ export default function StateLicenses() {
                     <div className="space-y-2 transition-all duration-300">
                         {stateLicenses.map((stateLicense) => (
                             <label
-                                className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-1 rounded"
+                                className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 rounded transition-colors duration-200"
                                 key={stateLicense._id}
                             >
                                 <input
                                     type="checkbox"
-                                    className="rounded"
+                                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-colors duration-200"
                                     checked={isStateLicenseSelected(stateLicense.state)}
                                     onChange={() => handleToggleStateLicense(stateLicense.state)}
                                 />
-                                <span>{stateLicense.state}</span>
+                                <span className="text-gray-700">{stateLicense.state}</span>
                             </label>
                         ))}
                     </div>

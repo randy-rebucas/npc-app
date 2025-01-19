@@ -72,16 +72,16 @@ export default function PracticeTypes() {
                     <div className="space-y-2 transition-all duration-300">
                         {practiceTypes.map((practiceType) => (
                             <label
-                                className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-1 rounded"
+                                className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 rounded transition-colors duration-200"
                                 key={practiceType._id}
                             >
                                 <input
                                     type="checkbox"
-                                    className="rounded"
+                                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-colors duration-200"
                                     checked={isPracticeTypeSelected(practiceType.type)}
                                     onChange={() => handleTogglePracticeType(practiceType.type)}
                                 />
-                                <span>{practiceType.type}</span>
+                                <span className="text-gray-700">{practiceType.type}</span>
                             </label>
                         ))}
                     </div>
