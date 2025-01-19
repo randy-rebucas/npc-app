@@ -15,8 +15,6 @@ export default function Sort({ counts }: { counts: number }) {
         replace(`${pathname}?${params.toString()}`);
     }
 
-    console.log(sort);
-    
     return (
         <div className="flex justify-between items-center mb-4">
             <div>{counts} results</div>
