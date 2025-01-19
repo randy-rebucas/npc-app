@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 
 export interface IPracticeType {
-  _id?: string;
+  _id: string;
   type: string;
   enabled: boolean;
 }

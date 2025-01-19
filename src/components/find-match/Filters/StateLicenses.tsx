@@ -29,7 +29,6 @@ export default function StateLicenses() {
         const fetchStateLicenses = async () => {
             const response = await fetch('/api/admin/miscellaneous/license-states');
             const data = await response.json();
-            console.log(data);
             setStateLicenses(data);
         };
         fetchStateLicenses();

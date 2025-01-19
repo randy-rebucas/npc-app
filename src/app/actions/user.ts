@@ -3,6 +3,8 @@
 import User, { IUser } from "@/app/models/User";
 import connect from "@/lib/db";
 import mongoose from "mongoose";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]/options";
 
 
 interface GetUsersParams {
@@ -24,6 +26,7 @@ interface UserQuery {
   role?: string;
   'profile.medicalLicenseStates'?: { $in: licenseState[] };
   'profile.practiceTypes'?: { $in: string[] };
+  'profile.monthlyCollaborationRate'?: { $gte: number; $lte: number };
 }
 
 export interface UserDocument {
@@ -305,6 +308,7 @@ export async function getNpUsers({
   sort = "lowest_price",
   stateLicense = "",
   practiceType = "",
+  priceRange = ""
 }: {
   page?: number;
   search?: string;
@@ -312,11 +316,14 @@ export async function getNpUsers({
   sort?: 'lowest_price' | 'highest_price' | 'most_recent';
   stateLicense?: string;
   practiceType?: string;
+  priceRange?: string;
 }): Promise<GetUsersResponse> {
   try {
+    const session = await getServerSession(authOptions); 
+
     await connect();
     const query: UserQuery = {
-      role: 'NURSE_PRACTITIONER' // Ensure we only get NP users
+      role: session?.user?.role === 'NURSE_PRACTITIONER' ? 'NURSE_PRACTITIONER' : 'PHYSICIAN' // Ensure we only get NP users
     };
 
     if (search) {
@@ -338,6 +345,11 @@ export async function getNpUsers({
       query['profile.practiceTypes'] = { 
         $in: practiceTypes
       };
+    }
+
+    if (priceRange) {
+      const [min, max] = priceRange.split(',').map(Number);
+      query['profile.monthlyCollaborationRate'] = { $gte: min, $lte: max };
     }
 
     const skip = (page - 1) * limit;

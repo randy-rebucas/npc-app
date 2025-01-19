@@ -9,6 +9,8 @@ import { getNpUsers } from "@/app/actions/user";
 import Price from "@/components/find-match/Filters/Price";
 import StateLicenses from "@/components/find-match/Filters/StateLicenses";
 import PracticeTypes from "@/components/find-match/Filters/PracticeTypes";
+import { Suspense } from "react";
+import { ResultsSkeleton } from "@/components/skeletons";
 
 export type SimplifiedUserResponse = {
     id: string;
@@ -41,7 +43,7 @@ export default async function FindMatch(props: {
     // filters
     const stateLicense = params?.stateLicense as string | undefined;
     const practiceType = params?.practiceType as string | undefined;
-
+    const priceRange = params?.priceRange as string | undefined;
     // get users
     const { users, total }: { users: SimplifiedUserResponse[], total: number } = await getNpUsers({
         page: currentPage,
@@ -49,7 +51,8 @@ export default async function FindMatch(props: {
         limit: ITEMS_PER_PAGE,
         sort: sort,
         stateLicense: stateLicense,
-        practiceType: practiceType
+        practiceType: practiceType,
+        priceRange: priceRange
     });
 
     const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
@@ -75,8 +78,10 @@ export default async function FindMatch(props: {
                     {/* Results */}
                     <div className="flex flex-1 flex-col">
                         <Sort counts={total} />
-
-                        <Results results={users} />
+                        
+                        <Suspense fallback={<ResultsSkeleton />}>
+                            <Results results={users} />
+                        </Suspense>
 
                         <Pagination
                             startItem={startItem}

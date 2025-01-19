@@ -29,7 +29,6 @@ export default function PracticeTypes() {
         const fetchPracticeTypes = async () => {
             const response = await fetch('/api/admin/miscellaneous/practice-types');
             const data = await response.json();
-            console.log(data);
             setPracticeTypes(data);
         };
         fetchPracticeTypes();

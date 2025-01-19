@@ -1,10 +1,15 @@
 'use client'
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 
 export default function Price() {
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
+    const { replace } = useRouter();
+
     const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
-    
+
     const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = Math.min(Number(e.target.value), priceRange[1]);
         setPriceRange([value, priceRange[1]]);
@@ -26,18 +31,24 @@ export default function Price() {
         setPriceRange([0, 1000]);
     };
 
+    useEffect(() => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('priceRange', priceRange.join(','));
+        replace(`${pathname}?${params.toString()}`);
+    }, [priceRange, searchParams, pathname, replace]);
+
     return (
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-800">Price Range</h3>
-                <button 
+                <button
                     onClick={handleClear}
                     className="text-sm text-blue-600 hover:text-blue-700 transition-colors"
                 >
                     Reset
                 </button>
             </div>
-            
+
             <div className="space-y-6">
                 <div className="flex items-center gap-3">
                     <div className="relative flex-1">

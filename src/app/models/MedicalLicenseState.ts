@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 
 export interface IMedicalLicenseState {
-  _id?: string;
+  _id: string;
   state: string;
   enabled: boolean;
 }

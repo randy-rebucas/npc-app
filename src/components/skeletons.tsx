@@ -337,3 +337,27 @@ export const GovidSkeleton = () => {
     );
 }
 
+export const ResultsSkeleton = () => {
+    return (Array.from({ length: 3 }).map((_, index) => (
+        <div key={index} className="flex gap-4 border rounded-lg p-4 animate-pulse">
+            {/* Image skeleton */}
+            <Skeleton className="w-40 h-40 bg-gray-200 rounded-md"/>
+
+            <div className="flex-grow">
+                <div className="flex justify-between items-start">
+                    {/* Title skeleton */}
+                    <Skeleton className="h-7 bg-gray-200 rounded w-48 mb-2"/>
+                    {/* Heart button skeleton */}
+                    <Skeleton className="w-10 h-10 bg-gray-200 rounded"/>
+                </div>
+                {/* Price skeleton */}
+                <Skeleton className="h-6 bg-gray-200 rounded w-32 mb-2"/>
+                {/* Specialties skeleton */}
+                <Skeleton className="h-5 bg-gray-200 rounded w-64 mb-2"/>
+                {/* Description skeleton */}
+                <Skeleton className="h-10 bg-gray-200 rounded w-full"/>
+            </div>
+        </div>
+    )));
+}
+
