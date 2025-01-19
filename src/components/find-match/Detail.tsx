@@ -1,13 +1,13 @@
 'use client'
 
-import { getUserById } from '@/app/actions/user';
-import { SimplifiedUserResponse } from '@/app/np/find-match/page';
+import { getUserById, UserDocument } from '@/app/actions/user';
+import { Certification, License } from '@/lib/types/onboarding';
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
 import Image from 'next/image'
 import { useEffect, useState } from 'react';
 
 export default function FindMatchDetail({ id }: { id: string }) {
-    const [user, setUser] = useState<SimplifiedUserResponse | null>(null);
+    const [user, setUser] = useState<UserDocument | null>(null);
     // In a real app, you would fetch this data based on the id
     useEffect(() => {
         const getUser = async () => {
@@ -37,7 +37,7 @@ export default function FindMatchDetail({ id }: { id: string }) {
                         <h1 className="text-2xl font-bold mb-3">{user?.profile?.title ?? 'MD - Backup Collaborator for PA'}</h1>
                         <div className="flex items-center gap-3">
                             <Avatar>
-                                <AvatarImage src={user?.profile?.profilePhotoPath} alt={user?.profile?.firstName || 'Photo not found'} className="w-12 h-12 rounded-full" />
+                                <AvatarImage src={user?.profile?.profilePhotoPath || ''} alt={user?.profile?.firstName || 'Photo not found'} className="w-12 h-12 rounded-full" />
                                 <AvatarFallback>{user?.profile?.firstName?.charAt(0)} {user?.profile?.lastName?.charAt(0)}</AvatarFallback>
                             </Avatar>
                             <div>
@@ -74,18 +74,20 @@ export default function FindMatchDetail({ id }: { id: string }) {
                     {/* Licenses and Certifications */}
                     <div className="bg-gray-50 p-6 rounded-lg">
                         <h2 className="text-xl font-bold mb-6">Licenses & Certifications</h2>
-                        
+
                         {/* Medical Licenses */}
                         <div className="mb-6">
                             <h3 className="font-semibold mb-3">Medical Licenses</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {user?.profile?.medicalLicenseStates?.map((state) => (
-                                    <div key={state.state} className="border p-3 rounded-lg">
-                                        <p className="font-medium">{state.state}</p>
-                                        <p className="text-sm text-gray-600">License: {state.licenseNumber}</p>
-                                        <p className="text-sm text-gray-600">Expires: {state.expirationDate ? new Date(state.expirationDate).toLocaleDateString() : 'N/A'}</p>
-                                    </div>
-                                ))}
+                                {user?.profile?.medicalLicenseStates?.map((state: License) => {
+                                    return (
+                                        <div key={state.state} className="border p-3 rounded-lg">
+                                            <p className="font-medium">{state.state}</p>
+                                            <p className="text-sm text-gray-600">License: {state.licenseNumber}</p>
+                                            <p className="text-sm text-gray-600">Expires: {state.expirationDate ? new Date(state.expirationDate).toLocaleDateString() : 'N/A'}</p>
+                                        </div>
+                                    )
+                                })}
                             </div>
                         </div>
 
@@ -93,13 +95,15 @@ export default function FindMatchDetail({ id }: { id: string }) {
                         <div className="mb-6">
                             <h3 className="font-semibold mb-3">DEA Licenses</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {user?.profile?.deaLicenseStates?.map((state) => (
-                                    <div key={state.state} className="border p-3 rounded-lg">
-                                        <p className="font-medium">{state.state}</p>
-                                        <p className="text-sm text-gray-600">License: {state.licenseNumber}</p>
+                                {user?.profile?.deaLicenseStates?.map((state: License) => {
+                                    return (
+                                        <div key={state.state} className="border p-3 rounded-lg">
+                                            <p className="font-medium">{state.state}</p>
+                                            <p className="text-sm text-gray-600">License: {state.licenseNumber}</p>
                                         <p className="text-sm text-gray-600">Expires: {state.expirationDate ? new Date(state.expirationDate).toLocaleDateString() : 'N/A'}</p>
-                                    </div>
-                                ))}
+                                        </div>
+                                    )
+                                })}
                             </div>
                         </div>
 
@@ -107,13 +111,15 @@ export default function FindMatchDetail({ id }: { id: string }) {
                         <div>
                             <h3 className="font-semibold mb-3">Additional Certifications</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {user?.profile?.additionalCertifications?.map((cert) => (
-                                    <div key={cert.certification} className="border p-3 rounded-lg">
-                                        <p className="font-medium">{cert.certification}</p>
+                                {user?.profile?.additionalCertifications?.map((cert: Certification) => {
+                                    return (
+                                        <div key={cert.certification} className="border p-3 rounded-lg">
+                                            <p className="font-medium">{cert.certification}</p>
                                         <p className="text-sm text-gray-600">Issued: {cert.issueDate ? new Date(cert.issueDate).toLocaleDateString() : 'N/A'}</p>
                                         <p className="text-sm text-gray-600">Expires: {cert.expirationDate ? new Date(cert.expirationDate).toLocaleDateString() : 'N/A'}</p>
-                                    </div>
-                                ))}
+                                        </div>
+                                    )
+                                })}
                             </div>
                         </div>
                     </div>

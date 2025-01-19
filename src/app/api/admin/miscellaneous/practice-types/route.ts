@@ -8,7 +8,7 @@ export async function GET() {
     const practiceTypes = await PracticeType.find({
       enabled: true,
     });
-    console.log(practiceTypes);
+
     return NextResponse.json(practiceTypes);
   } catch (error) {
     console.error("Error in practice type:", error);

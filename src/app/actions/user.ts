@@ -5,7 +5,8 @@ import connect from "@/lib/db";
 import mongoose from "mongoose";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/options";
-
+import { selectedItem } from "@/lib/utils";
+import { Certification, License } from "@/lib/types/onboarding";
 
 interface GetUsersParams {
   page: number;
@@ -22,13 +23,13 @@ interface UserQuery {
   $or?: {
     username?: { $regex: string; $options: string } | string;
     email?: { $regex: string; $options: string } | string;
-    'profile.firstName'?: { $regex: string; $options: string } | string;
-    'profile.lastName'?: { $regex: string; $options: string } | string;
+    "profile.firstName"?: { $regex: string; $options: string } | string;
+    "profile.lastName"?: { $regex: string; $options: string } | string;
   }[];
   role?: string;
-  'profile.medicalLicenseStates'?: { $in: licenseState[] };
-  'profile.practiceTypes'?: { $in: string[] };
-  'profile.monthlyCollaborationRate'?: { $gte: number; $lte: number };
+  "profile.medicalLicenseStates"?: { $in: licenseState[] };
+  "profile.practiceTypes"?: { $in: string[] };
+  "profile.monthlyCollaborationRate"?: { $gte: number; $lte: number };
 }
 
 export interface UserDocument {
@@ -49,9 +50,9 @@ export interface UserDocument {
     user: string;
     firstName: string;
     lastName: string;
-    medicalLicenseStates: string[];
-    deaLicenseStates: string[];
-    practiceTypes: string[];
+    medicalLicenseStates: License[];
+    deaLicenseStates: License[];
+    practiceTypes: string[]; 
     monthlyCollaborationRate: number;
     additionalStateFee: number;
     additionalNPFee: number;
@@ -59,13 +60,12 @@ export interface UserDocument {
     controlledSubstancesPerPrescriptionFee: number;
     description: string;
     boardCertification: string;
-    additionalCertifications: string[];
+    additionalCertifications: Certification[];
     linkedinProfile: string;
     profilePhotoPath: string;
     governmentIdPath: string;
     createdAt: Date;
     updatedAt: Date;
-    __v: number;
     address: string;
     city: string;
     phone: string;
@@ -74,7 +74,9 @@ export interface UserDocument {
     clinicalDegree: string;
     education: string[];
     npiNumber: string;
-  },
+    title: string;
+    publications: string;
+  };
 }
 
 interface GetUsersResponse {
@@ -134,13 +136,13 @@ export async function getUserByEmail(email: string) {
   }
 }
 
-export async function getUserById(id: string) {
+export async function getUserById(id: string): Promise<UserDocument> {
   await connect();
   const user = await User.aggregate([
     {
       $match: {
-        _id: new mongoose.Types.ObjectId(id)
-      }
+        _id: new mongoose.Types.ObjectId(id),
+      },
     },
     {
       $lookup: {
@@ -148,10 +150,10 @@ export async function getUserById(id: string) {
         localField: "_id",
         foreignField: "user",
         as: "profile",
-      }
+      },
     },
     {
-      $unwind: "$profile"
+      $unwind: "$profile",
     },
     {
       $limit: 1,
@@ -161,7 +163,40 @@ export async function getUserById(id: string) {
     },
   ]);
 
-  return user[0];
+  const transformedUser = {
+    ...user[0],
+    profile: selectedItem(user[0].profile, [
+      "firstName",
+      "lastName",
+      "medicalLicenseStates",
+      "deaLicenseStates",
+      "practiceTypes",
+      "monthlyCollaborationRate",
+      "additionalStateFee",
+      "additionalNPFee",
+      "controlledSubstancesMonthlyFee",
+      "controlledSubstancesPerPrescriptionFee",
+      "description",
+      "title",
+      "publications",
+      "boardCertification",
+      "additionalCertifications",
+      "linkedinProfile",
+      "profilePhotoPath",
+      "governmentIdPath",
+      "createdAt",
+      "updatedAt",
+      "address",
+      "city",
+      "phone",
+      "state",
+      "zip",
+      "clinicalDegree",
+      "education",
+      "npiNumber",
+    ]),
+  };
+  return transformedUser;
 }
 
 export async function getOnboardingStatus(id: string) {
@@ -256,7 +291,7 @@ export async function getUsers({
     const [aggregatedUsers, total] = await Promise.all([
       User.aggregate([
         {
-          $match: query
+          $match: query,
         },
         {
           $lookup: {
@@ -264,10 +299,10 @@ export async function getUsers({
             localField: "_id",
             foreignField: "user",
             as: "profile",
-          }
+          },
         },
         {
-          $unwind: "$profile"
+          $unwind: "$profile",
         },
         {
           $skip: skip,
@@ -310,58 +345,61 @@ export async function getNpUsers({
   sort = "lowest_price",
   stateLicense = "",
   practiceType = "",
-  priceRange = ""
+  priceRange = "",
 }: {
   page?: number;
   search?: string;
   limit?: number;
-  sort?: 'lowest_price' | 'highest_price' | 'most_recent';
+  sort?: "lowest_price" | "highest_price" | "most_recent";
   stateLicense?: string;
   practiceType?: string;
   priceRange?: string;
 }): Promise<GetUsersResponse> {
   try {
-    const session = await getServerSession(authOptions); 
+    const session = await getServerSession(authOptions);
 
     await connect();
     const query: UserQuery = {
-      role: session?.user?.role === 'NURSE_PRACTITIONER' ? 'NURSE_PRACTITIONER' : 'PHYSICIAN' // Ensure we only get NP users
+      role:
+        session?.user?.role === "NURSE_PRACTITIONER"
+          ? "NURSE_PRACTITIONER"
+          : "PHYSICIAN", // Ensure we only get NP users
     };
 
     if (search) {
       query.$or = [
         { username: { $regex: search, $options: "i" } },
         { email: { $regex: search, $options: "i" } },
-        { 'profile.firstName': { $regex: search, $options: "i" } },
-        { 'profile.lastName': { $regex: search, $options: "i" } },
+        { "profile.firstName": { $regex: search, $options: "i" } },
+        { "profile.lastName": { $regex: search, $options: "i" } },
       ];
     }
 
     if (stateLicense) {
-      const states = stateLicense.split(',').map(state => state.trim());
-      query['profile.medicalLicenseStates'] = { 
-        $in: states.map(state => ({ state: state }))
+      const states = stateLicense.split(",").map((state) => state.trim());
+      query["profile.medicalLicenseStates"] = {
+        $in: states.map((state) => ({ state: state })),
       };
     }
 
     if (practiceType) {
-      const practiceTypes = practiceType.split(',').map(type => type.trim());
-      query['profile.practiceTypes'] = { 
-        $in: practiceTypes
+      const practiceTypes = practiceType.split(",").map((type) => type.trim());
+      query["profile.practiceTypes"] = {
+        $in: practiceTypes,
       };
     }
 
     if (priceRange) {
-      const [min, max] = priceRange.split(',').map(Number);
-      query['profile.monthlyCollaborationRate'] = { $gte: min, $lte: max };
+      const [min, max] = priceRange.split(",").map(Number);
+      query["profile.monthlyCollaborationRate"] = { $gte: min, $lte: max };
     }
 
     const skip = (page - 1) * limit;
 
     const sortConfig = {
-      'lowest_price': { "profile.monthlyCollaborationRate": 1 },
-      'highest_price': { "profile.monthlyCollaborationRate": -1 },
-      'most_recent': { createdAt: -1 }
+      lowest_price: { "profile.monthlyCollaborationRate": 1 },
+      highest_price: { "profile.monthlyCollaborationRate": -1 },
+      most_recent: { createdAt: -1 },
     } as const;
 
     const [aggregatedUsers, total] = await Promise.all([
@@ -372,13 +410,13 @@ export async function getNpUsers({
             localField: "_id",
             foreignField: "user",
             as: "profile",
-          }
+          },
         },
         {
-          $unwind: "$profile"
+          $unwind: "$profile",
         },
         {
-          $match: query // Move $match after $lookup to filter on profile fields
+          $match: query, // Move $match after $lookup to filter on profile fields
         },
         {
           $sort: sortConfig[sort] || { "profile.monthlyCollaborationRate": 1 },
@@ -397,18 +435,18 @@ export async function getNpUsers({
             localField: "_id",
             foreignField: "user",
             as: "profile",
-          }
+          },
         },
         {
-          $unwind: "$profile"
+          $unwind: "$profile",
         },
         {
-          $match: query
+          $match: query,
         },
         {
-          $count: "total"
-        }
-      ])
+          $count: "total",
+        },
+      ]),
     ]);
 
     return {
@@ -422,7 +460,38 @@ export async function getNpUsers({
         onBoardingStatus: user.onBoardingStatus,
         submissionStatus: user.submissionStatus,
         metaData: user.metaData,
-        profile: user.profile,
+        profile: selectedItem(user.profile, [
+          "firstName",
+          "lastName",
+          "medicalLicenseStates",
+          "deaLicenseStates",
+          "practiceTypes",
+          "monthlyCollaborationRate",
+          "additionalStateFee",
+          "additionalNPFee",
+          "controlledSubstancesMonthlyFee",
+          "controlledSubstancesPerPrescriptionFee",
+          "description",
+          "title",
+          "publications",
+          "boardCertification",
+          "additionalCertifications",
+          "linkedinProfile",
+          "profilePhotoPath",
+          "governmentIdPath",
+          "createdAt",
+          "updatedAt",
+          "address",
+          "city",
+          "phone",
+          "state",
+          "zip",
+          "clinicalDegree",
+          "education",
+          "npiNumber",
+          "title",
+          "publications",
+        ]),
       })),
       total: total[0]?.total || 0,
     };

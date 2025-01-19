@@ -1,25 +1,10 @@
 import { getUserById } from "@/app/actions/user";
-import { IUserProfile } from "@/app/models/UserProfile";
+
 import { formatDistanceToNow } from "date-fns";
 import { ArrowLeftIcon, PencilIcon } from "lucide-react"; //DownloadIcon
 import Link from "next/link";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
-type SimplifiedUserResponse = {
-    id: string;
-    username: string;
-    email: string;
-    role: string;
-    provider: string;
-    createdAt: Date;
-    metaData?: {
-        [key: string]: string;
-    };
-    profile?: IUserProfile;
-    submissionStatus: string;
-    onBoardingStatus: string;
-};
 
 export default async function Page({
     params,
@@ -27,7 +12,7 @@ export default async function Page({
     params: Promise<{ id: string }>
 }) {
     const id = (await params).id;
-    const user = await getUserById(id) as SimplifiedUserResponse;
+    const user = await getUserById(id);
 
     return (
         <div className="px-2">

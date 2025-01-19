@@ -1,5 +1,8 @@
+'use client';
+
 import Image from "next/image";
 import Link from "next/link";
+import { Certification, Education, License } from "@/lib/types/onboarding";
 
 interface Profile {
     firstName?: string;
@@ -8,6 +11,25 @@ interface Profile {
     monthlyCollaborationRate?: number;
     practiceTypes: string[];
     description?: string;
+    title?: string;
+    publications?: string;
+    boardCertification?: string;
+    additionalCertifications?: Certification[];
+    medicalLicenseStates?: License[];
+    deaLicenseStates?: License[];
+    linkedinProfile?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    zip?: string;
+    phone?: string;
+    email?: string;
+    npiNumber?: string;
+    clinicalDegree?: string;
+    education?: Education;
+    governmentIdPath?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 interface Result {
@@ -16,6 +38,11 @@ interface Result {
 }
 
 export default function Results({ results }: { results: Result[] }) {
+
+    const addToFavorites = (id: string) => {
+        console.log(id);
+    }
+
     if (results.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center py-12 text-gray-600">
@@ -32,7 +59,7 @@ export default function Results({ results }: { results: Result[] }) {
         <div className="grid grid-cols-1 gap-6 mb-6">
             {/* Result Cards */}
             {results.map((result) => (
-                <Link key={result.id} href={`/np/find-match/${result.id}`} className="flex gap-4 border rounded-lg p-4 hover:shadow-lg transition-shadow">
+                <div key={result.id} className="flex gap-4 border rounded-lg p-4 hover:shadow-lg transition-shadow">
                     <div className="w-40 h-40">
                         <Image src={result.profile?.profilePhotoPath || ''} alt={result.profile?.firstName || ''} sizes="100vw"
                             width={100}
@@ -44,8 +71,12 @@ export default function Results({ results }: { results: Result[] }) {
                     </div>
                     <div className="flex-grow">
                         <div className="flex justify-between items-start">
-                            <h2 className="text-xl font-semibold">{result.profile?.firstName} {result.profile?.lastName}</h2>
-                            <button className="p-2">
+                            <h2 className="text-xl font-semibold">
+                                <Link href={`/np/find-match/${result.id}`} className="hover:underline">
+                                    {result.profile?.firstName} {result.profile?.lastName}
+                                </Link>
+                            </h2>
+                            <button className="p-2 z-10" onClick={() => addToFavorites(result.id)}>
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                 </svg>
@@ -56,8 +87,11 @@ export default function Results({ results }: { results: Result[] }) {
                         <div className="text-gray-600 line-clamp-2">
                             {result.profile?.description}
                         </div>
+                        <div className="flex justify-end">
+                            <Link href={`/np/find-match/${result.id}`} className="text-blue-600 hover:underline">View Profile</Link>
+                        </div>
                     </div>
-                </Link>
+                </div>
             ))}
         </div>
     );

@@ -8,7 +8,6 @@ export async function GET() {
     const licenseStates = await MedicalLicenseState.find({
       enabled: true,
     });
-    console.log(licenseStates);
     return NextResponse.json(licenseStates);
   } catch (error) {
     console.error("Error in license state:", error);
