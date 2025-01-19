@@ -4,6 +4,7 @@ import { Certification, Education, License } from "@/lib/types/onboarding";
 
 export interface IUserProfile {
   user: Types.ObjectId | IUser;
+  
   // Step 1: User Information
   firstName: string;
   lastName: string;
@@ -22,7 +23,9 @@ export interface IUserProfile {
   controlledSubstancesMonthlyFee: number;
 
   // Step 5: Background & Certifications
+  title?: string;
   description: string;
+  publications?: string;
   boardCertification: string;
   additionalCertifications: Certification[];
   linkedinProfile: string;
@@ -92,7 +95,9 @@ const userProfileSchema = new Schema<IUserProfile>(
     additionalNPFee: { type: Number, required: true },
     controlledSubstancesMonthlyFee: { type: Number, required: true },
 
+    title: { type: String },
     description: { type: String, required: true },
+    publications: { type: String },
     boardCertification: { type: String, required: true },
     additionalCertifications: [certificationSchema],
     linkedinProfile: { type: String, required: true },

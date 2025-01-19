@@ -61,7 +61,7 @@ export default async function FindMatch(props: {
 
     return (
         <div className="bg-gray-50 min-h-screen w-full">
-            <Header />
+            <Header showSearch={true} />
             <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 <div className="flex gap-8">
                     {/* Filters Sidebar */}

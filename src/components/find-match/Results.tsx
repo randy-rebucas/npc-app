@@ -1,9 +1,21 @@
-
-
 import Image from "next/image";
-import { SimplifiedUserResponse } from "@/app/np/find-match/page";
+import Link from "next/link";
 
-export default function Results({ results }: { results: SimplifiedUserResponse[] }) {
+interface Profile {
+    firstName?: string;
+    lastName?: string;
+    profilePhotoPath?: string;
+    monthlyCollaborationRate?: number;
+    practiceTypes: string[];
+    description?: string;
+}
+
+interface Result {
+    id: string;
+    profile?: Profile;
+}
+
+export default function Results({ results }: { results: Result[] }) {
     if (results.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center py-12 text-gray-600">
@@ -20,7 +32,7 @@ export default function Results({ results }: { results: SimplifiedUserResponse[]
         <div className="grid grid-cols-1 gap-6 mb-6">
             {/* Result Cards */}
             {results.map((result) => (
-                <div key={result.id} className="flex gap-4 border rounded-lg p-4 hover:shadow-lg transition-shadow">
+                <Link key={result.id} href={`/np/find-match/${result.id}`} className="flex gap-4 border rounded-lg p-4 hover:shadow-lg transition-shadow">
                     <div className="w-40 h-40">
                         <Image src={result.profile?.profilePhotoPath || ''} alt={result.profile?.firstName || ''} sizes="100vw"
                             width={100}
@@ -45,7 +57,7 @@ export default function Results({ results }: { results: SimplifiedUserResponse[]
                             {result.profile?.description}
                         </div>
                     </div>
-                </div>
+                </Link>
             ))}
         </div>
     );

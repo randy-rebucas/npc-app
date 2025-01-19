@@ -22,6 +22,8 @@ interface UserQuery {
   $or?: {
     username?: { $regex: string; $options: string } | string;
     email?: { $regex: string; $options: string } | string;
+    'profile.firstName'?: { $regex: string; $options: string } | string;
+    'profile.lastName'?: { $regex: string; $options: string } | string;
   }[];
   role?: string;
   'profile.medicalLicenseStates'?: { $in: licenseState[] };
@@ -330,6 +332,8 @@ export async function getNpUsers({
       query.$or = [
         { username: { $regex: search, $options: "i" } },
         { email: { $regex: search, $options: "i" } },
+        { 'profile.firstName': { $regex: search, $options: "i" } },
+        { 'profile.lastName': { $regex: search, $options: "i" } },
       ];
     }
 
