@@ -46,13 +46,13 @@ export interface UserDocument {
     [key: string]: string;
   };
   profile: {
-    _id: string;
+    // _id: string;
     user: string;
     firstName: string;
     lastName: string;
     medicalLicenseStates: License[];
     deaLicenseStates: License[];
-    practiceTypes: string[]; 
+    practiceTypes: string[];
     monthlyCollaborationRate: number;
     additionalStateFee: number;
     additionalNPFee: number;
@@ -164,7 +164,16 @@ export async function getUserById(id: string): Promise<UserDocument> {
   ]);
 
   const transformedUser = {
-    ...user[0],
+    _id: user[0]._id.toString(),
+    email: user[0].email,
+    username: user[0].username,
+    provider: user[0].provider,
+    role: user[0].role,
+    createdAt: user[0].createdAt,
+    updatedAt: user[0].updatedAt,
+    onBoardingStatus: user[0].onBoardingStatus,
+    submissionStatus: user[0].submissionStatus,
+    metaData: user[0].metaData,
     profile: selectedItem(user[0].profile, [
       "firstName",
       "lastName",
@@ -194,7 +203,7 @@ export async function getUserById(id: string): Promise<UserDocument> {
       "clinicalDegree",
       "education",
       "npiNumber",
-    ]),
+    ]) as UserDocument["profile"],
   };
   return transformedUser;
 }
