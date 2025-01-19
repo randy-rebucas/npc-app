@@ -28,7 +28,7 @@ export default function Sync({ id }: { id: string }) {
             });
 
             // Redirect to the home page
-            router.push('/dashboard/members/webhook');
+            router.push('/np/members/webhook'); 
         } catch (error) {
             console.error('Error:', error);
             toast({

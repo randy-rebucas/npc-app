@@ -4,11 +4,16 @@ import User, { IUser } from "@/app/models/User";
 import connect from "@/lib/db";
 import mongoose from "mongoose";
 
+
 interface GetUsersParams {
   page: number;
   search?: string;
   role?: string;
   limit?: number;
+}
+
+interface licenseState {
+  state: string;
 }
 
 interface UserQuery {
@@ -17,6 +22,8 @@ interface UserQuery {
     email?: { $regex: string; $options: string } | string;
   }[];
   role?: string;
+  'profile.medicalLicenseStates'?: { $in: licenseState[] };
+  'profile.practiceTypes'?: { $in: string[] };
 }
 
 export interface UserDocument {
@@ -284,6 +291,124 @@ export async function getUsers({
         profile: user.profile,
       })),
       total,
+    };
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    throw new Error("Failed to fetch users");
+  }
+}
+
+export async function getNpUsers({
+  page = 1,
+  search = "",
+  limit = 10,
+  sort = "lowest_price",
+  stateLicense = "",
+  practiceType = "",
+}: {
+  page?: number;
+  search?: string;
+  limit?: number;
+  sort?: 'lowest_price' | 'highest_price' | 'most_recent';
+  stateLicense?: string;
+  practiceType?: string;
+}): Promise<GetUsersResponse> {
+  try {
+    await connect();
+    const query: UserQuery = {
+      role: 'NURSE_PRACTITIONER' // Ensure we only get NP users
+    };
+
+    if (search) {
+      query.$or = [
+        { username: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    if (stateLicense) {
+      const states = stateLicense.split(',').map(state => state.trim());
+      query['profile.medicalLicenseStates'] = { 
+        $in: states.map(state => ({ state: state }))
+      };
+    }
+
+    if (practiceType) {
+      const practiceTypes = practiceType.split(',').map(type => type.trim());
+      query['profile.practiceTypes'] = { 
+        $in: practiceTypes
+      };
+    }
+
+    const skip = (page - 1) * limit;
+
+    const sortConfig = {
+      'lowest_price': { "profile.monthlyCollaborationRate": 1 },
+      'highest_price': { "profile.monthlyCollaborationRate": -1 },
+      'most_recent': { createdAt: -1 }
+    } as const;
+
+    const [aggregatedUsers, total] = await Promise.all([
+      User.aggregate([
+        {
+          $lookup: {
+            from: "userprofiles",
+            localField: "_id",
+            foreignField: "user",
+            as: "profile",
+          }
+        },
+        {
+          $unwind: "$profile"
+        },
+        {
+          $match: query // Move $match after $lookup to filter on profile fields
+        },
+        {
+          $sort: sortConfig[sort] || { "profile.monthlyCollaborationRate": 1 },
+        },
+        {
+          $skip: skip,
+        },
+        {
+          $limit: limit,
+        },
+      ]),
+      User.aggregate([
+        {
+          $lookup: {
+            from: "userprofiles",
+            localField: "_id",
+            foreignField: "user",
+            as: "profile",
+          }
+        },
+        {
+          $unwind: "$profile"
+        },
+        {
+          $match: query
+        },
+        {
+          $count: "total"
+        }
+      ])
+    ]);
+
+    return {
+      users: (aggregatedUsers as unknown as UserDocument[]).map((user) => ({
+        id: user._id.toString(),
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        provider: user.provider,
+        createdAt: user.createdAt,
+        onBoardingStatus: user.onBoardingStatus,
+        submissionStatus: user.submissionStatus,
+        metaData: user.metaData,
+        profile: user.profile,
+      })),
+      total: total[0]?.total || 0,
     };
   } catch (error) {
     console.error("Error fetching users:", error);

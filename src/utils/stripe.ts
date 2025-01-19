@@ -305,8 +305,8 @@ export class StripeService {
   static async getStripeAccountLink(accountId: string) {
     const accountLink = await stripe.accountLinks.create({
       account: accountId,
-      refresh_url: `${process.env.NEXT_PUBLIC_URL}/dashboard/payment`,
-      return_url: `${process.env.NEXT_PUBLIC_URL}/dashboard/payment`,
+      refresh_url: `${process.env.NEXT_PUBLIC_URL}/np/payment`, 
+      return_url: `${process.env.NEXT_PUBLIC_URL}/np/payment`,
       type: "account_onboarding",
     });
     return accountLink;

@@ -162,7 +162,7 @@ export function Chat() {
             <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
               <h3 className="font-semibold">Chat</h3>
               {/* <Link
-                href="/dashboard/chat"
+                href="/np/chat"
                 className="text-sm text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
               >
                 Open in page

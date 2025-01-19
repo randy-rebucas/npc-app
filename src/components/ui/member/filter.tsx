@@ -16,6 +16,8 @@ export default function Filter({ target, options, placeholder, defaultValue }: {
     const pathname = usePathname();
     const { replace } = useRouter();
 
+    const filter = searchParams.get(target) || defaultValue;
+
     const onChange = (value: string) => {
         const params = new URLSearchParams(searchParams);
         params.set('page', '1');
@@ -26,7 +28,7 @@ export default function Filter({ target, options, placeholder, defaultValue }: {
     return (
         <div className="flex items-center gap-4">
             <Label className="text-sm font-medium">{placeholder}</Label>
-            <Select onValueChange={onChange} defaultValue={defaultValue}>
+            <Select onValueChange={onChange} defaultValue={filter}>
                 <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder={placeholder} />
                 </SelectTrigger>

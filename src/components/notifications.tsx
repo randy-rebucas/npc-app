@@ -77,7 +77,7 @@ export function Notifications() {
             {notifications.length > 5 && (
               <div className="pt-3 text-center border-t border-gray-200 dark:border-gray-700">
                 <Link
-                  href="/dashboard/notifications"
+                  href="/np/notifications" 
                   className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                 >
                   Show all notifications
