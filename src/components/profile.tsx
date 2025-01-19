@@ -1,13 +1,11 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { SignOut } from "./signout";
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
-// import { UserDocument } from '@/app/actions/user';
 import Link from 'next/link';
 import { getUserById, UserDocument } from '@/app/actions/user';
-import { useSession } from 'next-auth/react';
-// { user }: { user: Partial<UserDocument> }
+import { signOut, useSession } from 'next-auth/react';
+
 export default function Profile() {
     const { data: session } = useSession();
     const [user, setUser] = useState<Partial<UserDocument> | null>(null);
@@ -72,7 +70,7 @@ export default function Profile() {
                             Settings
                         </Link>
                         <button
-                            onClick={() => SignOut()}
+                            onClick={() => signOut({ callbackUrl: "/" })}
                             className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
                             Sign out

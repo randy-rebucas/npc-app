@@ -1,6 +1,5 @@
 'use client';
 
-// import { SignOut } from "./signout";
 import { Notifications } from "@/components/notifications";
 import { HelpMenu } from "@/components/help-menu";
 import Search from "@/components/find-match/Search";
@@ -23,7 +22,6 @@ export default function Header({ showSearch = false }: HeaderProps) {
           <div className="flex items-center gap-6">
             <HelpMenu />
             <Notifications />
-            {/* <SignOut /> */}
             <Profile /> 
           </div>
         </div>
