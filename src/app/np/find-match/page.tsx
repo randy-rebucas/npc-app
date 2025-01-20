@@ -5,7 +5,7 @@ import Header from "@/components/header";
 import Pagination from "@/components/ui/member/pagination";
 import { SearchParams } from "@/lib/types/search-params";
 import { getNpUsers } from "@/app/actions/user";
-// import Price from "@/components/find-match/Filters/Price";
+import Price from "@/components/find-match/Filters/Price";
 import StateLicenses from "@/components/find-match/Filters/StateLicenses";
 import PracticeTypes from "@/components/find-match/Filters/PracticeTypes";
 import { Suspense } from "react";
@@ -73,7 +73,7 @@ export default async function FindMatch(props: {
                         <StateLicenses /> 
 
                         {/* Price Range */}
-                        {/* <Price />  */}
+                        <Price /> 
                     </div>
                     {/* Results */}
                     <div className="flex flex-1 flex-col">

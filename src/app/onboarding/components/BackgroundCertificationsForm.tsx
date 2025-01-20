@@ -25,7 +25,7 @@ export default function BackgroundCertificationsForm({
   const onBoarding = useOnBoardingStore(state => state.onBoarding);
 
   return (
-    <>
+    <div className='flex flex-col gap-2'>
       <FormField
         control={form.control}
         name="description"
@@ -104,6 +104,6 @@ export default function BackgroundCertificationsForm({
           </FormItem>
         )}
       />
-    </>
+    </div>
   );
 }

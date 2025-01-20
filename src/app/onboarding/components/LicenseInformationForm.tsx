@@ -32,7 +32,7 @@ export default function LicenseInformationForm({ form }: FormStepProps) {
   const onBoarding = useOnBoardingStore(state => state.onBoarding);
 
   return (
-    <>
+    <div className='flex flex-col gap-2'>
       <FormField
         control={form.control}
         name="medicalLicenseStates"
@@ -88,6 +88,6 @@ export default function LicenseInformationForm({ form }: FormStepProps) {
           </FormItem>
         )}
       />
-    </>
+    </div>
   );
 }

@@ -1,12 +1,27 @@
 import mongoose, { Schema, Types } from "mongoose";
 import { IUser } from "./User";
 
+export enum CollaborationRequestStatus {
+  PENDING = "pending",
+  ACCEPTED = "accepted",
+  REJECTED = "rejected",
+  CANCELLED = "cancelled",
+  WITHDRAWN = "withdrawn",
+  OFFERED = "offered",
+}
+
+export enum ActiveCollaborationStatus {
+  ACTIVE = "active",
+  PAUSED = "paused",
+  TERMINATED = "terminated",
+}
+
 export interface IActiveCollaboration {
   _id: string;
   npUser: Types.ObjectId | IUser;
   physicianUser: Types.ObjectId | IUser;
   startDate: Date;
-  status: "active" | "paused" | "terminated";
+  status: ActiveCollaborationStatus;
   agreementSignedAt: Date;
   lastAttestationDate: Date;
   nextAttestationDue: Date;
@@ -17,7 +32,7 @@ export interface ICollaborationRequest {
   _id: string;
   npUser: Types.ObjectId | IUser;
   physicianUser: Types.ObjectId | IUser;
-  status: "pending" | "accepted" | "rejected" | "cancelled";
+  status: CollaborationRequestStatus;
   requestedAt: Date;
   message: string;
   responseMessage: string;
@@ -29,8 +44,8 @@ const collaborationRequestSchema = new mongoose.Schema({
   physicianUser: { type: Schema.Types.ObjectId, ref: "User", required: true },
   status: {
     type: String,
-    enum: ["pending", "accepted", "rejected", "cancelled"],
-    default: "pending",
+    enum: Object.values(CollaborationRequestStatus),
+    default: CollaborationRequestStatus.PENDING,
   },
   requestedAt: {
     type: Date,
@@ -50,8 +65,8 @@ const activeCollaborationSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["active", "paused", "terminated"],
-    default: "active",
+    enum: Object.values(ActiveCollaborationStatus),
+    default: ActiveCollaborationStatus.ACTIVE,
   },
   agreementSignedAt: Date,
   lastAttestationDate: Date,

@@ -14,10 +14,12 @@ export type Actions = {
 export const INITIAL_ON_BOARDING_DATA: OnboardingFormData = {
   firstName: "",
   lastName: "",
+  phone: "",
   email: "",
   medicalLicenseStates: [],
   deaLicenseStates: [],
   practiceTypes: [],
+  npiNumber: "",
   monthlyCollaborationRate: 0,
   additionalStateFee: 0,
   additionalNPFee: 0,

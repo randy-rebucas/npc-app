@@ -17,9 +17,11 @@ export async function POST(request: Request) {
     const userProfile = new UserProfile({
       firstName: body.firstName,
       lastName: body.lastName,
+      phone: body.phone,
       medicalLicenseStates: body.medicalLicenseStates || [],
       deaLicenseStates: body.deaLicenseStates || [],
       practiceTypes: body.practiceTypes || [],
+      npiNumber: body.npiNumber,
       monthlyCollaborationRate: body.monthlyCollaborationRate,
       additionalStateFee: body.additionalStateFee,
       additionalNPFee: body.additionalNPFee,

@@ -39,6 +39,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "sharetribe.imgix.net",
       },
+      {
+        protocol: "https",
+        hostname: "github.com",
+      },
     ],
   },
 };

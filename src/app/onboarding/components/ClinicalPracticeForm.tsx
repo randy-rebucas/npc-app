@@ -9,6 +9,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { OnboardingFormData } from '@/lib/types/onboarding';
 import { useOnBoardingStore } from '@/lib/store/onBoardingStore';
@@ -30,11 +31,11 @@ interface FormStepProps {
 
 export default function ClinicalPracticeForm({ form }: FormStepProps) {
 
-  const updateFields = useOnBoardingStore(state => state.updateFields); 
+  const updateFields = useOnBoardingStore(state => state.updateFields);
   const onBoarding = useOnBoardingStore(state => state.onBoarding);
 
   return (
-    <>
+    <div className='flex flex-col gap-2'>
       <FormField
         control={form.control}
         name="practiceTypes"
@@ -56,6 +57,20 @@ export default function ClinicalPracticeForm({ form }: FormStepProps) {
           </FormItem>
         )}
       />
-    </>
+
+      <FormField
+        control={form.control}
+        name="npiNumber"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>NPI Number</FormLabel>
+            <FormControl>
+              <Input {...field} value={onBoarding.npiNumber} onChange={(e) => updateFields({ npiNumber: e.target.value })} /> 
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </div>
   );
 }

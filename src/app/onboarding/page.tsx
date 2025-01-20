@@ -47,11 +47,16 @@ export default function OnboardingPage() {
             formSchema: z.object({
                 firstName: z.string().min(2, 'First name must be at least 2 characters'),
                 lastName: z.string().min(2, 'Last name must be at least 2 characters'),
+                phone: z.string().regex(
+                    /^\+?[1-9]\d{1,14}$/,
+                    "Please enter a valid international phone number (e.g. +12125551234)"
+                ),
                 email: z.string().email('Invalid email address'),
             }),
             defaultValues: {
                 firstName: onBoarding.firstName ?? '',
                 lastName: onBoarding.lastName ?? '',
+                phone: onBoarding.phone ?? '',
                 email: onBoarding.email ?? '',
             },
         },
@@ -84,9 +89,11 @@ export default function OnboardingPage() {
             component: ClinicalPracticeForm,
             formSchema: z.object({
                 practiceTypes: z.array(z.string()).min(1, "At least one practice type is required"),
+                npiNumber: z.string().min(2, 'NPI number must be at least 2 characters'),
             }),
             defaultValues: {
                 practiceTypes: onBoarding.practiceTypes ?? [],
+                npiNumber: onBoarding.npiNumber ?? '',
             },
         },
         {
@@ -98,15 +105,13 @@ export default function OnboardingPage() {
                 monthlyCollaborationRate: z.number().min(0, "Monthly collaboration rate must be greater than 0"),
                 additionalStateFee: z.number().min(0, "Additional state fee must be greater than 0"),
                 additionalNPFee: z.number().min(0, "Additional NP fee must be greater than 0"),
-                controlledSubstancesMonthlyFee: z.number().min(0, "Controlled substances monthly fee must be greater than 0"),
-                controlledSubstancesPerPrescriptionFee: z.number().min(0, "Controlled substances per prescription fee must be greater than 0"),
+                controlledSubstancesMonthlyFee: z.number().min(0, "Controlled substances monthly fee must be greater than 0")
             }),
             defaultValues: {
                 monthlyCollaborationRate: onBoarding.monthlyCollaborationRate ?? 0,
                 additionalStateFee: onBoarding.additionalStateFee ?? 0,
                 additionalNPFee: onBoarding.additionalNPFee ?? 0,
-                controlledSubstancesMonthlyFee: onBoarding.controlledSubstancesMonthlyFee ?? 0,
-                controlledSubstancesPerPrescriptionFee: onBoarding.controlledSubstancesPerPrescriptionFee ?? 0,
+                controlledSubstancesMonthlyFee: onBoarding.controlledSubstancesMonthlyFee ?? 0
             },
         },
         {

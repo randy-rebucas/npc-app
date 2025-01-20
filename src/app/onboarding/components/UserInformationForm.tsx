@@ -21,7 +21,7 @@ export default function UserInformationForm({ form }: FormStepProps) {
   const onBoarding = useOnBoardingStore(state => state.onBoarding);
 
   return (
-    <>
+    <div className='flex flex-col gap-2'>
       <FormField
         control={form.control}
         name="firstName"
@@ -43,7 +43,21 @@ export default function UserInformationForm({ form }: FormStepProps) {
           <FormItem>
             <FormLabel>Last Name</FormLabel>
             <FormControl>
-              <Input {...field} value={onBoarding.lastName} onChange={(e) => updateFields({ lastName: e.target.value })}/>
+              <Input {...field} value={onBoarding.lastName} onChange={(e) => updateFields({ lastName: e.target.value })} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="phone"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Phone number</FormLabel>
+            <FormControl>
+              <Input {...field} value={onBoarding.phone} onChange={(e) => updateFields({ phone: e.target.value })} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -57,12 +71,12 @@ export default function UserInformationForm({ form }: FormStepProps) {
           <FormItem>
             <FormLabel>Email</FormLabel>
             <FormControl>
-              <Input {...field} type="email" value={onBoarding.email} onChange={(e) => updateFields({ email: e.target.value })} readOnly/>
+              <Input {...field} type="email" value={onBoarding.email} onChange={(e) => updateFields({ email: e.target.value })} readOnly />
             </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
-    </>
+    </div>
   );
 }

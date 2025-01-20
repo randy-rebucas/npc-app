@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from 'lucide-react'
-import { Key, User, Shield, HelpCircle, CreditCardIcon, FileCheck, Settings, MessageCircle } from "lucide-react"
+import { Key, User, Shield, HelpCircle, CreditCardIcon, FileCheck, Settings, MessageCircle, Users } from "lucide-react"
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 
@@ -28,6 +28,16 @@ export default function Nav() {
             title: "Credentials",
             url: "/np/credentials",
             icon: Key,
+        },
+        {
+            title: "Settings",
+            url: "/np/settings",
+            icon: Settings,
+        },
+        {
+            title: "Help",
+            url: "/np/help",
+            icon: HelpCircle,
         }
     ]);
 
@@ -41,6 +51,11 @@ export default function Nav() {
             if (user?.submissionStatus === "APPROVED") {
                 setItems(currentItems => [
                     ...currentItems,
+                    {
+                        title: "Collaborators",
+                        url: "/np/collaborators",
+                        icon: Users,
+                    },
                     {
                         title: "Messages",
                         url: "/np/messages",
@@ -56,22 +71,7 @@ export default function Nav() {
                         url: "/np/attestations",
                         icon: FileCheck,
                     },
-                    {
-                        title: "Settings",
-                        url: "/np/settings",
-                        icon: Settings,
-                    }
-                ]);
-            }
-
-            if (user?.submissionStatus === "INCOMPLETE" || user?.submissionStatus === "INCORRECT" || user?.submissionStatus === "APPROVED") {
-                setItems(currentItems => [
-                    ...currentItems,
-                    {
-                        title: "Help",
-                        url: "/np/help",
-                        icon: HelpCircle,
-                    },
+                    
                 ]);
             }
 

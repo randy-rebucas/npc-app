@@ -28,7 +28,6 @@ export default function Profile() {
         const fetchUser = async () => {
             if (session?.user?.id) {
                 const user = await getUserById(session.user.id);
-                console.log(user);
                 setUser(user);
             }
         }
@@ -58,13 +57,13 @@ export default function Profile() {
                 <div className="absolute right-0 mt-2 w-48 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5">
                     <div className="py-1">
                         <Link
-                            href="/profile"
+                            href="/np/profile"
                             className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
                             Profile
                         </Link>
                         <Link
-                            href="/settings"
+                            href="/np/settings"
                             className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
                             Settings

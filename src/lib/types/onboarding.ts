@@ -19,6 +19,7 @@ export type License = {
 export type UserProfile = {
   firstName: string;
   lastName: string;
+  phone: string;
   email: string;
 }
 
@@ -73,6 +74,7 @@ export interface OnboardingFormData {
     // Step 1: User Information
     firstName: string;
     lastName: string;
+    phone: string;
     email: string;
     // Step 2: License Information
     medicalLicenseStates: License[];
@@ -80,7 +82,8 @@ export interface OnboardingFormData {
   
     // Step 3: Clinical Practice Types
     practiceTypes: string[];
-  
+    npiNumber: string;
+
     // Step 4: Rate Matrix
     monthlyCollaborationRate: number;
     additionalStateFee: number;

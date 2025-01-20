@@ -23,8 +23,7 @@ export default function RateMatrixForm({ form }: FormStepProps) {
   const onBoarding = useOnBoardingStore(state => state.onBoarding);
 
   return (
-    <>
-
+    <div className='flex flex-col gap-2'>
       <FormField
         control={form.control}
         name="monthlyCollaborationRate"
@@ -80,6 +79,6 @@ export default function RateMatrixForm({ form }: FormStepProps) {
           </FormItem>
         )}
       />
-    </>
+    </div>
   );
 }
