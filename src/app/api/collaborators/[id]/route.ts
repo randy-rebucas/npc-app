@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { CollaborationRequest } from "@/app/models/Collaboration";
 import connect from "@/lib/db";
+import User from "@/app/models/User";
+import Notification from "@/app/models/Notification";
+import { sendEmail } from "@/lib/email";
 
 export const DELETE = async (
   req: Request,
@@ -19,6 +22,21 @@ export const DELETE = async (
 
     if (collaborator) {
       // TODO: Send notification to the collaborator
+      const npUser = await User.findById(collaborator.npUser);
+      // Create a notification for the NP
+      await Notification.create({
+        user: npUser.id,
+        title: "Collaboration Request Removed",
+        message: "Your collaboration request has been removed",
+        link: `/collaborators/request`,
+      });
+
+      // TODO: Send email to NP
+      await sendEmail({
+        to: npUser.email,
+        subject: "Collaboration Request Removed",
+        body: "Your collaboration request has been removed",
+      });
     }
 
     return NextResponse.json({ success: true });

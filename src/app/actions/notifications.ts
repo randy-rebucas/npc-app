@@ -16,7 +16,7 @@ export async function createNotification({
     await connect();
     
     const notification = await Notification.create({
-      userId,
+      user: userId,
       title,
       message,
       link,

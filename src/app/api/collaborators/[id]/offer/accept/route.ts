@@ -1,6 +1,7 @@
 import {
     CollaborationRequest,
-    CollaborationRequestStatus,
+    ActiveCollaboration,
+    ActiveCollaborationStatus,
   } from "@/app/models/Collaboration";
 import Offer from "@/app/models/Offer";
 import { OfferStatus } from "@/app/models/Offer";
@@ -16,6 +17,8 @@ export async function POST(
   ) {
     try {
       const { id } = await params;
+
+      // Check if the collaboration request exists
       const collaborationRequest = await CollaborationRequest.findById(id);
       if (!collaborationRequest) {
         return NextResponse.json(
@@ -25,42 +28,51 @@ export async function POST(
       }
 
       // Withdraw the offer
-      const offer = await Offer.findOneAndUpdate({ collaborationId: id }, { status: OfferStatus.WITHDRAWN });
+      const offer = await Offer.findOneAndUpdate({ collaborationId: id }, { status: OfferStatus.ACCEPTED }); 
       if (!offer) {
         return NextResponse.json(
           { error: "Offer not found" },
           { status: 404 }
         );
       }
+      
+      // Create an active collaboration
+      const activeCollaboration = await ActiveCollaboration.create({ 
+        npUser: collaborationRequest.npUser,
+        physicianUser: collaborationRequest.physicianUser,
+        startDate: new Date(),
+        status: ActiveCollaborationStatus.ACTIVE,
+        agreementSignedAt: new Date(),
+        lastAttestationDate: new Date(),
+        nextAttestationDue: new Date(),
+      });
+
+      // Delete the collaboration request
+      await collaborationRequest.deleteOne();
   
-      collaborationRequest.status = CollaborationRequestStatus.WITHDRAWN;
-      collaborationRequest.responseMessage = "Offer withdrawn";
-      collaborationRequest.respondedAt = new Date();
-      const savedCollaborationRequest = await collaborationRequest.save();
-  
-      if (savedCollaborationRequest) {
-        const npUser = await User.findById(savedCollaborationRequest.npUser); 
+      if (activeCollaboration) {
+        const npUser = await User.findById(activeCollaboration.npUser); 
         // Create a notification for the NP
         await Notification.create({
           user: npUser.id,
-          title: "Offer Withdrawn",
-          message: "Your offer has been withdrawn",
+          title: "Offer Accepted",
+          message: "Your offer has been accepted",
           link: `/collaborators/${id}`
         });
 
         // TODO: Send email to NP
         await sendEmail({
           to: npUser.email,
-          subject: "Offer Withdrawn",
-          body: "Your offer has been withdrawn"
+          subject: "Offer Accepted",
+          body: "Your offer has been accepted"
         });
       }
   
       return NextResponse.json({ success: true });
     } catch (error) {
-      console.error("Error withdrawing offer:", error);
+      console.error("Error accepting offer:", error);
       return NextResponse.json(
-        { error: "Failed to withdraw offer" },
+        { error: "Failed to accept offer" },
         { status: 500 }
       );
     }

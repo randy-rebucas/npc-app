@@ -10,6 +10,9 @@ import Offer, {
   PositionType,
 } from "@/app/models/Offer";
 import { OfferStatus } from "@/app/models/Offer";
+import User from "@/app/models/User";
+import Notification from "@/app/models/Notification";
+import { sendEmail } from "@/lib/email";
 import { getServerSession } from "next-auth/next";
 import { NextResponse } from "next/server";
 
@@ -107,7 +110,21 @@ export async function POST(
     const savedOffer = await offer.save();
 
     if (savedOffer) {
-        // TODO: Send email to NP
+      const npUser = await User.findById(savedCollaborationRequest.npUser);
+      // Create a notification for the NP
+      await Notification.create({
+        user: npUser.id,
+        title: "Offer Sent",
+        message: "Your offer has been sent",
+        link: `/collaborators/${id}/offer/accept`,
+      });
+
+      // TODO: Send email to NP
+      await sendEmail({
+        to: npUser.email,
+        subject: "Offer Sent",
+        body: "Your offer has been sent",
+      });
     }
 
     return NextResponse.json({ success: true });

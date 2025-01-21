@@ -3,6 +3,9 @@ import {
   CollaborationRequestStatus,
 } from "@/app/models/Collaboration";
 import Offer, { OfferStatus } from "@/app/models/Offer";
+import User from "@/app/models/User";
+import Notification from "@/app/models/Notification";
+import { sendEmail } from "@/lib/email";
 
 import { NextResponse } from "next/server";
 
@@ -20,12 +23,12 @@ export async function POST(
       );
     }
 
-    const offer = await Offer.findOneAndUpdate({ collaborationId: id }, { status: OfferStatus.CANCELLED });
+    const offer = await Offer.findOneAndUpdate(
+      { collaborationId: id },
+      { status: OfferStatus.CANCELLED }
+    );
     if (!offer) {
-      return NextResponse.json(
-        { error: "Offer not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Offer not found" }, { status: 404 });
     }
     // Cancel the offer
     collaborationRequest.status = CollaborationRequestStatus.CANCELLED;
@@ -34,7 +37,21 @@ export async function POST(
     const savedCollaborationRequest = await collaborationRequest.save();
 
     if (savedCollaborationRequest) {
+      const npUser = await User.findById(savedCollaborationRequest.npUser);
+      // Create a notification for the NP
+      await Notification.create({
+        user: npUser.id,
+        title: "Offer Cancelled",
+        message: "Your offer has been cancelled",
+        link: `/collaborators/${id}`,
+      });
+
       // TODO: Send email to NP
+      await sendEmail({
+        to: npUser.email,
+        subject: "Offer Cancelled",
+        body: "Your offer has been cancelled",
+      });
     }
 
     return NextResponse.json({ success: true });

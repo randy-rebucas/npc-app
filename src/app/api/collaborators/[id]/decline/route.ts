@@ -23,8 +23,8 @@ export async function POST(
         { status: 404 }
       );
     }
-    collaborationRequest.status = CollaborationRequestStatus.ACCEPTED;
-    collaborationRequest.responseMessage = "Collaboration request accepted";
+    collaborationRequest.status = CollaborationRequestStatus.DECLINED;
+    collaborationRequest.responseMessage = "Collaboration request declined";
     collaborationRequest.respondedAt = new Date();
     const savedCollaborationRequest = await collaborationRequest.save();
 
@@ -33,22 +33,22 @@ export async function POST(
       // Create a notification for the NP
       await Notification.create({
         user: npUser.id,
-        title: "Collaboration Request Accepted",
-        message: "Your collaboration request has been accepted",
+        title: "Collaboration Request Declined",
+        message: "Your collaboration request has been declined",
         link: `/collaborators/${id}`,
       });
 
       // TODO: Send email to NP
       await sendEmail({
         to: npUser.email,
-        subject: "Collaboration Request Accepted",
-        body: "Your collaboration request has been accepted",
+        subject: "Collaboration Request Declined",
+        body: "Your collaboration request has been declined",
       });
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error accepting offer:", error);
+    console.error("Error declining collaboration request:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
