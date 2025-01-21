@@ -21,8 +21,7 @@ export async function GET() {
       model: "User",
       select: "-password",
     });
-    
-    console.log(collaborationRequests);
+
     const collaborationRequestsArray = collaborationRequests.map((request) => ({
       id: request._id,
       name: request.npUser.username,

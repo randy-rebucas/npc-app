@@ -341,21 +341,42 @@ export const ResultsSkeleton = () => {
     return (Array.from({ length: 3 }).map((_, index) => (
         <div key={index} className="flex gap-4 border rounded-lg p-4 animate-pulse">
             {/* Image skeleton */}
-            <Skeleton className="w-40 h-40 bg-gray-200 rounded-md"/>
+            <Skeleton className="w-40 h-40 bg-gray-200 rounded-md" />
 
             <div className="flex-grow">
                 <div className="flex justify-between items-start">
                     {/* Title skeleton */}
-                    <Skeleton className="h-7 bg-gray-200 rounded w-48 mb-2"/>
+                    <Skeleton className="h-7 bg-gray-200 rounded w-48 mb-2" />
                     {/* Heart button skeleton */}
-                    <Skeleton className="w-10 h-10 bg-gray-200 rounded"/>
+                    <Skeleton className="w-10 h-10 bg-gray-200 rounded" />
                 </div>
                 {/* Price skeleton */}
-                <Skeleton className="h-6 bg-gray-200 rounded w-32 mb-2"/>
+                <Skeleton className="h-6 bg-gray-200 rounded w-32 mb-2" />
                 {/* Specialties skeleton */}
-                <Skeleton className="h-5 bg-gray-200 rounded w-64 mb-2"/>
+                <Skeleton className="h-5 bg-gray-200 rounded w-64 mb-2" />
                 {/* Description skeleton */}
-                <Skeleton className="h-10 bg-gray-200 rounded w-full"/>
+                <Skeleton className="h-10 bg-gray-200 rounded w-full" />
+            </div>
+        </div>
+    )));
+}
+
+export const CollaborationSkeleton = () => {
+    return (Array.from({ length: 3 }).map((_, index) => (
+        <div key={index} className="bg-white shadow rounded-lg p-6 animate-pulse">
+            <div className="flex items-center space-x-4">
+                <Skeleton className="h-12 w-12 rounded-full bg-gray-200" />
+                <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 bg-gray-200 rounded w-3/4" />
+                    <Skeleton className="h-3 bg-gray-200 rounded w-1/2" />
+                </div>
+            </div>
+            <div className="mt-4">
+                <Skeleton className="h-4 bg-gray-200 rounded w-1/4" />
+            </div>
+            <div className="mt-4 flex space-x-3">
+                <Skeleton className="flex-1 h-8 bg-gray-200 rounded" />
+                <Skeleton className="flex-1 h-8 bg-gray-200 rounded" />
             </div>
         </div>
     )));

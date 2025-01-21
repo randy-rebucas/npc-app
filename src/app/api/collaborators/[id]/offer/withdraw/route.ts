@@ -2,6 +2,8 @@ import {
     CollaborationRequest,
     CollaborationRequestStatus,
   } from "@/app/models/Collaboration";
+import Offer from "@/app/models/Offer";
+import { OfferStatus } from "@/app/models/Offer";
 
 import { NextResponse } from "next/server";
 
@@ -15,6 +17,15 @@ export async function POST(
       if (!collaborationRequest) {
         return NextResponse.json(
           { error: "Collaboration request not found" },
+          { status: 404 }
+        );
+      }
+
+      // Withdraw the offer
+      const offer = await Offer.findOneAndUpdate({ collaborationId: id }, { status: OfferStatus.WITHDRAWN });
+      if (!offer) {
+        return NextResponse.json(
+          { error: "Offer not found" },
           { status: 404 }
         );
       }

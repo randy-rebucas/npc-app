@@ -2,6 +2,7 @@ import {
   CollaborationRequest,
   CollaborationRequestStatus,
 } from "@/app/models/Collaboration";
+import Offer, { OfferStatus } from "@/app/models/Offer";
 
 import { NextResponse } from "next/server";
 
@@ -19,6 +20,14 @@ export async function POST(
       );
     }
 
+    const offer = await Offer.findOneAndUpdate({ collaborationId: id }, { status: OfferStatus.CANCELLED });
+    if (!offer) {
+      return NextResponse.json(
+        { error: "Offer not found" },
+        { status: 404 }
+      );
+    }
+    // Cancel the offer
     collaborationRequest.status = CollaborationRequestStatus.CANCELLED;
     collaborationRequest.responseMessage = "Offer cancelled";
     collaborationRequest.respondedAt = new Date();

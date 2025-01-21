@@ -11,7 +11,7 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    console.log(id);
+
     await connect();
     const collaborationRequest = await CollaborationRequest.findById(id);
     if (!collaborationRequest) {

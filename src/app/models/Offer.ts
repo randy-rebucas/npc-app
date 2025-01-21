@@ -1,11 +1,14 @@
 import mongoose, { Schema, Types } from "mongoose";
 import { IUser } from "./User";
+import { ICollaborationRequest } from "./Collaboration";
 
 export enum OfferStatus {
   PENDING = "PENDING",
   ACCEPTED = "ACCEPTED",
   DECLINED = "DECLINED",
   EXPIRED = "EXPIRED",
+  CANCELLED = "CANCELLED",
+  WITHDRAWN = "WITHDRAWN",
 }
 
 export enum CompensationType {
@@ -98,6 +101,9 @@ export interface IOffer {
   duties: string[];
   requirements: string[];
   additionalNotes?: string;
+
+  // Collaboration details
+  collaborationId: Types.ObjectId | ICollaborationRequest; 
 }
 
 const nonCompeteClauseSchema = new Schema<INonCompeteClause>(
@@ -162,6 +168,7 @@ const offerSchema = new mongoose.Schema<IOffer>({
   duties: { type: [String], required: true },
   requirements: { type: [String], required: true },
   additionalNotes: { type: String, required: false },
+  collaborationId: { type: Schema.Types.ObjectId, ref: "CollaborationRequest", required: true },
 });
 
 export default mongoose.models.Offer ||

@@ -36,6 +36,13 @@ export async function POST(
       );
     }
 
+    // Offer the collaboration
+    collaborationRequest.status = CollaborationRequestStatus.OFFERED;
+    collaborationRequest.responseMessage = "Offer sent";
+    collaborationRequest.respondedAt = new Date();
+    const savedCollaborationRequest = await collaborationRequest.save();
+
+    // Create the offer
     const offer = new Offer({
       nursePractitionerUser: collaborationRequest.npUser._id.toString(),
       physicianUser: session.user.id,
@@ -95,18 +102,12 @@ export async function POST(
       duties: ["Duty 1", "Duty 2", "Duty 3"],
       requirements: ["Requirement 1", "Requirement 2", "Requirement 3"],
       additionalNotes: "Additional notes",
+      collaborationId: savedCollaborationRequest._id,
     });
     const savedOffer = await offer.save();
 
     if (savedOffer) {
-      collaborationRequest.status = CollaborationRequestStatus.OFFERED;
-      collaborationRequest.responseMessage = "Offer sent";
-      collaborationRequest.respondedAt = new Date();
-      const savedCollaborationRequest = await collaborationRequest.save();
-
-      if (savedCollaborationRequest) {
         // TODO: Send email to NP
-      }
     }
 
     return NextResponse.json({ success: true });

@@ -4,7 +4,7 @@ import { IUser } from "./User";
 export enum CollaborationRequestStatus {
   PENDING = "pending",
   ACCEPTED = "accepted",
-  REJECTED = "rejected",
+  DECLINED = "declined",
   CANCELLED = "cancelled",
   WITHDRAWN = "withdrawn",
   OFFERED = "offered",
