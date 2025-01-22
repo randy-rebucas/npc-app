@@ -23,30 +23,48 @@ export async function POST(
         { status: 404 }
       );
     }
+
     collaborationRequest.status = CollaborationRequestStatus.ACCEPTED;
     collaborationRequest.responseMessage = "Collaboration request accepted";
     collaborationRequest.respondedAt = new Date();
     const savedCollaborationRequest = await collaborationRequest.save();
 
-    if (savedCollaborationRequest) {
-      const npUser = await User.findById(savedCollaborationRequest.npUser);
-      // Create a notification for the NP
-      await Notification.create({
-        user: npUser.id,
-        title: "Collaboration Request Accepted",
-        message: "Your collaboration request has been accepted",
-        link: `/collaborators/${id}`,
-      });
-
-      // TODO: Send email to NP
-      await sendEmail({
-        to: npUser.email,
-        subject: "Collaboration Request Accepted",
-        body: "Your collaboration request has been accepted",
-      });
+    if (!savedCollaborationRequest) {
+      return NextResponse.json(
+        { error: "Failed to save collaboration request" },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({ success: true });
+    const npUser = await User.findById(savedCollaborationRequest.npUser);
+    if (!npUser) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    // Create a notification for the NP
+    await Notification.create({
+      user: npUser.id,
+      title: "Collaboration Request Accepted",
+      message: "Your collaboration request has been accepted",
+      link: `/collaborators/${id}`,
+    });
+
+    // Send email to NP
+    await sendEmail({
+      to: npUser.email,
+      subject: "Collaboration Request Accepted",
+      body: "Your collaboration request has been accepted",
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: savedCollaborationRequest,
+      message: "Collaboration request accepted successfully"
+    });
+
   } catch (error) {
     console.error("Error accepting offer:", error);
     return NextResponse.json(

@@ -4,19 +4,27 @@ import { toast } from "@/hooks/use-toast";
 
 
 export default function AcceptOffer({ collaboratorId, refetch }: { collaboratorId: string, refetch: () => void }) {
-    
+
     const handleAcceptOffer = async (id: string) => {
         try {
             const response = await fetch(`/api/collaborators/${id}/offer/accept`, {
                 method: 'POST',
             });
-            if (!response.ok) throw new Error('Failed to accept offer');
-            toast({
-                title: 'Offer accepted',
-                description: 'The offer has been accepted',
-                variant: 'default',
-            });
-            refetch();
+            const data = await response.json();
+            if (data.success) {
+                toast({
+                    title: 'Offer accepted',
+                    description: 'The offer has been accepted',
+                    variant: 'default',
+                });
+                refetch();
+            } else {
+                toast({
+                    title: 'Failed to accept offer',
+                    description: data.message,
+                    variant: 'destructive',
+                });
+            }
         } catch (err) {
             console.error('Error accepting offer:', err);
             toast({

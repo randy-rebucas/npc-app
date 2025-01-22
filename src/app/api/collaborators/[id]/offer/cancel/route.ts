@@ -18,7 +18,7 @@ export async function POST(
     const collaborationRequest = await CollaborationRequest.findById(id);
     if (!collaborationRequest) {
       return NextResponse.json(
-        { error: "Collaboration request not found" },
+        { success: false, error: "Collaboration request not found" },
         { status: 404 }
       );
     }
@@ -28,37 +28,57 @@ export async function POST(
       { status: OfferStatus.CANCELLED }
     );
     if (!offer) {
-      return NextResponse.json({ error: "Offer not found" }, { status: 404 });
+      return NextResponse.json(
+        { success: false, error: "Offer not found" },
+        { status: 404 }
+      );
     }
+
     // Cancel the offer
     collaborationRequest.status = CollaborationRequestStatus.CANCELLED;
     collaborationRequest.responseMessage = "Offer cancelled";
     collaborationRequest.respondedAt = new Date();
     const savedCollaborationRequest = await collaborationRequest.save();
 
-    if (savedCollaborationRequest) {
-      const npUser = await User.findById(savedCollaborationRequest.npUser);
-      // Create a notification for the NP
-      await Notification.create({
-        user: npUser.id,
-        title: "Offer Cancelled",
-        message: "Your offer has been cancelled",
-        link: `/collaborators/${id}`,
-      });
-
-      // TODO: Send email to NP
-      await sendEmail({
-        to: npUser.email,
-        subject: "Offer Cancelled",
-        body: "Your offer has been cancelled",
-      });
+    if (!savedCollaborationRequest) {
+      return NextResponse.json(
+        { success: false, error: "Failed to save collaboration request" },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({ success: true });
+    const npUser = await User.findById(savedCollaborationRequest.npUser);
+    if (!npUser) {
+      return NextResponse.json(
+        { success: false, error: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    // Create a notification for the NP
+    await Notification.create({
+      user: npUser.id,
+      title: "Offer Cancelled",
+      message: "Your offer has been cancelled",
+      link: `/collaborators/${id}`,
+    });
+
+    // Send email to NP
+    await sendEmail({
+      to: npUser.email,
+      subject: "Offer Cancelled",
+      body: "Your offer has been cancelled",
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: "Offer cancelled successfully",
+      data: savedCollaborationRequest,
+    });
   } catch (error) {
     console.error("Error cancelling offer:", error);
     return NextResponse.json(
-      { error: "Failed to cancel offer" },
+      { success: false, error: "Failed to cancel offer" },
       { status: 500 }
     );
   }

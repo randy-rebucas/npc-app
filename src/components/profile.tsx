@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
-import Link from 'next/link';
+// import Link from 'next/link';
 import { getUserById, UserDocument } from '@/app/actions/user';
 import { signOut, useSession } from 'next-auth/react';
 
@@ -56,7 +56,7 @@ export default function Profile() {
             {isOpen && (
                 <div className="absolute right-0 mt-2 w-48 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5">
                     <div className="py-1">
-                        <Link
+                        {/* <Link
                             href="/np/profile"
                             className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
@@ -67,7 +67,7 @@ export default function Profile() {
                             className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
                             Settings
-                        </Link>
+                        </Link> */}
                         <button
                             onClick={() => signOut({ callbackUrl: "/" })}
                             className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"

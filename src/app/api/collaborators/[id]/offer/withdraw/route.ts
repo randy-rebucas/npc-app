@@ -48,15 +48,27 @@ export async function POST(
           link: `/collaborators/${id}`
         });
 
-        // TODO: Send email to NP
+        // Send email to NP
         await sendEmail({
           to: npUser.email,
           subject: "Offer Withdrawn",
           body: "Your offer has been withdrawn"
         });
+
+        return NextResponse.json({
+          success: true,
+          data: {
+            collaborationRequest: savedCollaborationRequest,
+            offer: offer,
+            message: "Offer successfully withdrawn"
+          }
+        });
       }
-  
-      return NextResponse.json({ success: true });
+
+      return NextResponse.json(
+        { error: "Failed to save collaboration request" },
+        { status: 500 }
+      );
     } catch (error) {
       console.error("Error withdrawing offer:", error);
       return NextResponse.json(

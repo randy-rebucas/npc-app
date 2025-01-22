@@ -19,18 +19,24 @@ export default function Decline({ collaboratorId, refetch }: { collaboratorId: s
             message: `Are you sure you want to decline this collaboration request?`,
             action: async () => {
                 try {
-                    // Replace with your actual API endpoint
-                    const response = await fetch(`/api/collaborators/${id}`, {
-                        method: 'DELETE',
+                    const response = await fetch(`/api/collaborators/${id}/decline`, {
+                        method: 'POST',
                     });
-                    if (!response.ok) throw new Error('Failed to decline collaborator');
-
-                    toast({
-                        title: 'Collaboration request declined',
-                        description: 'The collaboration request has been declined',
-                        variant: 'destructive',
-                    });
-                    refetch();
+                    const data = await response.json();
+                    if (data.success) { 
+                        toast({
+                            title: 'Collaboration request declined',
+                            description: 'The collaboration request has been declined',
+                            variant: 'destructive',
+                        });
+                        refetch();
+                    } else {
+                        toast({
+                            title: 'Failed to decline collaborator',
+                            description: data.message,
+                            variant: 'destructive',
+                        });
+                    }
                 } catch (err) {
                     console.error('Error declining collaborator:', err);
                     toast({

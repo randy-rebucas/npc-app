@@ -7,13 +7,21 @@ export default function Accept({ collaboratorId, refetch }: { collaboratorId: st
         const response = await fetch(`/api/collaborators/${id}/accept`, {
             method: 'POST',
         });
-        if (!response.ok) throw new Error('Failed to accept collaborator');
-        toast({
-            title: 'Collaborator accepted',
-            description: 'The collaborator has been accepted',
-            variant: 'default',
-        });
-        refetch();
+        const data = await response.json();
+        if (data.success) {
+            toast({
+                title: 'Collaborator accepted',
+                description: 'The collaborator has been accepted',
+                variant: 'default',
+            });
+            refetch();
+        } else {
+            toast({
+                title: 'Failed to accept collaborator',
+                description: data.message,
+                variant: 'destructive',
+            });
+        }
     };
 
     return (

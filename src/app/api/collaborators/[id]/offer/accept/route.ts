@@ -50,29 +50,53 @@ export async function POST(
       // Delete the collaboration request
       await collaborationRequest.deleteOne();
   
-      if (activeCollaboration) {
-        const npUser = await User.findById(activeCollaboration.npUser); 
-        // Create a notification for the NP
-        await Notification.create({
-          user: npUser.id,
-          title: "Offer Accepted",
-          message: "Your offer has been accepted",
-          link: `/collaborators/${id}`
-        });
-
-        // TODO: Send email to NP
-        await sendEmail({
-          to: npUser.email,
-          subject: "Offer Accepted",
-          body: "Your offer has been accepted"
-        });
+      if (!activeCollaboration) {
+        return NextResponse.json(
+          { error: "Failed to create active collaboration" },
+          { status: 500 }
+        );
       }
+
+      const npUser = await User.findById(activeCollaboration.npUser);
+      if (!npUser) {
+        return NextResponse.json(
+          { error: "NP user not found" },
+          { status: 404 }
+        );
+      }
+
+      // Create a notification for the NP
+      await Notification.create({
+        user: npUser.id,
+        title: "Offer Accepted",
+        message: "Your offer has been accepted",
+        link: `/collaborators/${id}`
+      });
+
+      // Send email to NP
+      await sendEmail({
+        to: npUser.email,
+        subject: "Offer Accepted",
+        body: "Your offer has been accepted"
+      });
   
-      return NextResponse.json({ success: true });
+      return NextResponse.json({
+        success: true,
+        data: {
+          activeCollaboration: {
+            id: activeCollaboration._id,
+            npUser: activeCollaboration.npUser,
+            physicianUser: activeCollaboration.physicianUser,
+            status: activeCollaboration.status,
+            startDate: activeCollaboration.startDate
+          }
+        },
+        message: "Offer accepted successfully"
+      });
     } catch (error) {
       console.error("Error accepting offer:", error);
       return NextResponse.json(
-        { error: "Failed to accept offer" },
+        { error: "Failed to accept offer"},
         { status: 500 }
       );
     }

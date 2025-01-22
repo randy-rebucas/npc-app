@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from 'lucide-react'
-import { Key, User, Shield, HelpCircle, CreditCardIcon, FileCheck, Settings, MessageCircle, Users } from "lucide-react"
+import { Key, User, HelpCircle, CreditCardIcon, FileCheck, Settings, MessageCircle, Users } from "lucide-react"
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 
@@ -72,17 +72,6 @@ export default function Nav() {
                         icon: FileCheck,
                     },
                     
-                ]);
-            }
-
-            if (user?.role === "ADMIN") {
-                setItems(currentItems => [
-                    ...currentItems,
-                    {
-                        title: "Admin",
-                        url: "/admin/dashboard",
-                        icon: Shield,
-                    }
                 ]);
             }
         };

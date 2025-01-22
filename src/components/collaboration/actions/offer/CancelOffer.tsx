@@ -4,19 +4,27 @@ import { toast } from "@/hooks/use-toast";
 
 
 export default function CancelOffer({ collaboratorId, refetch }: { collaboratorId: string, refetch: () => void }) {
-    
+
     const handleCancelOffer = async (id: string) => {
         try {
             const response = await fetch(`/api/collaborators/${id}/offer/cancel`, {
                 method: 'POST',
             });
-            if (!response.ok) throw new Error('Failed to cancel offer');
-            toast({
-                title: 'Offer cancelled',
-                description: 'The offer has been cancelled',
-                variant: 'destructive',
-            });
-            refetch();
+            const data = await response.json();
+            if (data.success) {
+                toast({
+                    title: 'Offer cancelled',
+                    description: 'The offer has been cancelled',
+                    variant: 'default',
+                });
+                refetch();
+            } else {
+                toast({
+                    title: 'Failed to cancel offer',
+                    description: data.message,
+                    variant: 'destructive',
+                });
+            }
         } catch (err) {
             console.error('Error cancelling offer:', err);
             toast({

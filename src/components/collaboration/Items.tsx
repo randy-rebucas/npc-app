@@ -3,7 +3,6 @@
 import Accept from "./actions/Accept";
 import WithdrawOffer from "./actions/offer/WithdrawOffer";
 import CancelOffer from "./actions/offer/CancelOffer";
-// import AcceptOffer from "./actions/offer/AcceptOffer";
 import SendOffer from "./actions/offer/SendOffer";
 import Remove from "./actions/Remove";
 import Decline from "./actions/Decline";    
@@ -119,13 +118,11 @@ export default function Items({ type }: { type: 'active' | 'request' }) {
                             ) : collaborator.status === 'offered' ? (
                                 <>
                                     <WithdrawOffer collaboratorId={collaborator.id} refetch={fetchCollaborators} />
-                                    {/* <AcceptOffer collaboratorId={collaborator.id} refetch={fetchCollaborators} />  */}
                                     <CancelOffer collaboratorId={collaborator.id} refetch={fetchCollaborators} />
                                 </>
                             ) : collaborator.status === 'accepted' ? (
                                 <>
                                     <SendOffer collaboratorId={collaborator.id} refetch={fetchCollaborators} />
-                                    {/* <Decline collaboratorId={collaborator.id} refetch={fetchCollaborators} /> */}
                                 </>
                             ) : collaborator.status === 'declined' || collaborator.status === 'cancelled' || collaborator.status === 'withdrawn' ? (
                                 <>

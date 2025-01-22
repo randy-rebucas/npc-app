@@ -119,15 +119,25 @@ export async function POST(
         link: `/collaborators/${id}/offer/accept`,
       });
 
-      // TODO: Send email to NP
+      // Send email to NP
       await sendEmail({
         to: npUser.email,
         subject: "Offer Sent",
         body: "Your offer has been sent",
       });
+
+      return NextResponse.json({
+        success: true,
+        offer: savedOffer,
+        collaborationRequest: savedCollaborationRequest
+      });
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json(
+      { error: "Failed to create offer" },
+      { status: 500 }
+    );
+
   } catch (error) {
     console.error("Error offering collaboration:", error);
     return NextResponse.json(

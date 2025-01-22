@@ -1,24 +1,29 @@
 "use client"
 
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Form, useForm } from "react-hook-form";
-import { useState } from "react";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Mail } from "lucide-react";
 
 const formSchema = z.object({
     email: z.string().email("Invalid email address"),
 });
 
-
-export default function CollaboratorForm({ id }: { id: string | null }) {
+export default function CollaboratorForm() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
     const { toast } = useToast();
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -26,19 +31,6 @@ export default function CollaboratorForm({ id }: { id: string | null }) {
             email: "",
         },
     });
-
-    if (id) {
-        // const getCollaborator = async () => {
-        //     const collaborator = await fetch(`/api/admin/miscellaneous/collaborators/${id}`)
-        //     const data = await collaborator.json();
-        //     console.log(data)
-        //     form.setValue("email", data?.email || "");
-
-
-        //     console.log(form.getValues())
-        // }
-        // getCollaborator()
-    }
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsLoading(true);
@@ -48,24 +40,26 @@ export default function CollaboratorForm({ id }: { id: string | null }) {
                 method: "POST",
                 body: JSON.stringify(values),
             });
-            if (response.ok) {
+
+            const data = await response.json();
+
+            if (data.success) {
                 toast({
-                    title: "Collaborator added successfully",
-                    description: "Collaborator added successfully",
+                    title: "Nurse Practitioner invited successfully",
+                    description: "Nurse Practitioner invited successfully",
                 });
                 form.reset();
-                router.push("/admin/dashboard/collaborators");
+                router.push("/np/collaborators");
             } else {
-                console.error("Failed to add collaborator");
                 toast({
-                    title: "Failed to add collaborator",
-                    description: "Please try again later.",
+                    title: "Failed to invite Nurse Practitioner",
+                    description: data.message,
                     variant: "destructive",
                 });
             }
 
         } catch (error) {
-            console.error("Error in collaborator:", error);
+            console.error("Error in invite Nurse Practitioner:", error);
             toast({
                 title: "Error",
                 description: "Please try again later.",
@@ -76,27 +70,53 @@ export default function CollaboratorForm({ id }: { id: string | null }) {
         }
     }
 
+    if (!isMounted) {
+        return null;
+    }
+
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+
                 <FormField
                     control={form.control}
                     name="email"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Email</FormLabel>
+                            <FormLabel>Email Address</FormLabel>
                             <FormControl>
-                                <Input type="email" placeholder="Email of the collaborator" {...field} />
+                                <div className="relative">
+                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 h-5 w-5" />
+                                    <Input
+                                        type="email"
+                                        placeholder="practitioner@example.com"
+                                        className="pl-10"
+                                        {...field}
+                                    />
+                                </div>
                             </FormControl>
+                            <FormDescription>
+                                The practitioner will receive an email with instructions to join.
+                            </FormDescription>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
 
-                <Button type="submit" disabled={isLoading}>
-                    {isLoading ? "Submitting..." : "Send Invitation"}
+                <Button
+                    type="submit"
+                    disabled={isLoading}
+                >
+                    {isLoading ? (
+                        <>
+                            <span className="loading loading-spinner loading-sm mr-2"></span>
+                            Sending Invitation...
+                        </>
+                    ) : (
+                        "Send Invitation"
+                    )}
                 </Button>
             </form>
         </Form>
-    )
+    );
 }

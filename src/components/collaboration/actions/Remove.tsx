@@ -21,14 +21,21 @@ export default function Remove({ collaboratorId, refetch }: { collaboratorId: st
                     const response = await fetch(`/api/collaborators/${id}`, {
                         method: 'DELETE',
                     });
-                    if (!response.ok) throw new Error('Failed to remove collaborator');
-
-                    toast({
-                        title: 'Collaborator removed',
-                        description: 'The collaborator has been removed',
-                        variant: 'destructive',
-                    });
-                    refetch();
+                    const data = await response.json();
+                    if (data.success) {
+                        toast({
+                            title: 'Collaborator removed',
+                            description: 'The collaborator has been removed',
+                            variant: 'destructive',
+                        });
+                        refetch();
+                    } else {
+                        toast({
+                            title: 'Failed to remove collaborator',
+                            description: data.message,
+                            variant: 'destructive',
+                        });
+                    }
                 } catch (err) {
                     console.error('Error removing collaborator:', err);
                     toast({
