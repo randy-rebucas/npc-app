@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from 'lucide-react'
-import { Key, User, HelpCircle, CreditCardIcon, FileCheck, Settings, MessageCircle, Users } from "lucide-react"
+import { Key, User, HelpCircle, CreditCardIcon, FileCheck, Settings, MessageCircle, Users, Search, Heart, Shield } from "lucide-react"
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 
@@ -18,28 +18,7 @@ type NavItem = {
 export default function Nav() {
     const pathname = usePathname();
     const { data: session } = useSession();
-    const [items, setItems] = useState<NavItem[]>([
-        {
-            title: "Profile",
-            url: "/np/profile",
-            icon: User,
-        },
-        {
-            title: "Credentials",
-            url: "/np/credentials",
-            icon: Key,
-        },
-        {
-            title: "Settings",
-            url: "/np/settings",
-            icon: Settings,
-        },
-        {
-            title: "Help",
-            url: "/np/help",
-            icon: HelpCircle,
-        }
-    ]);
+    const [items, setItems] = useState<NavItem[]>([]);
 
     // Use useEffect to fetch user data and update items once when component mounts
     useEffect(() => {
@@ -48,7 +27,33 @@ export default function Nav() {
 
             const response = await fetch(`/api/user/${session.user.id}`);
             const user = await response.json();
-            if (user?.submissionStatus === "APPROVED") {
+            if (user?.role === "PHYSICIAN") {
+                setItems(currentItems => [
+                    ...currentItems,
+                    {
+                        title: "Profile",
+                        url: "/np/profile",
+                        icon: User,
+                    },
+                    {
+                        title: "Credentials",
+                        url: "/np/credentials",
+                        icon: Key,
+                    },
+                    {
+                        title: "Settings",
+                        url: "/np/settings",
+                        icon: Settings,
+                    },
+                    {
+                        title: "Help",
+                        url: "/np/help",
+                        icon: HelpCircle,
+                    }
+                ]);
+            }
+
+            if (user?.role === "PHYSICIAN" && user?.submissionStatus === "APPROVED") {
                 setItems(currentItems => [
                     ...currentItems,
                     {
@@ -71,7 +76,59 @@ export default function Nav() {
                         url: "/np/attestations",
                         icon: FileCheck,
                     },
-                    
+                ]);
+            }
+
+            if (user?.role === "NURSE_PRACTITIONER") {
+                setItems(currentItems => [
+                    ...currentItems,
+                    {
+                        title: "Find Match",
+                        url: "/np/find-match",
+                        icon: Search, 
+                    },
+                    {
+                        title: "Messages",
+                        url: "/np/messages",
+                        icon: MessageCircle,
+                    },
+                    {
+                        title: "Favorites",
+                        url: "/np/favorites",
+                        icon: Heart,
+                    },
+                    {
+                        title: "Settings",
+                        url: "/np/settings",
+                        icon: Settings,
+                    },
+                    {
+                        title: "Help",
+                        url: "/np/help",
+                        icon: HelpCircle,
+                    }
+                ]);
+            }
+
+            if (user?.role === "NURSE_PRACTITIONER" && user?.submissionStatus === "APPROVED") {
+                setItems(currentItems => [
+                    ...currentItems,
+                    {
+                        title: "Collaborators",
+                        url: "/np/collaborators",
+                        icon: Users,
+                    },
+                ]);
+            }
+
+            if (user?.role === "ADMIN") {
+                setItems(currentItems => [
+                    ...currentItems,
+                    {
+                        title: "Admin",
+                        url: "/admin",
+                        icon: Shield,
+                    },
                 ]);
             }
         };
