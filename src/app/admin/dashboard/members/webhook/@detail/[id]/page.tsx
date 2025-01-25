@@ -2,8 +2,8 @@ import { MemberstackAdminService } from "@/utils/memberstack-admin";
 import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import Migrate from "@/components/admin/member/actions/Migrate";
 
 // Assuming you have a type or interface for the member object
 interface Member {
@@ -90,7 +90,7 @@ export default async function DetailPage({
                 </CardContent>
                 <CardFooter>
                     <div className="flex justify-end space-x-2">
-                        <Button>Migrate</Button>
+                        <Migrate id={typedMember.id}/> 
                     </div>
                 </CardFooter>
             </Card>
