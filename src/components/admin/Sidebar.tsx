@@ -1,5 +1,3 @@
-import { GalleryVerticalEnd } from "lucide-react"
-
 import {
     Sidebar,
     SidebarContent,
@@ -8,15 +6,13 @@ import {
     SidebarGroupContent,
     SidebarGroupLabel,
     SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
-import AdminNavUser from "@/components/admin/NavUser"
+import AdminSidebarFooterUser from "@/components/admin/SidebarFooterUser"
 
-import { getConfigValue } from "@/app/actions/config"
 import MenuItems from "./MenuItems"
+import { AdminSidebarHeaderContent } from "./SidebarHeaderContent"
+
 export async function AdminSidebar() {
 
     // Menu items.
@@ -71,21 +67,7 @@ export async function AdminSidebar() {
     return (
         <Sidebar>
             <SidebarHeader>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
-                            <a href="#">
-                                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                                    <GalleryVerticalEnd className="size-4" />
-                                </div>
-                                <div className="flex flex-col gap-0.5 leading-none">
-                                    <span className="font-semibold">{await getConfigValue("siteName") || process.env.NEXT_PUBLIC_APP_NAME}</span>
-                                    <span className="">v{await getConfigValue("appVersion") || process.env.NEXT_PUBLIC_APP_VERSION}</span>
-                                </div>
-                            </a>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
+                <AdminSidebarHeaderContent />
             </SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
@@ -96,7 +78,7 @@ export async function AdminSidebar() {
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter>
-                <AdminNavUser />
+                <AdminSidebarFooterUser />
             </SidebarFooter>
         </Sidebar>
     )

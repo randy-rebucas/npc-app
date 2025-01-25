@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useApplicationSettings } from "@/providers/application-settings-provider";
 
 type ValidationConfig =
   | { type: "url"; message: string }
@@ -90,6 +91,7 @@ type SiteConfig = {
 
 export default function Application() {
   const [isLoading, setIsLoading] = useState(false);
+  const { settings } = useApplicationSettings();
   const { toast } = useToast();
 
   const form = useForm<SiteConfig>({
@@ -104,14 +106,12 @@ export default function Application() {
   });
 
   useEffect(() => {
-    fetch("/api/config").then(res => res.json()).then(data => {
-      form.setValue("siteName", data.siteName || "");
-      form.setValue("siteDescription", data.siteDescription || "");
-      form.setValue("siteUrl", data.siteUrl || "");
-      form.setValue("siteLogo", data.siteLogo || "");
-      form.setValue("siteFavicon", data.siteFavicon || "");
-    })
-  }, [form])
+    form.setValue("siteName", settings.siteName || "");
+    form.setValue("siteDescription", settings.siteDescription || "");
+    form.setValue("siteUrl", settings.siteUrl || "");
+    form.setValue("siteLogo", settings.siteLogo || "");
+    form.setValue("siteFavicon", settings.siteFavicon || "");
+  }, [form, settings]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);

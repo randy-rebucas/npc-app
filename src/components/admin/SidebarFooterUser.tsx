@@ -9,7 +9,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { getUserByEmail } from "@/app/actions/user";
 
-export default async function AdminNavUser() {
+export default async function AdminSidebarFooterUser() {
     // Get session
     const session = await getServerSession(authOptions);
     // Add user fetch using server action

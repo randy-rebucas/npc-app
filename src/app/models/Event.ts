@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 export enum EventType {
+  ALL = 'all',
   LOGGED_IN = 'logged-in',
   MEMBER_UPDATED = 'member-updated',
   MEMBER_CREATED = 'member-created',
