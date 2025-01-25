@@ -67,7 +67,6 @@ export default async function Page(props: {
                                 <TableRow key={member.id}>
                                     <TableCell>{member.auth.email}</TableCell>
                                     <TableCell>
-                                        {/* {member.verified ? <Badge variant="default">Yes</Badge> : <Badge variant="destructive">No</Badge>} */}
                                         <Badge variant={member.verified ? 'default' : 'destructive'}>
                                             {member.verified ? 'Validated' : 'Not Validated'}
                                         </Badge>

@@ -4,8 +4,9 @@ import LinkedInProvider, {
 } from "next-auth/providers/linkedin";
 import GoogleProvider from "next-auth/providers/google";
 import connect from "@/lib/db";
-import User from "@/app/models/User";
+import User, { UserOnBoardingStatus, UserRole } from "@/app/models/User";
 import { createEvent } from "@/app/actions/events";
+import { EventType } from "@/app/models/Event";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -26,7 +27,7 @@ export const authOptions: NextAuthOptions = {
           name: profile.name,
           email: profile.email,
           image: profile.picture,
-          role: "PHYSICIAN",
+          role: UserRole.PHYSICIAN,
         };
       },
     }),
@@ -53,7 +54,7 @@ export const authOptions: NextAuthOptions = {
           name: profile.name ?? profile.username,
           email: profile.email,
           image: profile.picture,
-          role: "PHYSICIAN",
+          role: UserRole.PHYSICIAN,
         };
       },
     },
@@ -72,14 +73,14 @@ export const authOptions: NextAuthOptions = {
           const newUser = await User.create({
             email: user.email,
             username: user.email?.split("@")[0],
-            role: "PHYSICIAN",
+            role: UserRole.PHYSICIAN,
             // For social login, we don't store password
             provider: account?.provider,
-            onBoardingStatus: "INCOMPLETE",
+            onBoardingStatus: UserOnBoardingStatus.INCOMPLETE,
           });
           
           user.id = newUser._id.toString();
-          user.role = "PHYSICIAN";
+          user.role = UserRole.PHYSICIAN;
         } else {
           user.id = existingUser._id.toString();
           user.role = existingUser.role;
@@ -93,7 +94,7 @@ export const authOptions: NextAuthOptions = {
       await createEvent({
         user: user.id,
         email: user.email!,
-        type: "logged-in",
+        type: EventType.LOGGED_IN, 
       });
       return true;
     },

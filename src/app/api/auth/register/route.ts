@@ -4,6 +4,7 @@ import User from "@/app/models/User";
 import UserProfile from "@/app/models/UserProfile";
 import bcrypt from "bcrypt";
 import { createEvent } from "@/app/actions/events";
+import { EventType } from "@/app/models/Event";
 
 export async function POST(req: Request) {
   const { username, email, password } = await req.json();
@@ -26,7 +27,7 @@ export async function POST(req: Request) {
     await createEvent({
       user: user._id,
       email: user.email!,
-      type: 'member-created'
+      type: EventType.MEMBER_CREATED 
     });
 
     return NextResponse.json({ message: "Account created successfully" });

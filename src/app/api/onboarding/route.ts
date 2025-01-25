@@ -1,5 +1,5 @@
 import UserProfile from "@/app/models/UserProfile";
-import User from "@/app/models/User";
+import User, { UserOnBoardingStatus } from "@/app/models/User";
 import connect from "@/lib/db";
 
 export const config = {
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     await userProfile.save();
     const user = await User.findOneAndUpdate(
       { _id: userId },
-      { $set: { onBoardingStatus: "COMPLETED" } }
+      { $set: { onBoardingStatus: UserOnBoardingStatus.COMPLETED } }
     );
 
     return Response.json({ user });

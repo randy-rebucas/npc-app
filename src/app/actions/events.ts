@@ -1,6 +1,6 @@
 "use server";
 
-import Event, { IEvent } from "../models/Event";
+import Event, { EventType, IEvent } from "../models/Event";
 import connect from "@/lib/db";
 
 export async function createEvent(event: Omit<IEvent, "createdAt">) {
@@ -27,7 +27,7 @@ export interface EventDocument {
   _id: string; // We'll cast this to string anyway
   user: string;
   email: string;
-  type: "logged-in" | "member-updated" | "member-created" | "member-deleted" | "member-synced";
+  type: EventType;
   createdAt: Date;
 }
 
@@ -36,12 +36,7 @@ interface GetEventsResponse {
     id: string;
     user: string;
     email: string;
-    type:
-      | "logged-in"
-      | "member-updated"
-      | "member-created"
-      | "member-deleted"
-      | "member-synced";
+    type: EventType;
     createdAt: Date;
   }[];
   total: number;

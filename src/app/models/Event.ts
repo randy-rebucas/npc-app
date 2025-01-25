@@ -1,9 +1,18 @@
 import mongoose from "mongoose";
 
+export enum EventType {
+  LOGGED_IN = 'logged-in',
+  MEMBER_UPDATED = 'member-updated',
+  MEMBER_CREATED = 'member-created',
+  MEMBER_DELETED = 'member-deleted',
+  MEMBER_SYNCED = 'member-synced',
+  USER_SYNCED = 'user-synced'
+}
+
 export interface IEvent {
   user: string;
   email: string;
-  type: 'logged-in' | 'member-updated' | 'member-created' | 'member-deleted' | 'member-synced';
+  type: EventType;
   createdAt: Date;
 }
 
@@ -13,7 +22,7 @@ const eventSchema = new mongoose.Schema<IEvent>({
   type: { 
     type: String, 
     required: true,
-    enum: ['logged-in', 'member-updated', 'member-created', 'member-deleted', 'member-synced']
+    enum: Object.values(EventType)
   },
   createdAt: { type: Date, default: Date.now }
 });

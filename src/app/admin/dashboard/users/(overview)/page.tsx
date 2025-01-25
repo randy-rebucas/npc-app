@@ -94,6 +94,7 @@ export default async function AdminUsers(props: {
                                 <TableHead>Stripe Account</TableHead>
                                 <TableHead>Onboarding</TableHead>
                                 <TableHead>Submission Status</TableHead>
+                                <TableHead>Synced</TableHead>
                                 <TableHead>Created At</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
@@ -125,6 +126,9 @@ export default async function AdminUsers(props: {
                                     </TableCell>
                                     <TableCell>
                                         {user.submissionStatus}
+                                    </TableCell>
+                                    <TableCell>
+                                        {user.metaData?.accountSynced ? 'Yes' : 'No'}
                                     </TableCell>
                                     <TableCell>
                                         {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}

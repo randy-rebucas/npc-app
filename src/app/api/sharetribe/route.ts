@@ -1,37 +1,31 @@
 import { sdk } from "@/config/sharetribe";
 import connect from "@/lib/db";
-import Member from "@/app/models/Member";
 import { generatePassword } from "@/lib/utils";
 import { createEvent } from "@/app/actions/events";
+import User from "@/app/models/User";
+import { EventType } from "@/app/models/Event";
+import { getUserById } from "@/app/actions/user";
 
 export async function POST(request: Request) {
   try {
     await connect();
     const { id } = await request.json();
 
-    const member = await Member.findById(id).exec();
+    const user = await getUserById(id);
 
-    if (!member) {
-      return Response.json({ error: "Member not found" }, { status: 404 });
+    if (!user) {
+      return Response.json({ error: "User not found" }, { status: 404 });
     }
-
-    const customFields = {
-      firstName: member.payload.customFields["first-name"] || "User",
-      lastName: member.payload.customFields["last-name"] || "Name",
-      displayName: member.payload.customFields["display-name"],
-    };
 
     /**
      * Create the payload for the user
      */
     const sharetribePayload = {
-      email: member.payload.auth.email,
+      email: user.email,
       password: generatePassword(),
-      firstName: customFields.firstName,
-      lastName: customFields.lastName,
-      displayName:
-        customFields.displayName ||
-        `${customFields.firstName} ${customFields.lastName}`,
+      firstName: user.profile.firstName,
+      lastName: user.profile.lastName,
+      displayName: `${user.profile.firstName} ${user.profile.lastName}` || user.username,
       protectedData: {},
       publicData: {},
     };
@@ -40,32 +34,35 @@ export async function POST(request: Request) {
      */
     const sharetribeUser = await sdk.currentUser.create(sharetribePayload);
 
+    if (!sharetribeUser) {
+      return Response.json(
+        { error: "Failed to create Sharetribe user" },
+        { status: 500 }
+      );
+    }
+
     /**
      * Update the member accountSynced to true
      */
-    if (sharetribeUser) {
-      await Member.findByIdAndUpdate(id, {
-        $set: {
+    await User.findByIdAndUpdate(id, {
+      $set: {
+        metaData: {
           accountSynced: true,
         },
-      });
+      },
+    });
 
-      // Create an event
-      await createEvent({
-        user: member._id,
-        email: member.payload.auth.email,
-        type: "member-synced",
-      });
+    // Create an event
+    await createEvent({
+      user: user._id,
+      email: user.email,
+      type: EventType.USER_SYNCED,
+    });
 
-      return Response.json(sharetribeUser);
-    }
+    return Response.json({ success: true, user: sharetribeUser });
 
-    return Response.json(
-      { error: "Failed to create Sharetribe user" },
-      { status: 500 }
-    );
   } catch (error) {
-    console.error("Error syncing member to Sharetribe:", error);
+    console.error("Error syncing user to Sharetribe:", error); 
     return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }

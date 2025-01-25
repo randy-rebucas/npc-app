@@ -11,7 +11,7 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     await connect();
-    console.log(session.user.id);
+
     const activeCollaborations = await ActiveCollaboration.find({
       physicianUser: session.user.id,
       status: "active",
@@ -22,6 +22,7 @@ export async function GET() {
     });
 
     return NextResponse.json(activeCollaborations);
+    
   } catch (error) {
     console.error("Error fetching user:", error);
     return NextResponse.json(

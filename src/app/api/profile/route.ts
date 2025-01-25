@@ -5,6 +5,7 @@ import { authOptions } from "../auth/[...nextauth]/options";
 import { getServerSession } from "next-auth";
 import User from "@/app/models/User";
 import { createEvent } from "@/app/actions/events";
+import { EventType } from "@/app/models/Event";
 
 export async function POST(request: Request) {
   try {
@@ -24,7 +25,7 @@ export async function POST(request: Request) {
     await createEvent({
         user: user._id,
         email: user.email!,
-        type: 'member-updated'
+        type: EventType.MEMBER_UPDATED
     });
     return NextResponse.json({ userProfile });
   } catch (error) {

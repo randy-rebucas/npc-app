@@ -1,9 +1,17 @@
 import { getUserById } from "@/app/actions/user";
 
 import { formatDistanceToNow } from "date-fns";
-import { ArrowLeftIcon, PencilIcon } from "lucide-react"; //DownloadIcon
+import { ArrowLeftIcon, DownloadIcon, PencilIcon } from "lucide-react"; //DownloadIcon
 import Link from "next/link";
+import Image from "next/image";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import Sync from "@/components/admin/user/actions/Sync";
 import { Button } from "@/components/ui/button";
 
 export default async function Page({
@@ -27,183 +35,232 @@ export default async function Page({
                         </CardTitle>
                     </div>
                     <div className="flex items-center justify-between gap-2">
-                        <Button variant="ghost" size="icon" asChild>
-                            <Link href={`/admin/dashboard/users/${id}/edit`}>
-                                <PencilIcon className="w-4 h-4" />
-                            </Link>
-                        </Button>
+
+                        <Sync id={id} /> 
+
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button variant="outline" size="icon" asChild>
+                                        <Link href={`/admin/dashboard/users/form/${id}/edit`}>
+                                            <PencilIcon className="w-6 h-6" />
+                                        </Link>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Edit User</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </div>
                 </CardHeader>
                 <CardContent>
                     {/* User Information */}
-                    <div>
-                        <h2 className="text-xl font-semibold">User Information</h2>
-                        <dl className="divide-y divide-gray-200">
-                            <div className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">ID</dt>
-                                <dd className="text-gray-900">{id}</dd>
+                    <div className="space-y-6 mb-4">
+                        <div className="flex items-center gap-4">
+                            <Card className="w-[100px] h-[100px] relative overflow-hidden">
+                                <Image
+                                    src={user.profile?.profilePhotoPath}
+                                    alt="Profile Photo"
+                                    fill
+                                    className="object-cover"
+                                />
+                            </Card>
+                            <div>
+                                <h2 className="text-xl font-semibold">{user.profile?.firstName} {user.profile?.lastName}</h2>
+                                <p className="text-sm text-gray-500">{user.email}</p>
+                                <p className="text-sm text-gray-500">{user.username}</p>
+                                <p className="text-sm text-gray-500">{user.role}</p>
                             </div>
-                            <div className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">Email</dt>
-                                <dd className="text-gray-900">{user.email}</dd>
-                            </div>
-                            <div className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">Username</dt>
-                                <dd className="text-gray-900">{user.username}</dd>
-                            </div>
-                            <div className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">Role</dt>
-                                <dd className="text-gray-900">{user.role}</dd>
-                            </div>
-                            <div className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">Provider</dt>
-                                <dd className="text-gray-900">{user.provider}</dd>
-                            </div>
-                            <div className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">Submission Status</dt>
-                                <dd className="text-gray-900">{user.submissionStatus}</dd>
-                            </div>
-                            <div className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">Onboarding Status</dt>
-                                <dd className="text-gray-900">{user.onBoardingStatus}</dd>
-                            </div>
-                            <div className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">Created At</dt>
-                                <dd className="text-gray-900">{formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}</dd>
-                            </div>
-                        </dl>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="text-sm font-medium text-gray-500">Status Information</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-2">
+                                    <div className="flex justify-between">
+                                        <span className="text-sm font-medium">Provider</span>
+                                        <span className="text-sm">{user.provider}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-sm font-medium">Submission Status</span>
+                                        <span className="text-sm">{user.submissionStatus}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-sm font-medium">Onboarding Status</span>
+                                        <span className="text-sm">{user.onBoardingStatus}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-sm font-medium">Created At</span>
+                                        <span className="text-sm">{formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}</span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
                     </div>
 
                     {user.metaData && (
-                        <div>
-                            <h2 className=" font-semibold text-xl">
-                                Metadata
-                            </h2>
-                            <dl className="divide-y divide-gray-200">
-                                {Object.entries(user.metaData).map(([key, value]) => (
-                                    <div key={key} className="py-2 flex justify-between">
-                                        <dt className="font-medium text-gray-500">{key.replace(/-/g, ' ')}</dt>
-                                        <dd className="text-gray-900">{value}</dd>
-                                    </div>
-                                ))}
-                            </dl>
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className=" font-semibold text-xl">
+                                            Metadata
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        {Object.entries(user.metaData).map(([key, value]) => (
+                                            <div key={key} className="py-2 flex justify-between">
+                                                <span className="font-medium text-gray-500">{key.replace(/-/g, ' ')}</span>
+                                                <span className="text-gray-900">{value}</span>
+                                            </div>
+                                        ))}
+                                    </CardContent>
+                                </Card>
+                            </div>
                         </div>
                     )}
 
                     {/* Profile Information */}
-                    <div>
-                        <h2 className="text-xl font-semibold">Profile Information</h2>
-                        <dl className="divide-y divide-gray-200">
-                            <div className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">First Name</dt>
-                                <dd className="text-gray-900">{user.profile?.firstName}</dd>
-                            </div>
-                            <div className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">Last Name</dt>
-                                <dd className="text-gray-900">{user.profile?.lastName}</dd>
-                            </div>
-                            <div className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">Phone</dt>
-                                <dd className="text-gray-900">{user.profile?.phone}</dd>
-                            </div>
-                            <div className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">Address</dt>
-                                <dd className="text-gray-900">{user.profile?.address}</dd>
-                            </div>
-                            <div className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">City</dt>
-                                <dd className="text-gray-900">{user.profile?.city}</dd>
-                            </div>
-                            <div className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">State</dt>
-                                <dd className="text-gray-900">{user.profile?.state}</dd>
-                            </div>
-                            <div className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">Zip</dt>
-                                <dd className="text-gray-900">{user.profile?.zip}</dd>
-                            </div>
-                            {user.profile?.medicalLicenseStates &&
-                                <div className="py-2 flex justify-between">
-                                    <dt className="font-medium text-gray-500">Medical License States</dt>
-                                    <dd className="text-gray-900">{user.profile?.medicalLicenseStates.map((state) => state.state).join(', ')}</dd>
-                                </div>
-                            }
 
-                            {user.profile?.deaLicenseStates &&
-                                <div className="py-2 flex justify-between">
-                                    <dt className="font-medium text-gray-500">DEA License States</dt>
-                                    <dd className="text-gray-900">{user.profile?.deaLicenseStates.map((state) => state.state).join(', ')}</dd>
+                    <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                        {/* Personal Information */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-sm font-medium text-gray-500">Personal Information</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-2">
+                                <div className="flex justify-between">
+                                    <span className="text-sm font-medium">First Name</span>
+                                    <span className="text-sm">{user.profile?.firstName}</span>
                                 </div>
-                            }
-
-                            {user.profile?.practiceTypes &&
-                                <div className="py-2 flex justify-between">
-                                    <dt className="font-medium text-gray-500">Practice Types</dt>
-                                    <dd className="text-gray-900">{user.profile?.practiceTypes.map((type) => type).join(', ')}</dd>
+                                <div className="flex justify-between">
+                                    <span className="text-sm font-medium">Last Name</span>
+                                    <span className="text-sm">{user.profile?.lastName}</span>
                                 </div>
-                            }
-
-                            {user.profile?.additionalCertifications &&
-                                <div className="py-2 flex justify-between">
-                                    <dt className="font-medium text-gray-500">Additional Certifications</dt>
-                                    <dd className="text-gray-900">{user.profile?.additionalCertifications.map((certification) => certification.certification).join(', ')}</dd>
+                                <div className="flex justify-between">
+                                    <span className="text-sm font-medium">Phone</span>
+                                    <span className="text-sm">{user.profile?.phone}</span>
                                 </div>
-                            }
-
-                            {user.profile?.education && Object.entries(user.profile?.education).map(([key, value]) => (
-                                <div key={key} className="py-2 flex justify-between">
-                                    <dt className="font-medium text-gray-500">{key.replace(/-/g, ' ').charAt(0).toUpperCase() + key.replace(/-/g, ' ').slice(1)}</dt>
-                                    <dd className="text-gray-900">
-                                        {value}
-                                    </dd>
+                                <div className="flex justify-between">
+                                    <span className="text-sm font-medium">Description</span>
+                                    <span className="text-sm">{user.profile?.description}</span>
                                 </div>
-                            ))}
+                                <div className="flex justify-between">
+                                    <span className="text-sm font-medium">LinkedIn</span>
+                                    <span className="text-sm">{user.profile?.linkedinProfile}</span>
+                                </div>
+                            </CardContent>
+                        </Card>
 
-                            <div className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">Board Certification</dt>
-                                <dd className="text-gray-900">{user.profile?.boardCertification}</dd>
-                            </div>
-                            <div className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">LinkedIn</dt>
-                                <dd className="text-gray-900">{user.profile?.linkedinProfile}</dd>
-                            </div>
-                            <div className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">Description</dt>
-                                <dd className="text-gray-900">{user.profile?.description}</dd>
-                            </div>
-                            <div className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">Profile Photo Path</dt>
-                                <dd className="text-gray-900">{user.profile?.profilePhotoPath}</dd>
-                            </div>
-                            <div className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">Government ID Path</dt>
-                                <dd className="text-gray-900 flex items-center gap-2">
-                                    {user.profile?.governmentIdPath}
-                                    {/* {user.profile?.governmentIdPath && (
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            asChild
-                                            className="h-8 w-8"
-                                        >
-                                            <Link
-                                                href={{ pathname: '/admin/dashboard/users/download-file/[path]', query: { path: user.profile?.governmentIdPath } }}
-                                                download
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                            >
-                                                <DownloadIcon className="h-4 w-4" />
-                                            </Link>
-                                        </Button>
-                                    )} */}
-                                </dd>
-                            </div>
-                            <div className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">NPI Number</dt>
-                                <dd className="text-gray-900">{user.profile?.npiNumber}</dd>
-                            </div>
-                        </dl>
+                        {/* Address Information */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-sm font-medium text-gray-500">Address Information</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-2">
+                                <div className="flex justify-between">
+                                    <span className="text-sm font-medium">Address</span>
+                                    <span className="text-sm">{user.profile?.address ?? '--'}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-sm font-medium">City</span>
+                                    <span className="text-sm">{user.profile?.city ?? '--'}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-sm font-medium">State</span>
+                                    <span className="text-sm">{user.profile?.state ?? '--'}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-sm font-medium">Zip</span>
+                                    <span className="text-sm">{user.profile?.zip ?? '--'}</span>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Professional Licenses */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-sm font-medium text-gray-500">Professional Licenses</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-2">
+                                {user.profile?.medicalLicenseStates && (
+                                    <div className="flex justify-between">
+                                        <span className="text-sm font-medium">Medical License States</span>
+                                        <span className="text-sm">{user.profile.medicalLicenseStates.map((state) => state.state).join(', ')}</span>
+                                    </div>
+                                )}
+                                {user.profile?.deaLicenseStates && (
+                                    <div className="flex justify-between">
+                                        <span className="text-sm font-medium">DEA License States</span>
+                                        <span className="text-sm">{user.profile.deaLicenseStates.map((state) => state.state).join(', ')}</span>
+                                    </div>
+                                )}
+                                <div className="flex justify-between">
+                                    <span className="text-sm font-medium">NPI Number</span>
+                                    <span className="text-sm">{user.profile?.npiNumber}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-sm font-medium">Board Certification</span>
+                                    <span className="text-sm">{user.profile?.boardCertification}</span>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Professional Details */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-sm font-medium text-gray-500">Professional Details</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-2">
+                                {user.profile?.practiceTypes && (
+                                    <div className="flex justify-between">
+                                        <span className="text-sm font-medium">Practice Types</span>
+                                        <span className="text-sm">{user.profile.practiceTypes.map((type) => type).join(', ')}</span>
+                                    </div>
+                                )}
+                                {user.profile?.additionalCertifications && (
+                                    <div className="flex justify-between">
+                                        <span className="text-sm font-medium">Additional Certifications</span>
+                                        <span className="text-sm">{user.profile.additionalCertifications.map((cert) => cert.certification).join(', ')}</span>
+                                    </div>
+                                )}
+                                <div className="flex justify-between">
+                                    <span className="text-sm font-medium">Government ID</span>
+                                    <Link
+                                        href={{ pathname: '/admin/dashboard/users/download-file/' + user.profile?.governmentIdPath, query: { path: user.profile?.governmentIdPath } }}
+                                        download
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-2 text-sm"
+                                    >
+                                        Download
+                                        <DownloadIcon className="h-4 w-4" />
+                                    </Link>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Education */}
+                        {user.profile?.education && (
+                            <Card className="md:col-span-2">
+                                <CardHeader>
+                                    <CardTitle className="text-sm font-medium text-gray-500">Education</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-2">
+                                    {Object.entries(user.profile.education).map(([key, value]) => (
+                                        <div key={key} className="flex justify-between">
+                                            <span className="text-sm font-medium">{key.replace(/-/g, ' ').charAt(0).toUpperCase() + key.replace(/-/g, ' ').slice(1)}</span>
+                                            <span className="text-sm">{value}</span>
+                                        </div>
+                                    ))}
+                                </CardContent>
+                            </Card>
+                        )}
                     </div>
+
                 </CardContent>
             </Card>
         </div>

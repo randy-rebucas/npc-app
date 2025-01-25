@@ -1,3 +1,3 @@
-export default function LicenseStateModal() {
+export default function UserEditModal() {
     return null
 }

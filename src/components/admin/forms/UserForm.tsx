@@ -14,8 +14,6 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { ArrowLeftIcon } from "lucide-react"
-import Link from "next/link"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
@@ -122,158 +120,151 @@ export default function UserForm({ id }: { id: string | null }) {
     }, [id, form]);
 
     return (
-        <div className="space-y-6">
-            <h2 className="flex items-center gap-2 text-2xl font-bold">
-                <Link href={`/admin/dashboard/users`} className="flex justify-start items-center py-2">
-                    <ArrowLeftIcon className="w-4 h-4" />
-                </Link>
-                Edit User {id}
-            </h2>
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                    <FormField
-                        control={form.control}
-                        name="username"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Username</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="username" {...field} />
-                                </FormControl>
-                                <FormDescription>
-                                    This is the username of the user and its only editable if you are the owner of the account.
-                                </FormDescription>
-                                <FormMessage> {form.formState.errors.username?.message} </FormMessage>
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Email</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="email" {...field} {...(id ? { readOnly: true } : {})} />
-                                </FormControl>
-                                <FormDescription>
-                                    This is the email of the user and its only editable if you are the owner of the account.
-                                </FormDescription>
-                                <FormMessage> {form.formState.errors.email?.message} </FormMessage>
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="role"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Role</FormLabel>
-                                <FormControl>
-                                    <Select onValueChange={field.onChange} value={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select a role" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="PHYSICIAN">Physician</SelectItem>
-                                            <SelectItem value="ADMIN">Admin</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </FormControl>
-                                <FormMessage> {form.formState.errors.role?.message} </FormMessage>
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="submissionStatus"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Submission Status</FormLabel>
+
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <FormField
+                    control={form.control}
+                    name="username"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Username</FormLabel>
+                            <FormControl>
+                                <Input placeholder="username" {...field} />
+                            </FormControl>
+                            <FormDescription>
+                                This is the username of the user and its only editable if you are the owner of the account.
+                            </FormDescription>
+                            <FormMessage> {form.formState.errors.username?.message} </FormMessage>
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                                <Input placeholder="email" {...field} {...(id ? { readOnly: true } : {})} />
+                            </FormControl>
+                            <FormDescription>
+                                This is the email of the user and its only editable if you are the owner of the account.
+                            </FormDescription>
+                            <FormMessage> {form.formState.errors.email?.message} </FormMessage>
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="role"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Role</FormLabel>
+                            <FormControl>
                                 <Select onValueChange={field.onChange} value={field.value}>
                                     <FormControl>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select a status" />
+                                            <SelectValue placeholder="Select a role" />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        {Object.values(submissionStatus).map((status) => (
-                                            <SelectItem key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</SelectItem>
-                                        ))}
+                                        <SelectItem value="PHYSICIAN">Physician</SelectItem>
+                                        <SelectItem value="ADMIN">Admin</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <FormMessage> {form.formState.errors.submissionStatus?.message} </FormMessage>
-                            </FormItem>
-                        )}
-                    />
-                    {/* MetaData Section */}
-                    <div className="space-y-4">
-                        <div className="flex justify-between items-center">
-                            <h3 className="text-lg font-semibold">Metadata</h3>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={addMetaDataField}
-                            >
-                                Add Field
-                            </Button>
-                        </div>
-
-                        <div className="grid gap-4 p-4 border rounded-lg bg-muted/50">
-                            {form.watch("metaData").map((_, index) => (
-                                <div key={index} className="grid grid-cols-[1fr,1fr,auto] gap-4 items-end">
-                                    <FormField
-                                        control={form.control}
-                                        name={`metaData.${index}.key`}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className="text-sm">Key</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="Enter key" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name={`metaData.${index}.value`}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className="text-sm">Value</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="Enter value" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => removeMetaDataField(index)}
-                                        className="h-10 w-10"
-                                    >
-                                        <span className="sr-only">Remove field</span>
-                                        ✕
-                                    </Button>
-                                </div>
-                            ))}
-
-                            {form.watch("metaData").length === 0 && (
-                                <div className="text-center py-4 text-muted-foreground">
-                                    No metadata fields added
-                                </div>
-                            )}
-                        </div>
+                            </FormControl>
+                            <FormMessage> {form.formState.errors.role?.message} </FormMessage>
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="submissionStatus"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Submission Status</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a status" />
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {Object.values(submissionStatus).map((status) => (
+                                        <SelectItem key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage> {form.formState.errors.submissionStatus?.message} </FormMessage>
+                        </FormItem>
+                    )}
+                />
+                {/* MetaData Section */}
+                <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                        <h3 className="text-lg font-semibold">Metadata</h3>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={addMetaDataField}
+                        >
+                            Add Field
+                        </Button>
                     </div>
-                    <Button type="submit" disabled={isLoading}>{isLoading ? "Updating..." : "Update User"}</Button>
-                </form>
-            </Form>
-        </div>
+
+                    <div className="grid gap-4 p-4 border rounded-lg bg-muted/50">
+                        {form.watch("metaData").map((_, index) => (
+                            <div key={index} className="grid grid-cols-[1fr,1fr,auto] gap-4 items-end">
+                                <FormField
+                                    control={form.control}
+                                    name={`metaData.${index}.key`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-sm">Key</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Enter key" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name={`metaData.${index}.value`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-sm">Value</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Enter value" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => removeMetaDataField(index)}
+                                    className="h-10 w-10"
+                                >
+                                    <span className="sr-only">Remove field</span>
+                                    ✕
+                                </Button>
+                            </div>
+                        ))}
+
+                        {form.watch("metaData").length === 0 && (
+                            <div className="text-center py-4 text-muted-foreground">
+                                No metadata fields added
+                            </div>
+                        )}
+                    </div>
+                </div>
+                <Button type="submit" disabled={isLoading}>{isLoading ? "Updating..." : "Update User"}</Button>
+            </form>
+        </Form>
     );
 }

@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 
-export default function UserLayout({ children, detail }: { children: React.ReactNode, detail: React.ReactNode }) {
+export default function UserLayout({ children, detail, modal }: { children: React.ReactNode, detail: React.ReactNode, modal: React.ReactNode }) {
     const { id } = useParams<{ id: string }>()
 
     if (id) {
@@ -17,6 +17,7 @@ export default function UserLayout({ children, detail }: { children: React.React
                 <div className="w-1/3 px-2 border-l">
                     {detail}
                 </div>
+                {modal}
             </div>
         );
     } else {
