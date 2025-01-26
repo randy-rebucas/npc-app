@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Certification, Education, License } from "@/lib/types/onboarding";
+import { toast } from "@/hooks/use-toast";
 
 interface Profile {
     firstName?: string;
@@ -39,8 +40,26 @@ interface Result {
 
 export default function Results({ results }: { results: Result[] }) {
 
-    const addToFavorites = (id: string) => {
-        console.log(id);
+    const addToFavorites = async (id: string) => {
+        const favorite = await fetch('/api/favorites', {
+            method: 'POST',
+            body: JSON.stringify({ id }),
+        });
+
+        const data = await favorite.json();
+        if (data.success) {
+            toast({
+                title: 'Favorite added',
+                description: 'The favorite has been added',
+                variant: 'default',
+            });
+        } else {
+            toast({
+                title: 'Failed to add favorite',
+                description: data.message,
+                variant: 'destructive',
+            });
+        }
     }
 
     if (results.length === 0) {

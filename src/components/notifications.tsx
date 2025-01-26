@@ -49,7 +49,7 @@ export function Notifications() {
               <div
                 key={notification._id}
                 onClick={() => markAsRead(notification._id)}
-                className={`py-3 border-b border-gray-200 dark:border-gray-700 last:border-0 ${!notification.read ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                className={`py-3 px-4 border-b border-gray-200 dark:border-gray-700 last:border-0 ${!notification.read ? 'bg-blue-50 dark:bg-blue-900/20' : ''
                   }`}
               >
                 <div className="flex justify-between items-start">

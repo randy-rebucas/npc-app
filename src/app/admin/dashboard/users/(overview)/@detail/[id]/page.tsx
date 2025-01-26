@@ -102,7 +102,7 @@ export default async function Page({
                     </div>
 
                     {user.metaData && (
-                        <div className="space-y-6">
+                        <div className="space-y-6 mb-4">
                             <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                                 <Card>
                                     <CardHeader>

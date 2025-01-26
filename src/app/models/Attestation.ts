@@ -1,13 +1,18 @@
 import mongoose, { Schema, Types } from "mongoose";
 import { IUser } from "./User";
 
+export enum AttestationStatus {
+  PENDING = 'pending',
+  VERIFIED = 'verified',
+  REJECTED = 'rejected',
+}
+
 export interface IAttestation {
-  _id: string; // Add this line
   schema: string;
   recipient: Types.ObjectId | IUser; 
   attester: Types.ObjectId | IUser; 
-  timestamp: string;
-  status: 'pending' | 'verified' | 'rejected';
+  timestamp: Date;
+  status: AttestationStatus;
   createdAt: Date;
 }
 
@@ -15,10 +20,18 @@ const attestationSchema = new Schema<IAttestation>({
   schema: { type: String, required: true },
   recipient: { type: Schema.Types.ObjectId, ref: "User", required: true },
   attester: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  timestamp: { type: String, required: true },
-  status: { type: String, enum: ['pending', 'verified', 'rejected'], required: true },
+  timestamp: { type: Date, required: true },
+  status: { type: String, enum: AttestationStatus, required: true },
   createdAt: { type: Date, default: Date.now },
+}, {
+  timestamps: true,
+  collection: 'attestations'
 });
+
+attestationSchema.index({ recipient: 1 });
+attestationSchema.index({ attester: 1 });
+attestationSchema.index({ status: 1 });
+attestationSchema.index({ createdAt: 1 });
 
 const Attestation =
   mongoose.models.Attestation ??

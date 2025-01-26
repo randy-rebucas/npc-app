@@ -11,7 +11,7 @@ export interface ITransaction {
   status: string;
 }
 
-const transactionSchema = new Schema<ITransaction>({
+export const transactionSchema = new Schema<ITransaction>({
   user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   amount: {
     type: Number,

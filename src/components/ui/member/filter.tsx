@@ -17,10 +17,8 @@ export default function Filter({ target, options, placeholder, defaultValue }: {
     const { replace } = useRouter();
 
     const filter = searchParams.get(target) || defaultValue;
-
     const onChange = (value: string) => {
         const params = new URLSearchParams(searchParams);
-        params.set('page', '1');
         params.set(target, value);
         replace(`${pathname}?${params.toString()}`);
     }

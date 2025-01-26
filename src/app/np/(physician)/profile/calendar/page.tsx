@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import Script from "next/script";
 import { useSession } from "next-auth/react";
+import { getUserById } from "@/app/actions/user";
+import { cn } from "@/lib/utils";
+import { BadgeInfo } from "lucide-react";
 
 interface CalendarEvent {
     id: string;
@@ -38,6 +41,7 @@ declare global {
 export default function Calendar() {
     const { data: session } = useSession();
     const [isConnected, setIsConnected] = useState(false);
+    const [isApproved, setIsApproved] = useState(false);
     const [events, setEvents] = useState<CalendarEvent[]>([]);
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(true);
@@ -57,10 +61,10 @@ export default function Calendar() {
     }, [CLIENT_ID]);
 
     useEffect(() => {
-        const fetchAccessToken = async () => {
+        const fetchAccessToken = async (userId: string) => {
             try {
                 setIsLoading(true);
-                const response = await fetch(`/api/calendar/${session?.user?.id}`);
+                const response = await fetch(`/api/calendar/${userId}`);
                 const accessTokenData = await response.json();
 
                 if (accessTokenData.access_token) {
@@ -74,8 +78,22 @@ export default function Calendar() {
                 setIsLoading(false);
             }
         };
-        fetchAccessToken();
-    }, [session?.user?.id, isScriptLoaded]);
+        if (session) {
+            fetchAccessToken(session.user.id);
+        }
+    }, [session, isScriptLoaded]);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            const user = await getUserById(session?.user?.id);
+            if (user.submissionStatus === 'APPROVED') {
+                setIsApproved(true);
+            }
+        };
+        if (session) {
+            fetchUser();
+        }
+    }, [session]);
 
     const fetchCalendarEvents = async (token: string) => {
         try {
@@ -193,6 +211,18 @@ export default function Calendar() {
                 onLoad={handleScriptLoad}
             />
             <div className="rounded-lg">
+                {!isApproved && <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-green-900 mb-8">
+                    <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2">
+                            <BadgeInfo className="h-4 w-4" />
+                            <h3 className="font-medium">Information</h3>
+                        </div>
+                    </div>
+                    <div className="mt-2 text-sm">
+                        You must be approved to connect your Google Calendar.
+                    </div>
+                </div>}
+
                 <div className="mb-6">
                     <h2 className="text-xl font-semibold text-gray-900">Calendar</h2>
                     <p className="text-sm text-gray-600 mt-1">
@@ -214,7 +244,13 @@ export default function Calendar() {
                         ) : !isConnected ? (
                             <button
                                 onClick={handleGoogleSignIn}
-                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                className={cn(
+                                    "px-4 py-2 rounded ",
+                                    isApproved
+                                        ? " text-white hover:bg-blue-700 transition-colors bg-blue-600"
+                                        : " bg-gray-300"
+                                )}
+                                disabled={!isApproved}
                             >
                                 Connect Google Calendar
                             </button>
@@ -225,6 +261,7 @@ export default function Calendar() {
                                     <button
                                         onClick={handleDisconnect}
                                         className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                                        disabled={!isConnected}
                                     >
                                         Disconnect
                                     </button>

@@ -7,6 +7,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/options";
 import { selectedItem } from "@/lib/utils";
 import { Certification, License } from "@/lib/types/onboarding";
+import { handleAsync, handleError } from '@/lib/errorHandler';
+import { DatabaseError, NotFoundError, ValidationError } from '@/lib/errors';
 
 interface GetUsersParams {
   page: number;
@@ -19,7 +21,7 @@ interface licenseState {
   state: string;
 }
 
-interface UserQuery {
+export interface UserQuery {
   $or?: {
     username?: { $regex: string; $options: string } | string;
     email?: { $regex: string; $options: string } | string;
@@ -97,13 +99,14 @@ interface GetUsersResponse {
 }
 
 export async function getUserByEmail(email: string) {
-  try {
-    await connect();
-    const user = await User.aggregate([
+  if (!email) {
+    throw new ValidationError('Email is required');
+  }
+
+  const [user, error] = await handleAsync(
+    User.aggregate([
       {
-        $match: {
-          email: email,
-        },
+        $match: { email },
       },
       {
         $lookup: {
@@ -115,25 +118,22 @@ export async function getUserByEmail(email: string) {
       },
       {
         $addFields: {
-          profile: {
-            $first: "$profile",
-          },
+          profile: { $first: "$profile" },
         },
       },
-      {
-        $limit: 1,
-      },
-    ]);
+      { $limit: 1 },
+    ])
+  );
 
-    if (!user) {
-      return null;
-    }
-
-    return user[0];
-  } catch (error) {
-    console.error("Error fetching user:", error);
-    throw new Error("Failed to fetch user");
+  if (error) {
+    throw new DatabaseError(`Failed to fetch user: ${error.message}`);
   }
+
+  if (!user || user.length === 0) {
+    throw new NotFoundError(`User with email ${email} not found`);
+  }
+
+  return user[0];
 }
 
 export async function getUserById(id: string): Promise<UserDocument> {
@@ -280,28 +280,28 @@ export async function getUsers({
 }: GetUsersParams): Promise<GetUsersResponse> {
   try {
     await connect();
-    // Build query conditions
-    const query: UserQuery = {};
+    
+    if (page < 1 || limit < 1) {
+      throw new ValidationError('Invalid pagination parameters');
+    }
 
+    const query: UserQuery = {};
     if (search) {
       query.$or = [
         { username: { $regex: search, $options: "i" } },
         { email: { $regex: search, $options: "i" } },
       ];
     }
-
+    console.log(role);
     if (role !== "all") {
       query.role = role;
     }
 
-    // Execute query with pagination
     const skip = (page - 1) * limit;
 
-    const [aggregatedUsers, total] = await Promise.all([
+    const [result, error] = await handleAsync(Promise.all([
       User.aggregate([
-        {
-          $match: query,
-        },
+        { $match: query },
         {
           $lookup: {
             from: "userprofiles",
@@ -310,24 +310,22 @@ export async function getUsers({
             as: "profile",
           },
         },
-        {
-          $unwind: "$profile",
-        },
-        {
-          $skip: skip,
-        },
-        {
-          $limit: limit,
-        },
-        {
-          $sort: { createdAt: -1 },
-        },
+        { $unwind: "$profile" },
+        { $skip: skip },
+        { $limit: limit },
+        { $sort: { createdAt: -1 } },
       ]),
       User.countDocuments(query),
-    ]);
+    ]));
+
+    if (error) {
+      throw new DatabaseError(`Failed to fetch users: ${error.message}`);
+    }
+
+    const [aggregatedUsers, total] = result || [];
 
     return {
-      users: (aggregatedUsers as unknown as UserDocument[]).map((user) => ({
+      users: (aggregatedUsers as UserDocument[]).map((user: UserDocument) => ({
         id: user._id.toString(),
         username: user.username,
         email: user.email,
@@ -339,11 +337,10 @@ export async function getUsers({
         metaData: user.metaData,
         profile: user.profile,
       })),
-      total,
+      total: total || 0,
     };
   } catch (error) {
-    console.error("Error fetching users:", error);
-    throw new Error("Failed to fetch users");
+    throw handleError(error);
   }
 }
 
@@ -368,11 +365,12 @@ export async function getNpUsers({
     const session = await getServerSession(authOptions);
 
     await connect();
+
     const query: UserQuery = {
       role:
         session?.user?.role === "NURSE_PRACTITIONER"
-          ? "NURSE_PRACTITIONER"
-          : "PHYSICIAN", // Ensure we only get NP users
+          ? "PHYSICIAN"
+          : "NURSE_PRACTITIONER", // Ensure we only get NP users
     };
 
     if (search) {
@@ -459,7 +457,7 @@ export async function getNpUsers({
     ]);
 
     return {
-      users: (aggregatedUsers as unknown as UserDocument[]).map((user) => ({
+      users: (aggregatedUsers as UserDocument[]).map((user) => ({
         id: user._id.toString(),
         username: user.username,
         email: user.email,
