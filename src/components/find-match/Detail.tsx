@@ -8,16 +8,46 @@ import { useEffect, useState } from 'react';
 
 export default function FindMatchDetail({ id }: { id: string }) {
     const [user, setUser] = useState<UserDocument | null>(null);
-    // In a real app, you would fetch this data based on the id
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
     useEffect(() => {
         const getUser = async () => {
-            const user = await getUserById(id);
-            setUser(user);
+            try {
+                setIsLoading(true);
+                setError(null);
+                const user = await getUserById(id);
+                setUser(user);
+            } catch (err) {
+                setError('Failed to load user details');
+                console.error(err);
+            } finally {
+                setIsLoading(false);
+            }
         };
         getUser();
     }, [id]);
 
-    console.log(user);
+    if (isLoading) {
+        return (
+            <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p>Loading user details...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
+                <div className="text-center text-red-600">
+                    <p>{error}</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="h-[calc(100vh-4rem)] max-w-7xl mx-auto overflow-auto p-6">
@@ -131,7 +161,9 @@ export default function FindMatchDetail({ id }: { id: string }) {
                     <div className="bg-white rounded-lg p-6 shadow-sm border">
                         <h2 className="text-2xl font-bold text-gray-900 mb-2">{user?.profile?.title}</h2>
                         <p className="text-2xl font-bold text-blue-600 mb-4">
-                            ${user?.profile?.monthlyCollaborationRate?.toFixed(2)}<span className="text-sm text-gray-500 font-normal">/month</span>
+                            {user?.profile?.monthlyCollaborationRate 
+                                ? `$${user.profile.monthlyCollaborationRate.toFixed(2)}`
+                                : 'Price not available'}<span className="text-sm text-gray-500 font-normal">/month</span>
                         </p>
                         <div className="space-y-3">
                             <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors">
@@ -149,7 +181,9 @@ export default function FindMatchDetail({ id }: { id: string }) {
                         <div className="space-y-4">
                             <div className="flex justify-between text-gray-600">
                                 <span>Base Rate</span>
-                                <span>${user?.profile?.monthlyCollaborationRate?.toFixed(2)}</span>
+                                <span>{user?.profile?.monthlyCollaborationRate 
+                                    ? `$${user.profile.monthlyCollaborationRate.toFixed(2)}`
+                                    : 'N/A'}</span>
                             </div>
                             <div className="flex justify-between text-gray-600">
                                 <span>Platform Fee</span>
@@ -158,7 +192,9 @@ export default function FindMatchDetail({ id }: { id: string }) {
                             <div className="h-px bg-gray-200 my-2"></div>
                             <div className="flex justify-between font-bold text-gray-900">
                                 <span>Total Monthly Fee</span>
-                                <span>${user?.profile?.monthlyCollaborationRate?.toFixed(2)}</span>
+                                <span>{user?.profile?.monthlyCollaborationRate 
+                                    ? `$${user.profile.monthlyCollaborationRate.toFixed(2)}`
+                                    : 'N/A'}</span>
                             </div>
                         </div>
                         <p className="text-sm text-gray-500 mt-4">

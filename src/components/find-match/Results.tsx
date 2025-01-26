@@ -34,10 +34,9 @@ interface Profile {
     updatedAt?: Date;
 }
 
-interface Result {
+export interface Result {
     id: string;
     profile?: Profile;
-    isFavorite?: boolean;
 }
 
 export default function Results({ results }: { results: Result[] }) {
@@ -46,6 +45,8 @@ export default function Results({ results }: { results: Result[] }) {
     useEffect(() => {
         setFavorites(results);
     }, [results]);
+
+    console.log(favorites);
 
     if (results.length === 0) {
         return (
