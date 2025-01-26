@@ -8,6 +8,7 @@ export enum AttestationStatus {
 }
 
 export interface IAttestation {
+  _id: string;
   schema: string;
   recipient: Types.ObjectId | IUser; 
   attester: Types.ObjectId | IUser; 

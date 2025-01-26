@@ -8,7 +8,7 @@ import { getUserByEmail } from "@/app/actions/user";
 import { UserSubmissionStatus } from "@/app/models/User";
 import Header from "@/components/header";
 
-export default async function DashboardLayout({ children, stats, collaboratorRequests, activeCollaborator, modal }: { children: React.ReactNode, intro: React.ReactNode, stats: React.ReactNode, collaboratorRequests: React.ReactNode, activeCollaborator: React.ReactNode, modal: React.ReactNode; }) {
+export default async function DashboardLayout({ children, stats, collaboratorRequests, activeCollaborator, modal }: { children: React.ReactNode, stats: React.ReactNode, collaboratorRequests: React.ReactNode, activeCollaborator: React.ReactNode, modal: React.ReactNode; }) {
     const session = await getServerSession(authOptions);
 
     if (!session) {

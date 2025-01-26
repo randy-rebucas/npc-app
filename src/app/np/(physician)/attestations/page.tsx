@@ -107,7 +107,7 @@ export default function AttestationsPage() {
                                                 {attestation.attester}
                                             </td> */}
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {attestation.timestamp}
+                                                {attestation.timestamp.toLocaleString()}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span
