@@ -18,27 +18,45 @@ export async function POST(req: NextRequest) {
 
     const { id } = await req.json();
 
-    const favorite = new Favorite({
+    // Check if favorite already exists
+    const existingFavorite = await Favorite.findOne({
       npUser: session?.user?.id,
       physicianUser: id,
     });
-    const savedFavorite = await favorite.save();
 
-    if (!savedFavorite) {
-      return NextResponse.json(
-        { success: false, message: "Failed to save favorite" },
-        { status: 500 }
-      );
+    console.log(existingFavorite);
+    if (existingFavorite) {
+      // if (isFavorite) {
+      await Favorite.deleteOne({ _id: existingFavorite._id });
+
+      return NextResponse.json({
+        success: true,
+        message: "Favorite removed successfully",
+      });
+      // }
+    } else {
+      const favorite = new Favorite({
+        npUser: session?.user?.id,
+        physicianUser: id,
+      });
+      const savedFavorite = await favorite.save();
+
+      if (!savedFavorite) {
+        return NextResponse.json(
+          { success: false, message: "Failed to save favorite" },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: "Favorite added successfully",
+      });
     }
-
-    return NextResponse.json({
-      success: true,
-      message: "Favorite submitted successfully",
-    });
   } catch (error) {
     console.error("Error in favorite:", error);
     return NextResponse.json(
-      { error: "Failed to submit favorite" },
+      { success: false, message: "Failed to add favorite" },
       { status: 500 }
     );
   }

@@ -3,7 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Certification, Education, License } from "@/lib/types/onboarding";
-import { toast } from "@/hooks/use-toast";
+import Add from "@/components/favorite/actions/Add";
+import { useEffect, useState } from "react";
 
 interface Profile {
     firstName?: string;
@@ -36,31 +37,15 @@ interface Profile {
 interface Result {
     id: string;
     profile?: Profile;
+    isFavorite?: boolean;
 }
 
 export default function Results({ results }: { results: Result[] }) {
+    const [favorites, setFavorites] = useState<Result[]>([]);
 
-    const addToFavorites = async (id: string) => {
-        const favorite = await fetch('/api/favorites', {
-            method: 'POST',
-            body: JSON.stringify({ id }),
-        });
-
-        const data = await favorite.json();
-        if (data.success) {
-            toast({
-                title: 'Favorite added',
-                description: 'The favorite has been added',
-                variant: 'default',
-            });
-        } else {
-            toast({
-                title: 'Failed to add favorite',
-                description: data.message,
-                variant: 'destructive',
-            });
-        }
-    }
+    useEffect(() => {
+        setFavorites(results);
+    }, [results]);
 
     if (results.length === 0) {
         return (
@@ -77,7 +62,7 @@ export default function Results({ results }: { results: Result[] }) {
     return (
         <div className="grid grid-cols-1 gap-6 mb-6">
             {/* Result Cards */}
-            {results.map((result) => (
+            {favorites.map((result) => (
                 <div key={result.id} className="flex gap-4 border rounded-lg p-4 hover:shadow-lg transition-shadow">
                     <div className="w-40 h-40">
                         <Image src={result.profile?.profilePhotoPath || ''} alt={result.profile?.firstName || ''} sizes="100vw"
@@ -95,11 +80,7 @@ export default function Results({ results }: { results: Result[] }) {
                                     {result.profile?.firstName} {result.profile?.lastName}
                                 </Link>
                             </h2>
-                            <button className="p-2 z-10" onClick={() => addToFavorites(result.id)}>
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                </svg>
-                            </button>
+                            <Add itemId={result.id} />
                         </div>
                         <div className="text-lg font-medium mb-2">Total Price: ${result.profile?.monthlyCollaborationRate}</div>
                         <div className="text-gray-600 mb-1">{result.profile?.practiceTypes.join(', ')}</div>

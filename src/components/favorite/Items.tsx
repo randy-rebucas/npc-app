@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Message from "./actions/Message";
-import Remove from "./actions/Remove";
 
 interface IFavorite {
     id: string;
@@ -10,7 +9,7 @@ interface IFavorite {
     physicianUser: {
         email: string;
         profile: {
-            profilePhotoPath: string; 
+            profilePhotoPath: string;
             firstName: string;
             lastName: string;
             title: string;
@@ -24,9 +23,21 @@ interface IFavorite {
     };
 }
 
-export default function Items({ items }: { items: IFavorite[] }) { 
+export default function Items({ items }: { items: IFavorite[] }) {
+    if (items.length === 0) {
+        return (
+            <div className="text-center py-12">
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No Favorites Yet</h3>
+                <p className="text-gray-500">
+                    When you find physicians you&apos;re interested in, save them here for easy access.
+                </p>
+            </div>
+        );
+    }
+
     return (
-        <>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
             {items.map((item) => (
                 <div
                     key={item.id}
@@ -62,14 +73,13 @@ export default function Items({ items }: { items: IFavorite[] }) {
                                 </div>
 
                                 <div className="flex gap-2 mt-4">
-                                    <Message itemId={item.id}/> 
-                                    <Remove itemId={item.id}/>
+                                    <Message itemId={item.id} />
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             ))}
-        </>
+        </div>
     );
 }
