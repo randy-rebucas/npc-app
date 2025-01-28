@@ -1,24 +1,26 @@
-"use client"
+'use client'
 
-import { toast } from "@/hooks/use-toast";
-import { useCallback, useEffect, useState } from "react";
+import { toast } from '@/hooks/use-toast';
+import { useCallback, useState } from 'react';
+import { useEffect } from 'react';
 
-export default function Add({ itemId }: { itemId: string }) {
+export default function Favorite({ id }: { id: string }) {
     const [isFavorite, setIsFavorite] = useState(false);
-
     const fetchFavorite = useCallback(async () => {
         try {
-            const favorite = await fetch(`/api/favorites/${itemId}/check`);
+            const favorite = await fetch(`/api/favorites/${id}/check`);
             const data = await favorite.json();
             setIsFavorite(data.isFavorite);
         } catch (error) {
             console.error("Error in favorite:", error);
         }
-    }, [itemId]);
+    }, [id]);
 
     useEffect(() => {
         fetchFavorite();
     }, [fetchFavorite]);
+
+
 
     const toggleFavorites = async (id: string) => {
         const favorite = await fetch('/api/favorites', {
@@ -42,17 +44,8 @@ export default function Add({ itemId }: { itemId: string }) {
     }
 
     return (
-        <button className="p-2 z-10" onClick={() => toggleFavorites(itemId)}>
-            <svg xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill={isFavorite ? "currentColor" : "none"}
-                viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
+        <button onClick={() => toggleFavorites(id)} className={`w-full bg-white hover:bg-gray-50 py-3 px-4 rounded-lg transition-colors border ${isFavorite ? '' : 'text-blue-600 border-blue-600text-red-600 border -red-600'}`}>
+            {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
         </button>
-    );
+    )
 }

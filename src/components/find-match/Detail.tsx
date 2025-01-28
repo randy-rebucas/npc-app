@@ -1,28 +1,19 @@
 'use client'
 
 import { getUserById, UserDocument } from '@/app/actions/user';
-import { toast } from '@/hooks/use-toast';
-import { loadCalendlyScript } from '@/lib/calendly';
 import { Certification, License } from '@/lib/types/onboarding';
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
 import Image from 'next/image'
 import { useEffect, useState } from 'react';
-
-// Add type definition at the top
-declare global {
-    interface Window {
-        Calendly?: {
-            initPopupWidget: (options: {
-                url: string;
-            }) => void;
-        }
-    }
-}
+import Request from '@/components/collaboration/actions/Request';
+import Schedule from '../collaboration/actions/Schedule';
+import Favorite from '../collaboration/actions/Favorite';
 
 export default function FindMatchDetail({ id }: { id: string }) {
     const [user, setUser] = useState<UserDocument | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    
 
     useEffect(() => {
         const getUser = async () => {
@@ -41,32 +32,13 @@ export default function FindMatchDetail({ id }: { id: string }) {
         getUser();
     }, [id]);
 
-    useEffect(() => {
-        loadCalendlyScript();
-    }, []);
 
-    const scheduleInterview = (calendlyLink: string) => {
-        console.log('calendlyLink', calendlyLink);
-        if (window.Calendly) {
-            if (calendlyLink === '' || calendlyLink === null) {
-                toast({
-                    title: 'Calendly link is not setup',
-                    variant: 'destructive',
-                });
-            } else {
-                window.Calendly.initPopupWidget({
-                    url: calendlyLink
-                });
-            }
-        }
-    };
 
     if (isLoading) {
         return (
             <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-                    <p>Loading user details...</p>
                 </div>
             </div>
         );
@@ -199,15 +171,9 @@ export default function FindMatchDetail({ id }: { id: string }) {
                                 : 'Price not available'}<span className="text-sm text-gray-500 font-normal">/month</span>
                         </p>
                         <div className="space-y-3">
-                            <button
-                                onClick={() => scheduleInterview(user?.metaData?.calendlyLink || '')}
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors"
-                            >
-                                Schedule Interview
-                            </button>
-                            <button className="w-full bg-white hover:bg-gray-50 text-blue-600 border border-blue-600 py-3 px-4 rounded-lg transition-colors">
-                                Add to Favorites
-                            </button>
+                            <Schedule calendlyLink={user?.metaData?.calendlyLink || ''} /> 
+                            <Request id={id} /> 
+                            <Favorite id={id} />
                         </div>
                     </div>
 
