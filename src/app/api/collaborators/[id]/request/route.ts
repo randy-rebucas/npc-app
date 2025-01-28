@@ -32,7 +32,7 @@ export async function POST(
     const physician = await User.findById(id);
     if (!physician || physician.submissionStatus !== UserSubmissionStatus.APPROVED) {
       return NextResponse.json(
-        { success: false, message: "Physician is not approved. Submission status: " + physician.submissionStatus },
+        { success: false, message: "Physician is not approved. Current submission status: " + physician.submissionStatus },
         { status: 400 }
       );
     }
@@ -76,7 +76,7 @@ export async function POST(
       user: physicianUser.id,
       title: "Collaboration Request from NP",
       message: "NP has requested collaboration",
-      link: `/collaborators/${id}`,
+      link: `/np/collaborators/request`,
     });
 
     // Send email to NP

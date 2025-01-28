@@ -3,6 +3,8 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import Header from '@/components/header';
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 export default function PaymentLayout({
     children,
@@ -20,6 +22,20 @@ export default function PaymentLayout({
     const [activeTab, setActiveTab] = useState('payments');
     const [stripeConnected, setStripeConnected] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const { data: session } = useSession();
+
+    useEffect(() => {
+        const getUserSubmissionStatus = async (id: string) => {
+            const response = await fetch(`/api/user/${id}/submission-status`);
+            const data = await response.json();
+            if (data.submissionStatus !== 'APPROVED') {
+                redirect("/not-authorized");
+            }
+        }
+        if (session) {
+            getUserSubmissionStatus(session.user.id);
+        }
+    }, [session]);
 
     useEffect(() => {
         const fetchAccount = async () => {

@@ -1,16 +1,32 @@
 'use client';
 
 import Header from "@/components/header";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
+import { useEffect } from "react";
 
 export default function CollaboratorsLayout({ children, modal }: { children: React.ReactNode, modal: React.ReactNode }) {
     const pathname = usePathname();
     const currentTab = pathname.split('/').pop();
+    const { data: session } = useSession();
+
+    useEffect(() => {
+        const getUserSubmissionStatus = async (id: string) => {
+            const response = await fetch(`/api/user/${id}/submission-status`);
+            const data = await response.json();
+            if (data.submissionStatus !== 'APPROVED') {
+                redirect("/not-authorized");
+            }
+        }
+        if (session) {
+            getUserSubmissionStatus(session.user.id);
+        }
+    }, [session]);
 
     return (
         <div className="bg-gray-50 min-h-screen w-full">
-            <Header /> 
+            <Header />
             <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-1 flex-col space-y-8">
                     <div className="space-y-6">

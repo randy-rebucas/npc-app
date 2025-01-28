@@ -1,3 +1,4 @@
+
 export default function FindMatchLayout({
     children,
     modal,
@@ -5,6 +6,7 @@ export default function FindMatchLayout({
     children: React.ReactNode
     modal: React.ReactNode
 }) {
+
     return (
         <>
             {children}
