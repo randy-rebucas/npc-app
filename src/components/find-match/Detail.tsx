@@ -1,10 +1,23 @@
 'use client'
 
 import { getUserById, UserDocument } from '@/app/actions/user';
+import { toast } from '@/hooks/use-toast';
+import { loadCalendlyScript } from '@/lib/calendly';
 import { Certification, License } from '@/lib/types/onboarding';
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
 import Image from 'next/image'
 import { useEffect, useState } from 'react';
+
+// Add type definition at the top
+declare global {
+    interface Window {
+        Calendly?: {
+            initPopupWidget: (options: {
+                url: string;
+            }) => void;
+        }
+    }
+}
 
 export default function FindMatchDetail({ id }: { id: string }) {
     const [user, setUser] = useState<UserDocument | null>(null);
@@ -27,6 +40,26 @@ export default function FindMatchDetail({ id }: { id: string }) {
         };
         getUser();
     }, [id]);
+
+    useEffect(() => {
+        loadCalendlyScript();
+    }, []);
+
+    const scheduleInterview = (calendlyLink: string) => {
+        console.log('calendlyLink', calendlyLink);
+        if (window.Calendly) {
+            if (calendlyLink === '' || calendlyLink === null) {
+                toast({
+                    title: 'Calendly link is not setup',
+                    variant: 'destructive',
+                });
+            } else {
+                window.Calendly.initPopupWidget({
+                    url: calendlyLink
+                });
+            }
+        }
+    };
 
     if (isLoading) {
         return (
@@ -130,7 +163,7 @@ export default function FindMatchDetail({ id }: { id: string }) {
                                         <div key={state.state} className="border p-3 rounded-lg">
                                             <p className="font-medium">{state.state}</p>
                                             <p className="text-sm text-gray-600">License: {state.licenseNumber}</p>
-                                        <p className="text-sm text-gray-600">Expires: {state.expirationDate ? new Date(state.expirationDate).toLocaleDateString() : 'N/A'}</p>
+                                            <p className="text-sm text-gray-600">Expires: {state.expirationDate ? new Date(state.expirationDate).toLocaleDateString() : 'N/A'}</p>
                                         </div>
                                     )
                                 })}
@@ -145,8 +178,8 @@ export default function FindMatchDetail({ id }: { id: string }) {
                                     return (
                                         <div key={cert.certification} className="border p-3 rounded-lg">
                                             <p className="font-medium">{cert.certification}</p>
-                                        <p className="text-sm text-gray-600">Issued: {cert.issueDate ? new Date(cert.issueDate).toLocaleDateString() : 'N/A'}</p>
-                                        <p className="text-sm text-gray-600">Expires: {cert.expirationDate ? new Date(cert.expirationDate).toLocaleDateString() : 'N/A'}</p>
+                                            <p className="text-sm text-gray-600">Issued: {cert.issueDate ? new Date(cert.issueDate).toLocaleDateString() : 'N/A'}</p>
+                                            <p className="text-sm text-gray-600">Expires: {cert.expirationDate ? new Date(cert.expirationDate).toLocaleDateString() : 'N/A'}</p>
                                         </div>
                                     )
                                 })}
@@ -161,12 +194,15 @@ export default function FindMatchDetail({ id }: { id: string }) {
                     <div className="bg-white rounded-lg p-6 shadow-sm border">
                         <h2 className="text-2xl font-bold text-gray-900 mb-2">{user?.profile?.title}</h2>
                         <p className="text-2xl font-bold text-blue-600 mb-4">
-                            {user?.profile?.monthlyCollaborationRate 
+                            {user?.profile?.monthlyCollaborationRate
                                 ? `$${user.profile.monthlyCollaborationRate.toFixed(2)}`
                                 : 'Price not available'}<span className="text-sm text-gray-500 font-normal">/month</span>
                         </p>
                         <div className="space-y-3">
-                            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors">
+                            <button
+                                onClick={() => scheduleInterview(user?.metaData?.calendlyLink || '')}
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors"
+                            >
                                 Schedule Interview
                             </button>
                             <button className="w-full bg-white hover:bg-gray-50 text-blue-600 border border-blue-600 py-3 px-4 rounded-lg transition-colors">
@@ -181,7 +217,7 @@ export default function FindMatchDetail({ id }: { id: string }) {
                         <div className="space-y-4">
                             <div className="flex justify-between text-gray-600">
                                 <span>Base Rate</span>
-                                <span>{user?.profile?.monthlyCollaborationRate 
+                                <span>{user?.profile?.monthlyCollaborationRate
                                     ? `$${user.profile.monthlyCollaborationRate.toFixed(2)}`
                                     : 'N/A'}</span>
                             </div>
@@ -192,7 +228,7 @@ export default function FindMatchDetail({ id }: { id: string }) {
                             <div className="h-px bg-gray-200 my-2"></div>
                             <div className="flex justify-between font-bold text-gray-900">
                                 <span>Total Monthly Fee</span>
-                                <span>{user?.profile?.monthlyCollaborationRate 
+                                <span>{user?.profile?.monthlyCollaborationRate
                                     ? `$${user.profile.monthlyCollaborationRate.toFixed(2)}`
                                     : 'N/A'}</span>
                             </div>

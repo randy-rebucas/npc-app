@@ -20,6 +20,12 @@ const nextConfig: NextConfig = {
 
     NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
     NEXT_PUBLIC_APP_VERSION: process.env.NEXT_PUBLIC_APP_VERSION,
+
+    CALENDLY_API_KEY: process.env.CALENDLY_API_KEY,
+    CALENDLY_OWNER_URL: process.env.CALENDLY_OWNER_URL,
+    CALENDLY_EVENT_TYPE_URL: process.env.CALENDLY_EVENT_TYPE_URL,
+    CALENDLY_USER_ID: process.env.CALENDLY_USER_ID,
+    CALENDLY_EVENT_TYPE_ID: process.env.CALENDLY_EVENT_TYPE_ID,
   },
   images: {
     remotePatterns: [
