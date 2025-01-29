@@ -13,11 +13,7 @@ export interface IChat extends Document {
   _id: string;
   customerId: Types.ObjectId | IUser;
   agentId: Types.ObjectId | IUser;
-  messages: IMessage[];
-  status: 'active' | 'resolved' | 'waiting';
-  lastActivity: Date;
-  isAgentTyping: boolean;
-  isCustomerTyping: boolean;
+  content: string;
   createdAt: Date;
 }
 
@@ -32,41 +28,11 @@ const chatSchema = new Schema({
     ref: "User", 
     required: true 
   },
-  messages: [{
-    sender: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    content: { type: String, required: true },
-    timestamp: { type: Date, default: Date.now },
-    isAgent: { type: Boolean, required: true },
-    isRead: { type: Boolean, default: false }
-  }],
-  status: {
+  content: {
     type: String,
-    enum: ['active', 'resolved', 'waiting'],
-    default: 'active'
-  },
-  lastActivity: { 
-    type: Date, 
-    default: Date.now 
-  },
-  isAgentTyping: { 
-    type: Boolean, 
-    default: false 
-  },
-  isCustomerTyping: { 
-    type: Boolean, 
-    default: false 
-  },
-  createdAt: { 
-    type: Date, 
-    default: Date.now 
+    required: true
   }
-});
-
-// Update lastActivity on new messages
-chatSchema.pre('save', function(next) {
-  this.lastActivity = new Date();
-  next();
-});
+}, { timestamps: true });
 
 const Chat = mongoose.models.Chat ?? mongoose.model<IChat>("Chat", chatSchema);
 
