@@ -26,6 +26,12 @@ const nextConfig: NextConfig = {
     CALENDLY_EVENT_TYPE_URL: process.env.CALENDLY_EVENT_TYPE_URL,
     CALENDLY_USER_ID: process.env.CALENDLY_USER_ID,
     CALENDLY_EVENT_TYPE_ID: process.env.CALENDLY_EVENT_TYPE_ID,
+
+    BASE_RATE: process.env.BASE_RATE,
+    CONTROLLED_SUBSTANCES_FEE: process.env.CONTROLLED_SUBSTANCES_FEE,
+    ADDITIONAL_STATE_FEE: process.env.ADDITIONAL_STATE_FEE,
+    ADDITIONAL_NP_FEE: process.env.ADDITIONAL_NP_FEE,
+    PLATFORM_FEE: process.env.PLATFORM_FEE,
   },
   images: {
     remotePatterns: [

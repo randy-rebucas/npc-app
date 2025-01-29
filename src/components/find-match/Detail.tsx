@@ -8,12 +8,15 @@ import { useEffect, useState } from 'react';
 import Request from '@/components/collaboration/actions/Request';
 import Schedule from '../collaboration/actions/Schedule';
 import Favorite from '../collaboration/actions/Favorite';
+import { formatCurrency } from '@/lib/utils';
+import { useBreakdownStore } from '@/lib/store/breakdown';
 
 export default function FindMatchDetail({ id }: { id: string }) {
     const [user, setUser] = useState<UserDocument | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    
+    const { breakdown, setBreakdown, total } = useBreakdownStore(); 
+
 
     useEffect(() => {
         const getUser = async () => {
@@ -32,7 +35,23 @@ export default function FindMatchDetail({ id }: { id: string }) {
         getUser();
     }, [id]);
 
-
+    useEffect(() => {
+        const baseRate = Number(process.env.BASE_RATE ?? 0);
+        const controlledSubstancesFee = Number(process.env.CONTROLLED_SUBSTANCES_FEE ?? 0);
+        const platformFee = Number(process.env.PLATFORM_FEE ?? 0);
+        const additionalStates = (user?.profile?.medicalLicenseStates?.length || 0) * Number(process.env.ADDITIONAL_STATE_FEE ?? 0);
+        const additionalNps = (user?.profile?.additionalNPFee ?? 0)
+        
+        const newBreakdown = new Map([
+            ['Base Rate', baseRate],
+            ['Controlled Substances Fee', controlledSubstancesFee],
+            ['Platform Fee', platformFee],
+            ['Additional States Fee', additionalStates],
+            ['Additional NP Fee', additionalNps]
+        ]);
+        setBreakdown(newBreakdown);
+        
+    }, [user, setBreakdown]);
 
     if (isLoading) {
         return (
@@ -181,25 +200,21 @@ export default function FindMatchDetail({ id }: { id: string }) {
                     <div className="bg-white rounded-lg p-6 shadow-sm border">
                         <h3 className="font-bold text-gray-900 mb-4">Monthly Fee Breakdown</h3>
                         <div className="space-y-4">
-                            <div className="flex justify-between text-gray-600">
-                                <span>Base Rate</span>
-                                <span>{user?.profile?.monthlyCollaborationRate
-                                    ? `$${user.profile.monthlyCollaborationRate.toFixed(2)}`
-                                    : 'N/A'}</span>
-                            </div>
-                            <div className="flex justify-between text-gray-600">
-                                <span>Platform Fee</span>
-                                <span>$0.00</span>
-                            </div>
+                            {Array.from(breakdown.entries()).map(([key, value]) => (
+                                <div className="flex justify-between text-gray-600" key={key}>
+                                    <span>{key}</span>
+                                    <span>{formatCurrency(value)}</span>
+                                </div>
+                            ))}
+                            
                             <div className="h-px bg-gray-200 my-2"></div>
                             <div className="flex justify-between font-bold text-gray-900">
                                 <span>Total Monthly Fee</span>
-                                <span>{user?.profile?.monthlyCollaborationRate
-                                    ? `$${user.profile.monthlyCollaborationRate.toFixed(2)}`
-                                    : 'N/A'}</span>
+                                <span>{formatCurrency(total)}</span>
                             </div>
                         </div>
                         <p className="text-sm text-gray-500 mt-4">
+
                             * All fees are billed monthly. Cancel anytime.
                         </p>
                     </div>
