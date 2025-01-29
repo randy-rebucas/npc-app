@@ -1,30 +1,30 @@
 jdoe@example.com
 mErAymUW
 
-mongodb
-google calendar api
-    client id 
-memberstack secret key
-
-------
-User Types
-Nurse Practetioners [will request to be a provider]
-Physicians
-
 messages
 accept bids
 proposals 
 -
 
 V1 = Add Controlled Substance Fee,   + Add Additional States (based on filter selections)
-V2 = allow to add additional Nurse Practitioners, factor in any Special Fee per State (example - a specific state that a MD wants to charge extra for ‘controlled substance’,     or a specific state where a ‘general’ additional fee (Restricted state fee)
+V2 = allow to add additional Nurse Practitioners, 
+factor in any Special Fee per State (example - a specific state that a MD wants to charge extra for ‘controlled substance’,or a specific state where a ‘general’ additional fee (Restricted state fee)
 
 devtalk2022@gmail.com
 P@$$w0rd2025!
 
 -----------------
-NPs post collaboration requests and manage partnerships.
-Physicians can search, respond, negotiate terms, finalize partnerships efficiently, submit quotes, and engage in collaborations
+NPs 
+post collaboration requests 
+and manage partnerships.
+
+Physicians can 
+search, 
+respond, 
+negotiate terms, 
+finalize partnerships efficiently, 
+submit quotes, 
+and engage in collaborations
 
 NP's Onboarding
   - Select Practice Type: [IV Infusion, Hormone Optimization, Primary Care, Urgent Care, Medical Weight Loss, TRT/Men's Health, Medical Aesthetics, Mental Health, IV Hydration, Women's Health]
