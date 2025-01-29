@@ -4,6 +4,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/options";
 import connect from "@/lib/db";
 
+// Add this export to mark the route as dynamic
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: NextRequest) {
   try {
     await connect();
@@ -24,7 +27,6 @@ export async function POST(req: NextRequest) {
       physicianUser: id,
     });
 
-    console.log(existingFavorite);
     if (existingFavorite) {
       // if (isFavorite) {
       await Favorite.deleteOne({ _id: existingFavorite._id });

@@ -5,8 +5,8 @@ import { useMemo } from "react";
 
 export function PreviousMessage({ physicianId }: { physicianId: string }) {
 
-    const { messages } = useMessaging();
-   
+    const { messages, getSenderName } = useMessaging();
+
     // Memoize filtered messages to prevent unnecessary recalculations
     const filteredMessages = useMemo(() => {
         return messages.filter(m =>
@@ -25,7 +25,7 @@ export function PreviousMessage({ physicianId }: { physicianId: string }) {
                 filteredMessages.map(message => (
                     <div key={message._id as string} className="flex items-start space-x-3 bg-gray-50 p-4 rounded-lg">
                         <div className="flex-1">
-                            <p className="text-sm text-gray-500 mb-1">From: {message.senderId.toString()}</p>
+                            <p className="text-sm text-gray-500 mb-1">From: {getSenderName(message.senderId.toString())}</p>
                             <p className="text-sm text-gray-500 mb-2">Sent: {new Date(message.timestamp).toLocaleDateString()}</p>
                             <div className="bg-white p-3 rounded border border-gray-200">
                                 <p className="text-gray-700">

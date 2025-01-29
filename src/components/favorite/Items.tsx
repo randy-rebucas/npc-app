@@ -8,6 +8,7 @@ interface IFavorite {
     npUser: string;
     physicianUser: {
         email: string;
+        id: string;    
         profile: {
             profilePhotoPath: string;
             firstName: string;
@@ -74,7 +75,7 @@ export default function Items({ items }: { items: IFavorite[] }) {
 
                                 <div className="flex gap-2 mt-4">
                                     <Link
-                                        href={`/np/favorites/message/${item.id}`} 
+                                        href={`/np/favorites/message/${item.physicianUser.id}`} 
                                         className="text-center flex-1 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors"
                                     >
                                         Message

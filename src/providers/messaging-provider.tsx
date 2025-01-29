@@ -9,6 +9,7 @@ interface MessagingContextType {
   messages: IMessage[];
   sendMessage: (receiverId: string, content: string) => Promise<void>;
   markAsRead: (messageId: string) => Promise<void>;
+  getSenderName: (senderId: string) => Promise<string>;
   unreadCount: number;
 }
 
@@ -24,6 +25,7 @@ export function MessagingProvider({ children }: { children: React.ReactNode }) {
       try {
         const response = await fetch('/api/messages');
         const data = await response.json();
+        console.log(data);
         setMessages(data);
         setUnreadCount(data.filter((m: IMessage) =>
           m.receiverId.toString() === session?.user?.id && !m.read
@@ -78,8 +80,19 @@ export function MessagingProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const getSenderName = async (senderId: string) => { 
+    try { 
+      const response = await fetch(`/api/user/${senderId}`);
+      const data = await response.json();
+      return data.username;
+    } catch (error) {
+        console.error('Error getting sender name:', error);
+        return 'Unknown';
+    }
+  };
+
   return (
-    <MessagingContext.Provider value={{ messages, sendMessage, markAsRead, unreadCount }}>
+    <MessagingContext.Provider value={{ messages, sendMessage, markAsRead, getSenderName, unreadCount }}>
       {children}
     </MessagingContext.Provider>
   );

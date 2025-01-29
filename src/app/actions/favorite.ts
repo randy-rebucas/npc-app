@@ -54,6 +54,7 @@ export async function getFavorites() {
       npUser: favorite.npUser.toString(),
       physicianUser: {
         email: favorite.physicianUser.email,
+        id: favorite.physicianUser._id.toString(),
         profile: {
           profilePhotoPath: favorite.physicianUser.profile.profilePhotoPath,
           firstName: favorite.physicianUser.profile.firstName,
