@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Message from "./actions/Message";
+import Link from "next/link";
 
 interface IFavorite {
     id: string;
@@ -73,7 +73,12 @@ export default function Items({ items }: { items: IFavorite[] }) {
                                 </div>
 
                                 <div className="flex gap-2 mt-4">
-                                    <Message itemId={item.id} />
+                                    <Link
+                                        href={`/np/favorites/message/${item.id}`} 
+                                        className="text-center flex-1 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors"
+                                    >
+                                        Message
+                                    </Link>
                                 </div>
                             </div>
                         </div>
