@@ -8,10 +8,10 @@ interface WSMessage {
   payload: string | Record<string, unknown>;
 }
 
-let wss: WebSocket.Server
+let wss: WebSocket.WebSocketServer
 
 export function initializeWebSocket(server: HTTPServer) {
-  wss = new WebSocket.Server({ noServer: true })
+  wss = new WebSocket.WebSocketServer({ noServer: true })
 
   server.on('upgrade', async (request, socket, head) => {
     const parsedUrl = parse(request.url ?? '', true)
