@@ -35,15 +35,15 @@ export default function ChatPage() {
     }, [session]);
 
     // Helper function to format date
-    const formatDate = (date: Date) => {
-        const now = new Date();
-        const messageDate = new Date(date);
+    // const formatDate = (date: Date) => {
+    //     const now = new Date();
+    //     const messageDate = new Date(date);
         
-        if (messageDate.toDateString() === now.toDateString()) {
-            return messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
-        return messageDate.toLocaleDateString();
-    };
+    //     if (messageDate.toDateString() === now.toDateString()) {
+    //         return messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    //     }
+    //     return messageDate.toLocaleDateString();
+    // };
 
     if (isLoading) return <div className="p-4">Loading chats...</div>;
     if (error) return <div className="p-4 text-red-500">{error}</div>;
@@ -71,13 +71,13 @@ export default function ChatPage() {
                                         ? chat.customerId.username 
                                         : 'Unknown User'}
                                 </h3>
-                                <span className="text-xs text-gray-500">
+                                {/* <span className="text-xs text-gray-500">
                                     {formatDate(chat.lastActivity)}
-                                </span>
+                                </span> */}
                             </div>
-                            <p className="text-sm text-gray-500 truncate">
-                                {chat.messages?.[chat.messages.length - 1]?.content || 'No messages'}
-                            </p>
+                            {/* <p className="text-sm text-gray-500 truncate"> */}
+                                {/* {chat.messages?.[chat.messages.length - 1]?.content || 'No messages'} */}
+                            {/* </p> */}
                         </div>
                     </div>
                 ))}

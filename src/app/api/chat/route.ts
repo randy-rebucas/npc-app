@@ -19,6 +19,7 @@ export async function POST(req: Request) {
     const chatMessage = await Chat.create({
       content: message,
       customerId: session.user.id,
+      
     });
 
 

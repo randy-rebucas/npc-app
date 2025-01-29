@@ -8,6 +8,9 @@ import { NotificationsProvider } from "@/providers/notifications-provider";
 import { MessagingProvider } from "@/providers/messaging-provider";
 import { ApplicationSettingsProvider } from "@/providers/application-settings-provider";
 import ChatBot from '@/components/root/ChatBot/ChatBot';
+import { OpenAIProvider } from "@/providers/openai-provider";
+// import ChatComponent from "@/components/example/ChatComponent";
+
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -59,14 +62,19 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`} >
         <ApplicationSettingsProvider>
           <AuthProvider>
-            <MessagingProvider>
-              <NotificationsProvider>
-                {children}
-              </NotificationsProvider>
-            </MessagingProvider>
-            <ChatBot />
+            <OpenAIProvider>
+              <MessagingProvider>
+                <NotificationsProvider>
+                  {children}
+                </NotificationsProvider>
+              </MessagingProvider>
+              <ChatBot />
+              {/* <ChatComponent />  */}
+            </OpenAIProvider>
           </AuthProvider>
         </ApplicationSettingsProvider>
+
+
         <Toaster />
       </body>
     </html>
