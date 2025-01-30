@@ -18,14 +18,18 @@ export async function POST(request: Request) {
 
     const data = await request.json();
 
-    const userProfile = await UserProfile.findOneAndUpdate({ user: user._id }, {
+    const userProfile = await UserProfile.findOneAndUpdate(
+      { user: user._id },
+      {
         ...data,
-    }, { new: true });
+      },
+      { new: true }
+    );
 
     await createEvent({
-        user: user._id,
-        email: user.email!,
-        type: EventType.MEMBER_UPDATED
+      user: user._id,
+      email: user.email!,
+      type: EventType.MEMBER_UPDATED,
     });
     return NextResponse.json({ userProfile });
   } catch (error) {
@@ -41,13 +45,48 @@ export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const user = await UserProfile.findOne({ user: session?.user?.id });
+    const user = await UserProfile.findOne({ user: session?.user?.id }).populate('user');
     return NextResponse.json(user);
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
 
+export async function PUT(request: Request) {
+  try {
+    await connect();
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const { username, email, bio } = await request.json();
+
+    const user = await User.findOne({ email: session?.user?.email });
+    user.username = username;
+    user.email = email;
+    await user.save();
+
+
+    const userProfile = await UserProfile.findOneAndUpdate(
+      { user: user._id },
+      {
+        description: bio,
+      },
+      { new: true }
+    );
+    return NextResponse.json({ userProfile });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}

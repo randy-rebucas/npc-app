@@ -26,6 +26,7 @@ export const authOptions: NextAuthOptions = {
           id: profile.sub,
           name: profile.name,
           email: profile.email,
+          username: profile.email?.split("@")[0],
           image: profile.picture,
           role: UserRole.PHYSICIAN,
         };
@@ -53,6 +54,7 @@ export const authOptions: NextAuthOptions = {
           id: profile.sub,
           name: profile.name ?? profile.username,
           email: profile.email,
+          username: profile.email?.split("@")[0],
           image: profile.picture,
           role: UserRole.PHYSICIAN,
         };
@@ -81,9 +83,11 @@ export const authOptions: NextAuthOptions = {
           
           user.id = newUser._id.toString();
           user.role = UserRole.PHYSICIAN;
+          user.username = newUser.username;
         } else {
           user.id = existingUser._id.toString();
           user.role = existingUser.role;
+          user.username = existingUser.username;
         }
       } catch (error) {
         console.error("Error during social sign in:", error);
