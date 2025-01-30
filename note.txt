@@ -27,3 +27,14 @@ NP's Onboarding
     Comprehensive Information: Qualifications, years of experience, practice type, compliance status, reviews, and multimedia (photos/videos).
 
 
+Profile settings 
+picture
+first name
+last name
+bio
+practice type
+primary state of practice
+professional designation
+start date [today, 1 month, 3 months, 6 months, 1 year]
+national provider id (NPI) [number]
+controlled substances [yes, no]

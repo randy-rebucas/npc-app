@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import * as z from 'zod';
 import { useToast } from '@/hooks/use-toast';
+import Image from 'next/image';
 
 const profileSchema = z.object({
     username: z.string()
@@ -26,7 +27,9 @@ const profileSchema = z.object({
 type ProfileFormData = z.infer<typeof profileSchema>;
 
 export default function ProfilePage() {
-    const { toast } = useToast(); 
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+    const { toast } = useToast();
     const {
         register,
         handleSubmit,
@@ -43,6 +46,7 @@ export default function ProfilePage() {
     });
 
     const [isLoading, setIsLoading] = useState(true);
+    // const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
     const onSubmit = async (data: ProfileFormData) => {
         try {
@@ -90,6 +94,80 @@ export default function ProfilePage() {
         }
     };
 
+    const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        // Validate file type and size
+        if (!file.type.startsWith('image/')) {
+            toast({
+                title: 'Error',
+                description: 'Please upload an image file',
+                variant: 'destructive',
+            });
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+            toast({
+                title: 'Error',
+                description: 'Image must be less than 5MB',
+                variant: 'destructive',
+            });
+            return;
+        }
+
+        // Clean up previous preview URL if it exists
+        if (previewUrl && previewUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(previewUrl);
+        }
+
+        // Create new preview URL
+        const newPreviewUrl = URL.createObjectURL(file);
+        setPreviewUrl(newPreviewUrl);
+
+        // Upload avatar
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            // Upload file to server
+            const uploadResponse = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!uploadResponse.ok) {
+                throw new Error('Upload failed');
+            }
+
+            const uploadData = await uploadResponse.json();
+
+            const avatarResponse = await fetch('/api/profile/avatar', {
+                method: 'POST',
+                body: JSON.stringify({ profilePhotoPath: uploadData.url }),
+            });
+
+            const avatarData = await avatarResponse.json();
+            console.log(avatarData);
+            toast({
+                title: 'Success',
+                description: 'Avatar updated successfully!',
+                variant: 'default',
+            });
+        } catch (error) {
+            // Clean up preview URL on error
+            URL.revokeObjectURL(newPreviewUrl);
+            setPreviewUrl(null);
+            console.error(error);
+            toast({
+                title: 'Error',
+                description: 'Failed to upload avatar',
+                variant: 'destructive',
+            });
+        }
+    };
+
     useEffect(() => {
         const getUser = async () => {
             try {
@@ -107,6 +185,8 @@ export default function ProfilePage() {
                 setValue('username', responseData.user.username);
                 setValue('email', responseData.user.email);
                 setValue('bio', responseData.description);
+
+                setPreviewUrl(responseData.profilePhotoPath);
             } catch (error) {
                 console.error(error);
                 toast({
@@ -120,6 +200,15 @@ export default function ProfilePage() {
         };
         getUser();
     }, [setValue, setError, toast]);
+
+    // Clean up object URL when component unmounts or when previewUrl changes
+    useEffect(() => {
+        return () => {
+            if (previewUrl && previewUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(previewUrl);
+            }
+        };
+    }, [previewUrl]);
 
     if (isLoading) {
         return (
@@ -136,7 +225,36 @@ export default function ProfilePage() {
     return (
         <div className="max-w-2xl mx-auto p-6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                {/* Avatar Upload */}
+                <div className="space-y-4">
+                    <label className="block text-sm font-medium text-gray-700">
+                        Profile Picture
+                    </label>
+                    <div className="flex items-center space-x-6">
+                        <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100">
+                            {previewUrl && (
+                                <Image
+                                    src={previewUrl}
+                                    alt="Profile preview"
+                                    width={80}
+                                    height={80}
+                                    className="w-full h-full object-cover"
+                                />
+                            )}
+                        </div>
+                        <label className="cursor-pointer bg-white px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                            <span className="text-sm font-medium text-gray-700">Change Photo</span>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleAvatarChange}
+                                className="hidden"
+                            />
+                        </label>
+                    </div>
+                </div>
 
+                {/* Display Name */}
                 <div className="space-y-2">
                     <label htmlFor="username" className="block text-sm font-medium text-gray-700">
                         Display Name
@@ -152,6 +270,7 @@ export default function ProfilePage() {
                     )}
                 </div>
 
+                {/* Email */}
                 <div className="space-y-2">
                     <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                         Email
@@ -167,6 +286,7 @@ export default function ProfilePage() {
                     )}
                 </div>
 
+                {/* Bio */}
                 <div className="space-y-2">
                     <label htmlFor="bio" className="block text-sm font-medium text-gray-700">
                         Bio
@@ -183,10 +303,7 @@ export default function ProfilePage() {
                     )}
                 </div>
 
-                {errors.root && (
-                    <p className="text-red-500 text-sm mt-1">{errors.root.message}</p>
-                )}
-
+                {/* Save Changes */}
                 <button
                     type="submit"
                     disabled={isSubmitting}
