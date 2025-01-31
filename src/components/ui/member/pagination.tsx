@@ -20,7 +20,7 @@ export default function Pagination({
     return (
         
         <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-700">
+            <div className="text-sm text-muted-foreground">
                 Showing {startItem} to {endItem} of {totalItems} entries
             </div>
             <div className="flex gap-2">

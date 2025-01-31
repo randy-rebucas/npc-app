@@ -17,6 +17,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { Editor } from '@tinymce/tinymce-react';
+import { useTheme } from "next-themes";
 
 const formSchema = z.object({
     question: z.string().min(1, "Question is required"),
@@ -33,6 +34,7 @@ export default function FaqForm({ id }: FaqFormProps) {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
+    const { theme } = useTheme();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -145,6 +147,8 @@ export default function FaqForm({ id }: FaqFormProps) {
                                             'bold italic | alignleft aligncenter ' +
                                             'alignright alignjustify | bullist numlist outdent indent | ' +
                                             'removeformat | help',
+                                        skin: theme === 'dark' ? 'oxide-dark' : 'oxide',
+                                        content_css: theme === 'dark' ? 'dark' : 'default',
                                         content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
                                     }}
                                     value={field.value}

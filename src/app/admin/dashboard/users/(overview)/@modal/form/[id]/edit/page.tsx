@@ -10,7 +10,7 @@ export default async function UserEdit({
     return (
         <Modal>
             <div className="p-6">
-                <h2 className="text-2xl font-semibold mb-4">Edit User</h2>
+                <h2 className="text-2xl font-semibold text-foreground mb-4">Edit User</h2>
                 <UserForm id={id} />
             </div>
         </Modal>

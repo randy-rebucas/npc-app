@@ -36,7 +36,7 @@ export default async function PracticeTypesPage(props: {
             <div className="mx-auto w-full space-y-4">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Practice Types</h1>
-                    <Link href="/admin/dashboard/miscellaneous/practice-types/form" className="bg-primary text-white px-4 py-2 rounded-md">
+                    <Link href="/admin/dashboard/miscellaneous/practice-types/form" className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-md">
                         Add Practice Type
                     </Link>
                 </div>
@@ -46,7 +46,7 @@ export default async function PracticeTypesPage(props: {
                     <Filter target="enabled" options={[{ 'true': 'Enabled' }, { 'false': 'Disabled' }]} placeholder="Filter" defaultValue="all" />
                 </div>
 
-                <div className="rounded-md border">
+                <div className="rounded-md border bg-background">
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -68,13 +68,13 @@ export default async function PracticeTypesPage(props: {
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="flex items-center justify-end gap-2 p-3">
-                                        <Link href={`/admin/dashboard/miscellaneous/practice-types/form/${practiceType._id}`} className="flex justify-center items-center">
+                                        <Link href={`/admin/dashboard/miscellaneous/practice-types/form/${practiceType._id}`} className="flex justify-center items-center hover:text-primary">
                                             <PencilIcon className="w-4 h-4" />
                                         </Link>
                                         <form action={handleDelete} className="flex justify-center items-center">
                                             <input type="hidden" name="itemId" value={practiceType._id} />
-                                            <button type="submit" className="flex justify-center items-center">
-                                                <TrashIcon className="w-4 h-4 text-red-500" />
+                                            <button type="submit" className="flex justify-center items-center hover:text-destructive">
+                                                <TrashIcon className="w-4 h-4 text-destructive" />
                                             </button>
                                         </form>
                                     </TableCell>

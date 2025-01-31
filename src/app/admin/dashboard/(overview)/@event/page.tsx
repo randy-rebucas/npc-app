@@ -57,11 +57,11 @@ interface EventLogItemProps {
 function EventLogItem({ email, type, icon: Icon }: EventLogItemProps) {
     return (
         <div className="flex items-center gap-4">
-            <div className="rounded-full p-2 bg-gray-100">
-                <Icon className="h-4 w-4 text-gray-600" />
+            <div className="rounded-full p-2 bg-muted">
+                <Icon className="h-4 w-4 text-muted-foreground" />
             </div>
             <div>
-                <p className="text-sm font-medium">{email}</p>
+                <p className="text-sm font-medium text-foreground">{email}</p>
                 <p className="text-xs text-muted-foreground">
                     {type === 'logged-in' ? 'Logged in' : 'Member Updated'}
                 </p>

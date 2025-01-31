@@ -23,7 +23,7 @@ export default function AdminHeader({ breadcrumbs }: { breadcrumbs: Breadcrumb[]
       <Separator orientation="vertical" className="mr-2 h-4" />
       <Breadcrumbs breadcrumbs={breadcrumbs} />
 
-      <div className="flex-1 flex justify-end">
+      <div className="flex-1 flex justify-end gap-2">
         <ThemeToggle theme={theme as "light" | "dark"} setTheme={setTheme} />
         <Chat />
         <Notifications /> 

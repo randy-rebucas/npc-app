@@ -68,16 +68,16 @@ export default async function Page({
                             </Card>
                             <div>
                                 <h2 className="text-xl font-semibold">{user.profile?.firstName} {user.profile?.lastName}</h2>
-                                <p className="text-sm text-gray-500">{user.email}</p>
-                                <p className="text-sm text-gray-500">{user.username}</p>
-                                <p className="text-sm text-gray-500">{user.role}</p>
+                                <p className="text-sm text-muted-foreground">{user.email}</p>
+                                <p className="text-sm text-muted-foreground">{user.username}</p>
+                                <p className="text-sm text-muted-foreground">{user.role}</p>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                             <Card>
                                 <CardHeader>
-                                    <CardTitle className="text-sm font-medium text-gray-500">Status Information</CardTitle>
+                                    <CardTitle className="text-sm font-medium text-muted-foreground">Status Information</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-2">
                                     <div className="flex justify-between">
@@ -113,8 +113,8 @@ export default async function Page({
                                     <CardContent>
                                         {Object.entries(user.metaData).map(([key, value]) => (
                                             <div key={key} className="py-2 flex justify-between">
-                                                <span className="font-medium text-gray-500">{key.replace(/-/g, ' ')}</span>
-                                                <span className="text-gray-900">{value}</span>
+                                                <span className="font-medium text-muted-foreground">{key.replace(/-/g, ' ')}</span>
+                                                <span className="text-foreground">{value}</span>
                                             </div>
                                         ))}
                                     </CardContent>
@@ -129,7 +129,7 @@ export default async function Page({
                         {/* Personal Information */}
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-sm font-medium text-gray-500">Personal Information</CardTitle>
+                                <CardTitle className="text-sm font-medium text-muted-foreground">Personal Information</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-2">
                                 <div className="flex justify-between">
@@ -158,7 +158,7 @@ export default async function Page({
                         {/* Address Information */}
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-sm font-medium text-gray-500">Address Information</CardTitle>
+                                <CardTitle className="text-sm font-medium text-muted-foreground">Address Information</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-2">
                                 <div className="flex justify-between">
@@ -183,7 +183,7 @@ export default async function Page({
                         {/* Professional Licenses */}
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-sm font-medium text-gray-500">Professional Licenses</CardTitle>
+                                <CardTitle className="text-sm font-medium text-muted-foreground">Professional Licenses</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-2">
                                 {user.profile?.medicalLicenseStates && (
@@ -212,7 +212,7 @@ export default async function Page({
                         {/* Professional Details */}
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-sm font-medium text-gray-500">Professional Details</CardTitle>
+                                <CardTitle className="text-sm font-medium text-muted-foreground">Professional Details</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-2">
                                 {user.profile?.practiceTypes && (
@@ -247,7 +247,7 @@ export default async function Page({
                         {user.profile?.education && (
                             <Card className="md:col-span-2">
                                 <CardHeader>
-                                    <CardTitle className="text-sm font-medium text-gray-500">Education</CardTitle>
+                                    <CardTitle className="text-sm font-medium text-muted-foreground">Education</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-2">
                                     {Object.entries(user.profile.education).map(([key, value]) => (

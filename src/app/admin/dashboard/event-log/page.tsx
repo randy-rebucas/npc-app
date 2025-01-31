@@ -83,8 +83,8 @@ export default async function EventLog(props: {
                                         <TableRow key={event.id}>
                                             <TableCell>
                                                 <div className="flex items-center gap-2">
-                                                    <div className="rounded-full p-2 bg-gray-100">
-                                                        <Icon className="h-4 w-4 text-gray-600" />
+                                                    <div className="rounded-full p-2 bg-muted">
+                                                        <Icon className="h-4 w-4 text-muted-foreground" />
                                                     </div>
                                                 </div>
                                             </TableCell>

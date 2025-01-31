@@ -128,7 +128,7 @@ export default function UserForm({ id }: { id: string | null }) {
                     name="username"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Username</FormLabel>
+                            <FormLabel className="text-foreground">Username</FormLabel>
                             <FormControl>
                                 <Input placeholder="username" {...field} />
                             </FormControl>
@@ -144,7 +144,7 @@ export default function UserForm({ id }: { id: string | null }) {
                     name="email"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Email</FormLabel>
+                            <FormLabel className="text-foreground">Email</FormLabel>
                             <FormControl>
                                 <Input placeholder="email" {...field} {...(id ? { readOnly: true } : {})} />
                             </FormControl>
@@ -160,7 +160,7 @@ export default function UserForm({ id }: { id: string | null }) {
                     name="role"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Role</FormLabel>
+                            <FormLabel className="text-foreground">Role</FormLabel>
                             <FormControl>
                                 <Select onValueChange={field.onChange} value={field.value}>
                                     <FormControl>
@@ -183,7 +183,7 @@ export default function UserForm({ id }: { id: string | null }) {
                     name="submissionStatus"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Submission Status</FormLabel>
+                            <FormLabel className="text-foreground">Submission Status</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
                                     <SelectTrigger>
@@ -203,7 +203,7 @@ export default function UserForm({ id }: { id: string | null }) {
                 {/* MetaData Section */}
                 <div className="space-y-4">
                     <div className="flex justify-between items-center">
-                        <h3 className="text-lg font-semibold">Metadata</h3>
+                        <h3 className="text-lg font-semibold text-foreground">Metadata</h3>
                         <Button
                             type="button"
                             variant="outline"
@@ -214,7 +214,7 @@ export default function UserForm({ id }: { id: string | null }) {
                         </Button>
                     </div>
 
-                    <div className="grid gap-4 p-4 border rounded-lg bg-muted/50">
+                    <div className="grid gap-4 p-4 border rounded-lg bg-background dark:bg-background">
                         {form.watch("metaData").map((_, index) => (
                             <div key={index} className="grid grid-cols-[1fr,1fr,auto] gap-4 items-end">
                                 <FormField
@@ -257,7 +257,7 @@ export default function UserForm({ id }: { id: string | null }) {
                         ))}
 
                         {form.watch("metaData").length === 0 && (
-                            <div className="text-center py-4 text-muted-foreground">
+                            <div className="text-center py-4 text-muted-foreground dark:text-muted-foreground">
                                 No metadata fields added
                             </div>
                         )}

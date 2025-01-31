@@ -36,10 +36,10 @@ export default async function DetailPage({
     if (!member) {
         return (
             <div className="flex flex-col items-center justify-center h-full">
-                <div className="text-red-500 text-center mt-4">
+                <div className="text-destructive text-center mt-4">
                     <h2 className="text-3xl font-bold">Oops!</h2>
                     <p className="text-lg">We couldn&apos;t find the member you&apos;re looking for.</p>
-                    <Link href={`/admin/dashboard/members/node-api`} className="mt-4 text-blue-500 underline">
+                    <Link href={`/admin/dashboard/members/node-api`} className="mt-4 text-primary underline">
                         Go back to Members List
                     </Link>
                 </div>
@@ -59,32 +59,36 @@ export default async function DetailPage({
                     <CardTitle>Member Detail</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <dl className="divide-y divide-gray-200">
+                    <dl className="divide-y divide-border">
                         <div className="py-2 flex justify-between">
-                            <dt className="font-medium text-gray-500">ID</dt>
-                            <dd className="text-gray-900">{typedMember.id}</dd>
+                            <dt className="font-medium text-muted-foreground">ID</dt>
+                            <dd className="text-foreground">{typedMember.id}</dd>
                         </div>
                         <div className="py-2 flex justify-between">
-                            <dt className="font-medium text-gray-500">Email</dt>
-                            <dd className="text-gray-900">{typedMember.auth.email}</dd>
+                            <dt className="font-medium text-muted-foreground">Email</dt>
+                            <dd className="text-foreground">{typedMember.auth.email}</dd>
                         </div>
                         <div className="py-2 flex justify-between">
-                            <dt className="font-medium text-gray-500">Created At</dt>
-                            <dd className="text-gray-900">{new Date(typedMember.createdAt || '').toLocaleString()}</dd>
+                            <dt className="font-medium text-muted-foreground">Created At</dt>
+                            <dd className="text-foreground">{new Date(typedMember.createdAt || '').toLocaleString()}</dd>
                         </div>
                         <div className="py-2 flex justify-between">
-                            <dt className="font-medium text-gray-500">Last Login</dt>
-                            <dd className="text-gray-900">{new Date(typedMember.lastLogin || '').toLocaleString()}</dd>
+                            <dt className="font-medium text-muted-foreground">Last Login</dt>
+                            <dd className="text-foreground">{new Date(typedMember.lastLogin || '').toLocaleString()}</dd>
                         </div>
                         {Object.entries(typedMember.customFields).map(([key, value]) => (
                             <div key={key} className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">{key.replace(/-/g, ' ')}</dt>
-                                <dd className="text-gray-900 break-words">{value}</dd>
+                                <dt className="font-medium text-muted-foreground">{key.replace(/-/g, ' ')}</dt>
+                                <dd className="text-foreground break-words">{value}</dd>
                             </div>
                         ))}
                         <div className="py-2 flex justify-between">
-                            <dt className="font-medium text-gray-500">Verified</dt>
-                            <dd className="text-gray-900"><Badge variant={typedMember.verified ? 'secondary' : 'outline'} className="text-sm">{typedMember.verified ? 'Yes' : 'No'}</Badge></dd>
+                            <dt className="font-medium text-muted-foreground">Verified</dt>
+                            <dd className="text-foreground">
+                                <Badge variant={typedMember.verified ? 'secondary' : 'outline'} className="text-sm">
+                                    {typedMember.verified ? 'Yes' : 'No'}
+                                </Badge>
+                            </dd>
                         </div>
                     </dl>
                 </CardContent>

@@ -59,32 +59,36 @@ export default async function DetailPage({
                     <CardTitle>Member Detail</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <dl className="divide-y divide-gray-200">
+                    <dl className="divide-y divide-gray-200 dark:divide-gray-800">
                         <div className="py-2 flex justify-between">
-                            <dt className="font-medium text-gray-500">ID</dt>
-                            <dd className="text-gray-900">{typedMember.id}</dd>
+                            <dt className="font-medium text-gray-500 dark:text-gray-400">ID</dt>
+                            <dd className="text-gray-900 dark:text-gray-100">{typedMember.id}</dd>
                         </div>
                         <div className="py-2 flex justify-between">
-                            <dt className="font-medium text-gray-500">Email</dt>
-                            <dd className="text-gray-900">{typedMember.auth.email}</dd>
+                            <dt className="font-medium text-gray-500 dark:text-gray-400">Email</dt>
+                            <dd className="text-gray-900 dark:text-gray-100">{typedMember.auth.email}</dd>
                         </div>
                         <div className="py-2 flex justify-between">
-                            <dt className="font-medium text-gray-500">Created At</dt>
-                            <dd className="text-gray-900">{new Date(typedMember.createdAt || '').toLocaleString()}</dd>
+                            <dt className="font-medium text-gray-500 dark:text-gray-400">Created At</dt>
+                            <dd className="text-gray-900 dark:text-gray-100">{new Date(typedMember.createdAt || '').toLocaleString()}</dd>
                         </div>
                         <div className="py-2 flex justify-between">
-                            <dt className="font-medium text-gray-500">Last Login</dt>
-                            <dd className="text-gray-900">{new Date(typedMember.lastLogin || '').toLocaleString()}</dd>
+                            <dt className="font-medium text-gray-500 dark:text-gray-400">Last Login</dt>
+                            <dd className="text-gray-900 dark:text-gray-100">{new Date(typedMember.lastLogin || '').toLocaleString()}</dd>
                         </div>
                         {Object.entries(typedMember.customFields).map(([key, value]) => (
                             <div key={key} className="py-2 flex justify-between">
-                                <dt className="font-medium text-gray-500">{key.replace(/-/g, ' ')}</dt>
-                                <dd className="text-gray-900 break-words">{value}</dd>
+                                <dt className="font-medium text-gray-500 dark:text-gray-400">{key.replace(/-/g, ' ')}</dt>
+                                <dd className="text-gray-900 dark:text-gray-100 break-words">{value}</dd>
                             </div>
                         ))}
                         <div className="py-2 flex justify-between">
-                            <dt className="font-medium text-gray-500">Verified</dt>
-                            <dd className="text-gray-900"><Badge variant={typedMember.verified ? 'secondary' : 'outline'} className="text-sm">{typedMember.verified ? 'Yes' : 'No'}</Badge></dd>
+                            <dt className="font-medium text-gray-500 dark:text-gray-400">Verified</dt>
+                            <dd className="text-gray-900 dark:text-gray-100">
+                                <Badge variant={typedMember.verified ? 'secondary' : 'outline'} className="text-sm">
+                                    {typedMember.verified ? 'Yes' : 'No'}
+                                </Badge>
+                            </dd>
                         </div>
                     </dl>
                 </CardContent>

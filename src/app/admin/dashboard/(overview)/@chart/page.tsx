@@ -4,11 +4,13 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { useEffect, useState, useCallback } from 'react';
+import { useTheme } from 'next-themes'
 
 export default function AdminChartPage() {
     const [period, setPeriod] = useState('7days');
     const [view, setView] = useState('daily');
     const [data, setData] = useState<DataPoint[]>([]);
+    const { theme } = useTheme();
 
     interface DataPoint {
         date: string;
@@ -52,7 +54,18 @@ export default function AdminChartPage() {
         fetchData();
     }, [period, view, processDataByView]); // Add view as dependency
 
-    // Update the LineChart to use the actual data
+    // Update the chart colors based on theme
+    const chartColors = {
+        grid: theme === 'dark' ? '#374151' : '#e5e7eb',
+        text: theme === 'dark' ? '#9ca3af' : '#6b7280',
+        line: theme === 'dark' ? '#60a5fa' : '#2563eb',
+        tooltip: {
+            bg: theme === 'dark' ? '#1f2937' : '#ffffff',
+            border: theme === 'dark' ? '#374151' : '#e5e7eb',
+            text: theme === 'dark' ? '#ffffff' : '#000000',
+        }
+    };
+
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -83,9 +96,13 @@ export default function AdminChartPage() {
             <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
                     <LineChart data={data}>
-                        <CartesianGrid strokeDasharray="3 3" />
+                        <CartesianGrid 
+                            strokeDasharray="3 3" 
+                            stroke={chartColors.grid}
+                        />
                         <XAxis
                             dataKey="date"
+                            stroke={chartColors.text}
                             tickFormatter={(date) => {
                                 const d = new Date(date);
                                 if (view === 'monthly') {
@@ -96,17 +113,24 @@ export default function AdminChartPage() {
                                 return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                             }}
                         />
-                        <YAxis />
+                        <YAxis 
+                            stroke={chartColors.text}
+                        />
                         <Tooltip
+                            contentStyle={{
+                                backgroundColor: chartColors.tooltip.bg,
+                                border: `1px solid ${chartColors.tooltip.border}`,
+                                color: chartColors.tooltip.text,
+                            }}
                             labelFormatter={(date) => new Date(date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                             formatter={(value) => [`${value} signups`, 'Signups']}
                         />
                         <Line
                             type="monotone"
                             dataKey="signups"
-                            stroke="#2563eb"
+                            stroke={chartColors.line}
                             strokeWidth={2}
-                            dot={{ fill: '#2563eb' }}
+                            dot={{ fill: chartColors.line }}
                         />
                     </LineChart>
                 </ResponsiveContainer>
