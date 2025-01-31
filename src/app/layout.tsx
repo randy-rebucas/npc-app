@@ -9,6 +9,8 @@ import { MessagingProvider } from "@/providers/messaging-provider";
 import { ApplicationSettingsProvider } from "@/providers/application-settings-provider";
 import ChatBot from '@/components/root/ChatBot/ChatBot';
 import { OpenAIProvider } from "@/providers/openai-provider";
+import { ThemeProvider } from "next-themes";
+import { FontSizeProvider } from "@/providers/font-provider";
 // import ChatComponent from "@/components/example/ChatComponent";
 
 
@@ -60,21 +62,23 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`} >
-        <ApplicationSettingsProvider>
-          <AuthProvider>
-            <OpenAIProvider>
-              <MessagingProvider>
-                <NotificationsProvider>
-                  {children}
-                </NotificationsProvider>
-              </MessagingProvider>
-              <ChatBot />
-              {/* <ChatComponent />  */}
-            </OpenAIProvider>
-          </AuthProvider>
-        </ApplicationSettingsProvider>
-
-
+        <ThemeProvider attribute="class">
+          <FontSizeProvider>
+            <ApplicationSettingsProvider>
+              <AuthProvider>
+                <OpenAIProvider>
+                  <MessagingProvider>
+                    <NotificationsProvider>
+                      {children}
+                    </NotificationsProvider>
+                  </MessagingProvider>
+                  <ChatBot />
+                  {/* <ChatComponent />  */}
+                </OpenAIProvider>
+              </AuthProvider>
+            </ApplicationSettingsProvider>
+          </FontSizeProvider>
+        </ThemeProvider>
         <Toaster />
       </body>
     </html>

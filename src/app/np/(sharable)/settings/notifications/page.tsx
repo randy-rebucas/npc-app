@@ -1,4 +1,162 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useToast } from '@/hooks/use-toast'; // Assuming you have a toast component
+
+
+export interface INotificationSettings {
+    emailNotifications: boolean;
+    pushNotifications: boolean;
+    notificationTypes: {
+        [key: string]: boolean;
+    }
+}
+
+// Add type for main toggle settings
+type MainToggleType = 'emailNotifications' | 'pushNotifications';
+// Add type for notification types
+type NotificationTypeKey = keyof INotificationSettings['notificationTypes'] & string;
+
 export default function NotificationsPage() {
+    const [settings, setSettings] = useState<INotificationSettings>({
+        emailNotifications: false,
+        pushNotifications: false,
+        notificationTypes: {
+            'new-messages': false,
+            'mentions': false,
+            'updates': false,
+            'security-alerts': false
+        }
+    });
+    const [isLoading, setIsLoading] = useState(true);
+    const [updatingSettings, setUpdatingSettings] = useState<string[]>([]);
+    const { toast } = useToast();
+
+
+    // Fetch initial settings
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const response = await fetch('/api/settings/notifications');
+                const data = await response.json();
+                console.log(data);
+                setSettings(data);
+            } catch (error) {
+                console.error(error);
+                toast({
+                    title: "Error",
+                    description: "Failed to load notification settings",
+                    variant: "destructive",
+
+                });
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchSettings();
+    }, [toast]);
+
+    const handleToggle = async (type: MainToggleType) => {
+        setUpdatingSettings(prev => [...prev, type]);
+
+        setSettings(prev => ({
+            ...prev,
+            [type]: !prev[type]
+        }));
+
+        try {
+            const response = await fetch('/api/settings/notifications', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    type,
+                    value: !settings[type]
+                }),
+            });
+
+            if (!response.ok) throw new Error('Failed to update setting');
+
+            toast({
+                title: "Success",
+                description: "Settings updated successfully",
+            });
+        } catch (error) {
+            console.error(error);
+            setSettings(prev => ({
+                ...prev,
+                [type]: !prev[type]
+            }));
+
+            toast({
+                title: "Error",
+                description: "Failed to update setting",
+                variant: "destructive",
+            });
+        } finally {
+            setUpdatingSettings(prev => prev.filter(t => t !== type));
+        }
+    };
+
+    const handleTypeToggle = async (type: NotificationTypeKey) => {
+        setUpdatingSettings(prev => [...prev, type]);
+
+        setSettings(prev => ({
+            ...prev,
+            notificationTypes: {
+                ...prev.notificationTypes,
+                [type]: !prev.notificationTypes[type]
+            }
+        }));
+
+        try {
+            const response = await fetch('/api/settings/notifications/types', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    type,
+                    value: !settings.notificationTypes[type]
+                }),
+            });
+
+            if (!response.ok) throw new Error('Failed to update notification type');
+
+            toast({
+                title: "Success",
+                description: "Notification type updated successfully",
+            });
+        } catch (error) {
+            console.error(error);
+            setSettings(prev => ({
+                ...prev,
+                notificationTypes: {
+                    ...prev.notificationTypes,
+                    [type]: !prev.notificationTypes[type]
+                }
+            }));
+
+            toast({
+                title: "Error",
+                description: "Failed to update notification type",
+                variant: "destructive",
+            });
+        } finally {
+            setUpdatingSettings(prev => prev.filter(t => t !== type));
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <div className="max-w-4xl mx-auto p-6 flex justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+            </div>
+        );
+    }
+
     return (
         <div className="max-w-4xl mx-auto p-6 space-y-6">
             {/* Notification Preferences Section */}
@@ -11,7 +169,14 @@ export default function NotificationsPage() {
                             <p className="text-sm text-gray-500">Receive updates via email</p>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" className="sr-only peer" />
+                            <input
+                                type="checkbox"
+                                className="sr-only peer"
+                                checked={settings.emailNotifications}
+                                onChange={() => handleToggle('emailNotifications')}
+                                disabled={updatingSettings.includes('emailNotifications')}
+                            />
+
                             <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
                         </label>
                     </div>
@@ -22,7 +187,14 @@ export default function NotificationsPage() {
                             <p className="text-sm text-gray-500">Receive push notifications</p>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" className="sr-only peer" />
+                            <input
+                                type="checkbox"
+                                className="sr-only peer"
+                                checked={settings.pushNotifications}
+                                onChange={() => handleToggle('pushNotifications')}
+                                disabled={updatingSettings.includes('pushNotifications')}
+                            />
+
                             <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
                         </label>
                     </div>
@@ -31,16 +203,25 @@ export default function NotificationsPage() {
             <div className="border rounded-lg p-6">
                 <h2 className="text-lg font-medium mb-4">Notification Types</h2>
                 <div className="space-y-4">
-                    {['New Messages', 'Mentions', 'Updates', 'Security Alerts'].map((type) => (
-                        <div key={type} className="flex items-start">
+                    {[
+                        { id: 'new-messages' as const, label: 'New Messages' },
+                        { id: 'mentions' as const, label: 'Mentions' },
+                        { id: 'updates' as const, label: 'Updates' },
+                        { id: 'security-alerts' as const, label: 'Security Alerts' }
+                    ].map(({ id, label }) => (
+                        <div key={id} className="flex items-start">
                             <input
                                 type="checkbox"
-                                id={type.toLowerCase().replace(' ', '-')}
+                                id={id}
+                                checked={settings.notificationTypes[id]}
+                                onChange={() => handleTypeToggle(id)}
+                                disabled={updatingSettings.includes(id)}
                                 className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                             />
-                            <label htmlFor={type.toLowerCase().replace(' ', '-')} className="ml-3">
-                                <div className="font-medium">{type}</div>
-                                <p className="text-sm text-gray-500">Receive notifications for {type.toLowerCase()}</p>
+
+                            <label htmlFor={id} className="ml-3">
+                                <div className="font-medium">{label}</div>
+                                <p className="text-sm text-gray-500">Receive notifications for {id.toLowerCase()}</p>
                             </label>
                         </div>
                     ))}

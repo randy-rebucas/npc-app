@@ -1,19 +1,40 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
+import { useTheme } from 'next-themes';
+import { useFontSize } from '@/providers/font-provider';
+
 
 export default function AppearancePage() {
+    const { theme, setTheme } = useTheme();
+    const { fontSize, setFontSize } = useFontSize();
+    const [mounted, setMounted] = useState(false);
     const [formData, setFormData] = useState({
         theme: 'system',
         fontSize: 'normal',
         reducedMotion: false
     });
 
+    // Hydration fix
+    useEffect(() => {
+        setMounted(true);
+        setFormData(prev => ({ 
+            ...prev, 
+            theme: theme || 'system',
+            fontSize: fontSize
+        }));
+    }, [theme, fontSize]);
+
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
-        // TODO: Implement save logic
+        setTheme(formData.theme);
+        setFontSize(formData.fontSize);
         console.log('Saving settings:', formData);
     };
+
+    if (!mounted) {
+        return null; // Avoid hydration mismatch
+    }
 
     return (
         <div className="max-w-2xl mx-auto p-6 space-y-8">
