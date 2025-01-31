@@ -47,7 +47,9 @@ export async function GET() {
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const user = await UserProfile.findOne({ user: session?.user?.id }).populate('user');
+    const user = await UserProfile.findOne({
+      user: session?.user?.id,
+    }).populate("user");
     return NextResponse.json(user);
   } catch (error) {
     console.error(error);
@@ -66,18 +68,31 @@ export async function PUT(request: Request) {
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const { username, email, bio } = await request.json();
-
-    const user = await User.findOne({ email: session?.user?.email });
-    user.username = username;
-    user.email = email;
-    await user.save();
-
+    const {
+      description,
+      firstName,
+      lastName,
+      practiceType,
+      primaryStateOfPractice,
+      professionalDesignation,
+      startDate,
+      npi,
+      controlledSubstances,
+    } = await request.json();
+    // Semple description Lance Aaron Tenorio [ 'Primary Care' ] New York Nurse Practitioner 2025-01-28T03:09:53.733Z 2321312313 yes
 
     const userProfile = await UserProfile.findOneAndUpdate(
-      { user: user._id },
+      { user: session?.user?.id },
       {
-        description: bio,
+        description: description,
+        firstName: firstName,
+        lastName: lastName,
+        practiceTypes: practiceType,
+        medicalLicenseStates: [{ state: primaryStateOfPractice }],
+        title: professionalDesignation,
+        npiNumber: npi,
+        startDate: startDate,
+        controlledSubstances: controlledSubstances,
       },
       { new: true }
     );

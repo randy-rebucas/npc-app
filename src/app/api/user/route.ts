@@ -8,7 +8,7 @@ import connect from "@/lib/db";
 export async function GET() {
   try {
     await connect();
- 
+
     const session = await getServerSession(authOptions);
     const user = await User.findById(session?.user.id);
     return NextResponse.json(user);
@@ -19,13 +19,19 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
-  const session = await getServerSession(authOptions);
-
   try {
+    const session = await getServerSession(authOptions);
+
     await connect();
+
     const data = await request.json();
-    const userUpdated = await User.findByIdAndUpdate(session?.user.id, data);
-    return NextResponse.json(userUpdated);
+
+    const user = await User.findOne({ email: session?.user?.email });
+    user.username = data.username;
+    user.email = data.email;
+    await user.save();
+
+    return NextResponse.json(user); 
   } catch (error) {
     console.error("Error in user:", error);
     return NextResponse.json({ error: "User not found" }, { status: 404 });

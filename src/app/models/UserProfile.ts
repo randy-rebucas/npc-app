@@ -43,6 +43,9 @@ export interface IUserProfile {
   city?: string;
   state?: string;
   zip?: string;
+
+  startDate?: Date;
+  controlledSubstances?: boolean;
 }
 
 const licenseSchema = new Schema<License>(
