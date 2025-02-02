@@ -29,7 +29,7 @@ export default function SettingsLayout({
       />
       <div className="flex flex-1 flex-col gap-4 p-4">
         {children}
-        <Tabs defaultValue="application" className="w-full">
+        <Tabs defaultValue="application" className="space-y-4">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="application">Application</TabsTrigger>
             <TabsTrigger value="profile">Profile</TabsTrigger>

@@ -9,8 +9,8 @@ const SignIn = () => {
             onClick={() => {
                 router.push('/auth');
             }}
-            className="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 
-                transition duration-200 text-lg font-medium"
+            className="bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary/90 
+                transition duration-200 text-sm font-medium"
         >
             Sign In
         </button>

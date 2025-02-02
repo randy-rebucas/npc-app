@@ -11,6 +11,8 @@ import ChatBot from '@/components/root/ChatBot/ChatBot';
 import { OpenAIProvider } from "@/providers/openai-provider";
 import { ThemeProvider } from "next-themes";
 import { FontSizeProvider } from "@/providers/font-provider";
+import { getServerSession } from "next-auth";
+import { authOptions } from "./api/auth/[...nextauth]/options";
 // import ChatComponent from "@/components/example/ChatComponent";
 
 
@@ -53,11 +55,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getServerSession(authOptions);
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -72,7 +75,7 @@ export default function RootLayout({
                       {children}
                     </NotificationsProvider>
                   </MessagingProvider>
-                  <ChatBot />
+                  {session && <ChatBot />}  
                   {/* <ChatComponent />  */}
                 </OpenAIProvider>
               </AuthProvider>
