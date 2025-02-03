@@ -4,7 +4,7 @@ import LinkedInProvider, {
 } from "next-auth/providers/linkedin";
 import GoogleProvider from "next-auth/providers/google";
 import connect from "@/lib/db";
-import User, { UserOnBoardingStatus, UserRole } from "@/app/models/User";
+import User, { UserOnBoardingStatus } from "@/app/models/User";
 import { createEvent } from "@/app/actions/events";
 import { EventType } from "@/app/models/Event";
 
@@ -28,13 +28,23 @@ export const authOptions: NextAuthOptions = {
           email: profile.email,
           username: profile.email?.split("@")[0],
           image: profile.picture,
-          role: UserRole.PHYSICIAN,
+          role: undefined,
         };
       },
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      profile(profile) {
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          username: profile.email?.split("@")[0],
+          image: profile.picture,
+          role: undefined,
+        };
+      }
     }),
     {
       id: "logto",
@@ -56,7 +66,7 @@ export const authOptions: NextAuthOptions = {
           email: profile.email,
           username: profile.email?.split("@")[0],
           image: profile.picture,
-          role: UserRole.PHYSICIAN,
+          role: undefined,
         };
       },
     },
@@ -75,14 +85,13 @@ export const authOptions: NextAuthOptions = {
           const newUser = await User.create({
             email: user.email,
             username: user.email?.split("@")[0],
-            role: UserRole.PHYSICIAN,
-            // For social login, we don't store password
+            role: undefined,
             provider: account?.provider,
             onBoardingStatus: UserOnBoardingStatus.INCOMPLETE,
           });
           
           user.id = newUser._id.toString();
-          user.role = UserRole.PHYSICIAN;
+          user.role = undefined;
           user.username = newUser.username;
         } else {
           user.id = existingUser._id.toString();

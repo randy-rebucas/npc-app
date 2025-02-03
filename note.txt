@@ -10,6 +10,7 @@ V1 = Add Controlled Substance Fee,   + Add Additional States (based on filter se
 V2 = allow to add additional Nurse Practitioners, 
 factor in any Special Fee per State (example - a specific state that a MD wants to charge extra for ‘controlled substance’,or a specific state where a ‘general’ additional fee (Restricted state fee)
 
+cashit67@gmail.com
 devtalk2022@gmail.com
 P@$$w0rd2025!
 
@@ -25,3 +26,19 @@ NP's Onboarding
     Bookmarking: Allow NPs to bookmark (favorite) profiles for later review.
   - Detailed Physician Profile
     Comprehensive Information: Qualifications, years of experience, practice type, compliance status, reviews, and multimedia (photos/videos).
+-------------
+Physician Recruiting & Dashboard + Admin Dashboard
+Stripe Express / 1099 - payment sign up + payouts
+Email Automation - onboarding emails - Brevo
+Credentialing Dashboard -
+Approve npi / gov id & - (switch to Pending) → Displays initial contract button on Physician Side
+Listing Creator - transfer info to create a listing
+
+
+
+Physician Dashboard:
+View Current Collaborations
+View Payout (Upcoming + Past)
+Monthly Attestation
+Trigger Based on Contract Signature (contract - start date between 2)
+Built within Physician Dashboard Update

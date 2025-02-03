@@ -24,13 +24,13 @@ export interface IUser extends Document {
   email: string;
   username: string;
   provider: string;
-  role: UserRole;
   createdAt: Date;
   updatedAt: Date;
   onBoardingStatus: UserOnBoardingStatus;
   submissionStatus: UserSubmissionStatus;
   metaData: Map<string, string>;
   stripeAccountId: string;
+  role?: string | undefined;
 }
 
 const userSchema = new Schema<IUser>(
@@ -38,7 +38,7 @@ const userSchema = new Schema<IUser>(
     email: { type: String, required: true, unique: true },
     username: { type: String, required: true, unique: true },
     provider: { type: String, required: true },
-    role: { type: String, enum: Object.values(UserRole), default: UserRole.PHYSICIAN },
+    role: { type: String },
     onBoardingStatus: {
       type: String,
       enum: Object.values(UserOnBoardingStatus),
@@ -57,10 +57,9 @@ const userSchema = new Schema<IUser>(
   },
   { timestamps: true }
 );
+
 const User =
   mongoose.models.User ??
   mongoose.model<IUser>("User", userSchema);
 
-
 export default User;
-

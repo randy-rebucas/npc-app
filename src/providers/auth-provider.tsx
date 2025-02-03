@@ -10,11 +10,15 @@ function OnboardingCheck({ children }: { children: React.ReactNode }) {
 
     const fetchUser = useMemo(() => {
         return async (userId: string) => {
-            const response = await fetch(`/api/user/${userId}/status`);
-            const { onBoardingStatus } = await response.json();
+            const response = await fetch(`/api/user/${userId}`);
+            const user = await response.json();
 
-            if (onBoardingStatus === "INCOMPLETE") {
+            if (user.role === null || user.role === undefined) {
                 router.push("/onboarding");
+            } else if (user.role === "PHYSICIAN" && user.onBoardingStatus === "INCOMPLETE") {
+                router.push("/onboarding/physician");
+            } else if (user.role === "NURSE_PRACTITIONER" && user.onBoardingStatus === "INCOMPLETE") {
+                router.push("/onboarding/nurse-practitioner");
             }
         };
     }, [router]);
