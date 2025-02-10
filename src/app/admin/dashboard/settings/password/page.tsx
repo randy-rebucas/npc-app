@@ -65,7 +65,7 @@ export default function Password() {
         method: "PUT",
         body: JSON.stringify(values),
       });
-      
+
       if (response.ok) {
         toast({
           title: "Success",
@@ -88,66 +88,59 @@ export default function Password() {
   }
 
   return (
-    <div className="space-y-6 p-6">
-      <div>
-        <h3 className="text-lg font-medium">Password Settings</h3>
-        <p className="text-sm text-muted-foreground">
-          Manage your password settings and preferences.
-        </p>
-      </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Change Password</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="currentPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Current Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="newPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>New Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirm New Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Updating..." : "Update Password"}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-    </div>
+
+    <Card>
+      <CardHeader>
+        <CardTitle>Password</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="currentPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Current Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="newPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>New Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm New Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? "Updating..." : "Update Password"}
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }

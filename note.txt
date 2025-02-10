@@ -42,3 +42,30 @@ View Payout (Upcoming + Past)
 Monthly Attestation
 Trigger Based on Contract Signature (contract - start date between 2)
 Built within Physician Dashboard Update
+
+
+Brevo
+Key name: NPC App
+key value: xsmtpsib-101fa3d5ed156dd9c780526564f05e4793bcadaff1e11fb9044678dafa326eb7-FndTSBP6mztZ835g
+
+
+Listings Entity:
+- Category
+- Title
+- Description
+- Board Certification
+- Practice Type
+- Practice Name
+- State licenses
+- Specialties
+- Additional Certifications
+
+Pricing:
+- Monthly Base Rate
+- Multiple NP fee in same practice
+- Additional fee per state
+- Controlled substance fee
+
+Photos:
+- Upload 2 to 3 photos
+

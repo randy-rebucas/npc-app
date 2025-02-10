@@ -18,6 +18,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
 import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
 
 const submissionStatus = ["INCOMPLETE", "INCORRECT", "APPROVED", "REJECTED", "PENDING"];
 // Define form schema
@@ -30,6 +31,7 @@ const formSchema = z.object({
     }),
     role: z.string().optional(),
     submissionStatus: z.string().optional(),
+    canCreateListings: z.boolean().optional(),
     metaData: z.array(z.object({
         key: z.string(),
         value: z.string()
@@ -49,7 +51,9 @@ export default function UserForm({ id }: { id: string | null }) {
             email: "",
             role: "",
             submissionStatus: "",
+            canCreateListings: false,
             metaData: [{ key: "", value: "" }]
+
         },
     })
 
@@ -113,9 +117,11 @@ export default function UserForm({ id }: { id: string | null }) {
                 form.setValue("email", data?.email || "");
                 form.setValue("role", data?.role || "");
                 form.setValue("submissionStatus", data?.submissionStatus || "");
+                form.setValue("canCreateListings", data?.canCreateListings || false);
                 form.setValue("metaData", Object.keys(data?.metaData || {}).map(key => ({ key, value: data?.metaData[key] })) || [{ key: "", value: "" }]);
             }
             getUser()
+
         }
     }, [id, form]);
 
@@ -200,6 +206,19 @@ export default function UserForm({ id }: { id: string | null }) {
                         </FormItem>
                     )}
                 />
+                <FormField
+                    control={form.control}
+                    name="canCreateListings"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel className="text-foreground">Can Create Listings</FormLabel>
+                            <FormControl>
+                                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                        </FormItem>
+                    )}
+                />
+
                 {/* MetaData Section */}
                 <div className="space-y-4">
                     <div className="flex justify-between items-center">

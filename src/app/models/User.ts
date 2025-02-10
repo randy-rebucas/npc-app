@@ -31,7 +31,9 @@ export interface IUser extends Document {
   metaData: Map<string, string>;
   stripeAccountId: string;
   role?: string | undefined;
+  canCreateListings: boolean;
 }
+
 
 const userSchema = new Schema<IUser>(
   {
@@ -50,6 +52,7 @@ const userSchema = new Schema<IUser>(
       default: UserSubmissionStatus.PENDING,
     },
     stripeAccountId: { type: String, default: "" },
+    canCreateListings: { type: Boolean, default: false },
     metaData: {
       type: Map,
       of: String,

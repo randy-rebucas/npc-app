@@ -93,8 +93,13 @@ export default async function Page({
                                         <span className="text-sm">{user.onBoardingStatus}</span>
                                     </div>
                                     <div className="flex justify-between">
+                                        <span className="text-sm font-medium">Can Create Listings</span>
+                                        <span className="text-sm">{user.canCreateListings ? 'Yes' : 'No'}</span>
+                                    </div>
+                                    <div className="flex justify-between">
                                         <span className="text-sm font-medium">Created At</span>
                                         <span className="text-sm">{formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}</span>
+
                                     </div>
                                 </CardContent>
                             </Card>

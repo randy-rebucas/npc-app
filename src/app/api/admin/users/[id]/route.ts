@@ -10,7 +10,6 @@ export async function PUT(
 
   try {
     await connect();
-    console.log(id)
     const data = await request.json();
     const user = await User.findByIdAndUpdate(id, data, {
       new: true,

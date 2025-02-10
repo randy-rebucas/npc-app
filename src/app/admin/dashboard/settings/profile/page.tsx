@@ -49,7 +49,7 @@ const profileFormSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export default function Profile() {
-  const [isLoading, setIsLoading] = useState(false); 
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<ProfileFormValues>({
@@ -68,7 +68,7 @@ export default function Profile() {
         method: "PUT",
         body: JSON.stringify(data),
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to update profile');
       }
@@ -89,57 +89,51 @@ export default function Profile() {
   }
 
   return (
-    <div className="space-y-6 p-6">
-      <div>
-        <h3 className="text-lg font-medium">Profile Settings</h3>
-        <p className="text-sm text-muted-foreground">
-          Manage your profile information and preferences.
-        </p>
-      </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Profile Settings</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Username</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter username" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter email"
-                        type="email"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Saving..." : "Save changes"}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-    </div>
+
+    <Card>
+      <CardHeader>
+        <CardTitle>Profile</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter username" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter email"
+                      type="email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? "Saving..." : "Save changes"}
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }

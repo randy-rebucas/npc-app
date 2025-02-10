@@ -44,9 +44,11 @@ export interface UserDocument {
   updatedAt: Date;
   onBoardingStatus: string;
   submissionStatus: string;
+  canCreateListings: boolean;
   metaData?: {
     [key: string]: string;
   };
+
   profile: {
     // _id: string;
     user: string;
@@ -173,7 +175,9 @@ export async function getUserById(id: string): Promise<UserDocument> {
     updatedAt: user[0].updatedAt,
     onBoardingStatus: user[0].onBoardingStatus,
     submissionStatus: user[0].submissionStatus,
+    canCreateListings: user[0].canCreateListings,
     metaData: user[0].metaData,
+
     profile: selectedItem(user[0].profile, [
       "firstName",
       "lastName",

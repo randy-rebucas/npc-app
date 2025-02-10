@@ -139,56 +139,49 @@ export default function Notification() {
   };
 
   return (
-    <div className="space-y-6 p-6">
-      <div>
-        <h3 className="text-lg font-medium">Notification Settings</h3>
-        <p className="text-sm text-muted-foreground">
-          Manage your notification settings and preferences.
-        </p>
-      </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Notification</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {Object.entries(INITIAL_CONFIG).map(([key, config]) => (
-                config.type === "boolean" ? (
-                  <FormField
-                    key={key}
-                    control={form.control}
-                    name={key as keyof z.infer<typeof formSchema>}
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5">
-                          <FormLabel className="text-base">
-                            {config.label}
-                          </FormLabel>
-                          <FormDescription>
-                            {config.description}
-                          </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            id={key}
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                ) : null
-              ))}
 
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Updating..." : "Update"}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Notifications</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {Object.entries(INITIAL_CONFIG).map(([key, config]) => (
+              config.type === "boolean" ? (
+                <FormField
+                  key={key}
+                  control={form.control}
+                  name={key as keyof z.infer<typeof formSchema>}
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">
+                          {config.label}
+                        </FormLabel>
+                        <FormDescription>
+                          {config.description}
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          id={key}
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              ) : null
+            ))}
+
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? "Updating..." : "Update"}
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }

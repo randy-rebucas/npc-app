@@ -14,7 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useApplicationSettings } from "@/providers/application-settings-provider";
@@ -145,51 +145,45 @@ export default function Application() {
   }
 
   return (
-    <div className="space-y-6 p-6">
-      <div>
-        <h3 className="text-lg font-medium">Application Settings</h3>
-        <p className="text-sm text-muted-foreground">
-          Manage your application settings and preferences.
-        </p>
-      </div>
 
-      <Card>
-        <CardHeader>
-          <h4 className="text-sm font-medium">General Settings</h4>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {Object.entries(INITIAL_CONFIG).map(([key, config]) => (
-                <FormField
-                  key={key}
-                  control={form.control}
-                  name={key as keyof z.infer<typeof formSchema>}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{config.label}</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder={config.placeholder as string}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        {config.description}
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              ))}
+    <Card>
+      <CardHeader>
+        <CardTitle>Application</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
 
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Updating..." : "Update"}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-    </div>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {Object.entries(INITIAL_CONFIG).map(([key, config]) => (
+              <FormField
+                key={key}
+                control={form.control}
+                name={key as keyof z.infer<typeof formSchema>}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{config.label}</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={config.placeholder as string}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      {config.description}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ))}
+
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? "Updating..." : "Update"}
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
+
   );
 }
