@@ -44,7 +44,7 @@ export default function Add({ itemId }: { itemId: string }) {
     return (
         <button className="p-2 z-10" onClick={() => toggleFavorites(itemId)}>
             <svg xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
+                className={`h-6 w-6 ${isFavorite ? 'text-primary' : 'text-muted-foreground'}`}
                 fill={isFavorite ? "currentColor" : "none"}
                 viewBox="0 0 24 24"
                 stroke="currentColor">

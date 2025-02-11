@@ -8,14 +8,12 @@ import HowItWork from "@/components/root/home/HowItWork";
 
 export default function Home() {
   return (
-    <>
-      <main className="flex min-h-screen flex-col items-center justify-center">
-        <Banner />
-        <Brand />
-        <AboutUs /> 
-        <Matching /> 
-        <HowItWork />
-      </main>
-    </>
+    <main className="flex min-h-screen flex-col items-center justify-center bg-background">
+      <Banner />
+      <Brand />
+      <AboutUs /> 
+      <Matching /> 
+      <HowItWork />
+    </main>
   );
 }

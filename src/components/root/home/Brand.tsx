@@ -4,12 +4,12 @@
 
 export default function Brand() {
     return (
-        <div className="w-full bg-gray-900 py-12">
+        <div className="w-full bg-background py-12 border-y border-border">
             <div className="max-w-7xl mx-auto px-4">
                 <div className="flex flex-col items-center space-y-8">
                     <div className="text-center">
-                        <h2 className="text-2xl font-semibold text-white">
-                            Founder featured on <span className="text-orange-500">Media</span>
+                        <h2 className="text-2xl font-semibold text-foreground">
+                            Founder featured on <span className="text-warning">Media</span>
                         </h2>
                     </div>
                     

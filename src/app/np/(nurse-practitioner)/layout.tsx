@@ -1,8 +1,7 @@
 import { getUserByEmail } from "@/app/actions/user";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-
+import { ThemeProvider } from "next-themes";
 import { getServerSession } from "next-auth";
-
 import { redirect } from "next/navigation";
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
@@ -15,8 +14,17 @@ export default async function Layout({ children }: { children: React.ReactNode }
     const user = await getUserByEmail(session.user.email);
 
     if (user.role !== "NURSE_PRACTITIONER") {
-        redirect("/np");
+        redirect("/np/listings");
     }
 
-    return <>{children}</>;
+    return (
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+        >
+            {children}
+        </ThemeProvider>
+    );
 }

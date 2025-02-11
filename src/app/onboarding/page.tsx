@@ -27,7 +27,6 @@ export default function OnboardingPage() {
 
             if (!response.ok) throw new Error('Failed to update user role');
 
-            // Update the session with the new role
             await update();
             if (selectedRole === 'PHYSICIAN') {
                 router.push('/onboarding/physician');
@@ -44,14 +43,14 @@ export default function OnboardingPage() {
     return (
         <div className="flex items-center justify-center">
             <div className="max-w-xl w-full space-y-8 p-10">
-
                 <form className="space-y-6" onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div
-                            className={`relative rounded-lg border-2 p-4 cursor-pointer transition-all duration-200 ${selectedRole === 'PHYSICIAN'
-                                    ? 'border-blue-500 bg-blue-50'
-                                    : 'border-gray-200 hover:border-blue-200'
-                                }`}
+                            className={`relative rounded-lg border-2 p-4 cursor-pointer transition-all duration-200 ${
+                                selectedRole === 'PHYSICIAN'
+                                    ? 'border-primary bg-primary/10'
+                                    : 'border-border hover:border-primary/50'
+                            }`}
                             onClick={() => setSelectedRole('PHYSICIAN')}
                         >
                             <input
@@ -64,10 +63,10 @@ export default function OnboardingPage() {
                                 className="sr-only"
                             />
                             <div className="flex flex-col items-center p-4">
-                                <Stethoscope className="h-12 w-12 text-blue-600 mb-3" />
+                                <Stethoscope className="h-12 w-12 text-primary mb-3" />
                                 <label
                                     htmlFor="PHYSICIAN"
-                                    className="text-base font-medium text-gray-900"
+                                    className="text-base font-medium text-foreground"
                                 >
                                     Physician
                                 </label>
@@ -75,10 +74,11 @@ export default function OnboardingPage() {
                         </div>
 
                         <div
-                            className={`relative rounded-lg border-2 p-4 cursor-pointer transition-all duration-200 ${selectedRole === 'NURSE_PRACTITIONER'
-                                    ? 'border-blue-500 bg-blue-50'
-                                    : 'border-gray-200 hover:border-blue-200'
-                                }`}
+                            className={`relative rounded-lg border-2 p-4 cursor-pointer transition-all duration-200 ${
+                                selectedRole === 'NURSE_PRACTITIONER'
+                                    ? 'border-primary bg-primary/10'
+                                    : 'border-border hover:border-primary/50'
+                            }`}
                             onClick={() => setSelectedRole('NURSE_PRACTITIONER')}
                         >
                             <input
@@ -91,10 +91,10 @@ export default function OnboardingPage() {
                                 className="sr-only"
                             />
                             <div className="flex flex-col items-center p-4">
-                                <Syringe className="h-12 w-12 text-blue-600 mb-3" />
+                                <Syringe className="h-12 w-12 text-primary mb-3" />
                                 <label
                                     htmlFor="NURSE_PRACTITIONER"
-                                    className="text-base font-medium text-gray-900"
+                                    className="text-base font-medium text-foreground"
                                 >
                                     Nurse Practitioner
                                 </label>
@@ -105,7 +105,7 @@ export default function OnboardingPage() {
                     <button
                         type="submit"
                         disabled={!selectedRole || isSubmitting}
-                        className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200"
+                        className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:bg-muted disabled:cursor-not-allowed transition-colors duration-200"
                     >
                         {isSubmitting ? 'Saving...' : 'Continue'}
                     </button>

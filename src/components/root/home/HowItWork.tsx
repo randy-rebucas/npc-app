@@ -47,40 +47,37 @@ const processSteps = [
 export default function HowItWork() {
     return (
         <div className="max-w-7xl mx-auto px-4 py-16">
-            {/* Header with sparkle icon */}
             <div className="flex flex-col items-center mb-12">
-                <button className="bg-blue-50 text-blue-600 px-4 py-2 rounded-full text-sm mb-4">
+                <button className="bg-primary/10 text-primary px-4 py-2 rounded-full text-sm mb-4">
                     How It Works
                 </button>
                 
-                <h2 className="text-3xl font-bold text-center">
+                <h2 className="text-3xl font-bold text-center text-foreground">
                     Our Simple Process:
                 </h2>
             </div>
 
-            {/* Process steps grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {processSteps.map((step, index) => (
                     <div 
                         key={index}
-                        className="bg-gray-50 p-6 rounded-2xl flex flex-col items-center text-center"
+                        className="bg-card p-6 rounded-2xl flex flex-col items-center text-center border border-border"
                     >
-                        <div className="mb-4">
+                        <div className="mb-4 text-primary">
                             {step.icon}
                         </div>
-                        <h3 className="text-xl font-semibold mb-3">
+                        <h3 className="text-xl font-semibold mb-3 text-foreground">
                             {step.title}
                         </h3>
-                        <p className="text-gray-600 text-sm">
+                        <p className="text-muted-foreground text-sm">
                             {step.description}
                         </p>
                     </div>
                 ))}
             </div>
 
-            {/* CTA Button */}
             <div className="flex justify-center mt-12">
-                <button className="bg-blue-600 text-white px-8 py-3 rounded-full hover:bg-blue-700 transition-colors flex items-center">
+                <button className="bg-primary text-primary-foreground px-8 py-3 rounded-full hover:bg-primary/90 transition-colors flex items-center">
                     Match With an MD Now
                     <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

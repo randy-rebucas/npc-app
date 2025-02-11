@@ -36,7 +36,7 @@ export default function SendOffer({ collaboratorId, refetch }: { collaboratorId:
     return (
         <button
             onClick={() => handleSendOffer(collaboratorId)}
-            className="flex-1 bg-white text-gray-700 border border-gray-300 rounded-md py-2 px-4 text-sm font-medium hover:bg-gray-50"
+            className="flex-1 bg-background text-foreground border border-border rounded-md py-2 px-4 text-sm font-medium hover:bg-muted"
         >
             Send Offer
         </button>

@@ -39,7 +39,7 @@ export default function Schedule({ calendlyLink }: { calendlyLink: string }) {
     return (
         <button
             onClick={() => scheduleInterview(calendlyLink)}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors"
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 px-4 rounded-lg transition-colors"
         >
             Schedule Interview
         </button>

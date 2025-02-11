@@ -72,7 +72,7 @@ export default function Items({ type }: { type: 'active' | 'request' }) {
                 <EmptyCollaborator type={type} />
             ) : (
                 collaborators.map((collaborator) => (
-                    <div key={collaborator.id} className="bg-white shadow rounded-lg p-6">
+                    <div key={collaborator.id} className="bg-card shadow rounded-lg p-6">
                         <div className="flex items-center space-x-4">
                             {collaborator.avatarUrl ? (
                                 <Image
@@ -83,22 +83,23 @@ export default function Items({ type }: { type: 'active' | 'request' }) {
                                     className="h-12 w-12 rounded-full object-cover"
                                 />
                             ) : (
-                                <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
-                                    <span className="text-gray-500 text-lg font-medium">
+                                <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
+                                    <span className="text-muted-foreground text-lg font-medium">
                                         {collaborator.name.charAt(0).toUpperCase()}
                                     </span>
                                 </div>
                             )}
                             <div className="flex-1">
-                                <h3 className="text-lg font-medium">{collaborator.name}</h3>
-                                <p className="text-sm text-gray-500">{collaborator.email}</p>
+                                <h3 className="text-lg font-medium text-foreground">{collaborator.name}</h3>
+                                <p className="text-sm text-muted-foreground">{collaborator.email}</p>
                             </div>
                         </div>
                         <div className="mt-4">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${collaborator.status === 'active'
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-yellow-100 text-yellow-800'
-                                }`}>
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                collaborator.status === 'active'
+                                    ? 'bg-success/20 text-success'
+                                    : 'bg-warning/20 text-warning'
+                            }`}>
                                 {collaborator.status}
                             </span>
                         </div>

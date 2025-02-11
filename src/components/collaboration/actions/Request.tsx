@@ -25,8 +25,10 @@ export default function Request({ id }: { id: string }) {
     };
 
     return (
-        <button onClick={() => handleRequest(id)}
-            className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg transition-colors">
+        <button 
+            onClick={() => handleRequest(id)}
+            className="w-full bg-success hover:bg-success/90 text-success-foreground py-3 px-4 rounded-lg transition-colors"
+        >
             Request Collaboration
         </button>
     )

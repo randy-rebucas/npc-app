@@ -11,7 +11,7 @@ export default function CredentialsLayout({ children }: { children: React.ReactN
 
     const tabs = ['Credentials', 'Education', 'Govid', 'Certification'];
     return (
-        <div className="bg-background min-h-screen w-full">
+        <div className="min-h-screen w-full bg-background">
             <Header />
             <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-1 flex-col">

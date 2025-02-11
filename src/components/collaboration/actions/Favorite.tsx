@@ -1,8 +1,7 @@
 'use client'
 
 import { toast } from '@/hooks/use-toast';
-import { useCallback, useState } from 'react';
-import { useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 
 export default function Favorite({ id }: { id: string }) {
     const [isFavorite, setIsFavorite] = useState(false);
@@ -19,8 +18,6 @@ export default function Favorite({ id }: { id: string }) {
     useEffect(() => {
         fetchFavorite();
     }, [fetchFavorite]);
-
-
 
     const toggleFavorites = async (id: string) => {
         const favorite = await fetch('/api/favorites', {
@@ -44,7 +41,14 @@ export default function Favorite({ id }: { id: string }) {
     }
 
     return (
-        <button onClick={() => toggleFavorites(id)} className={`w-full bg-white hover:bg-gray-50 py-3 px-4 rounded-lg transition-colors border ${isFavorite ? '' : 'text-blue-600 border-blue-600text-red-600 border -red-600'}`}>
+        <button 
+            onClick={() => toggleFavorites(id)} 
+            className={`w-full bg-background hover:bg-muted py-3 px-4 rounded-lg transition-colors border ${
+                isFavorite 
+                    ? 'text-foreground border-border' 
+                    : 'text-primary border-primary'
+            }`}
+        >
             {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
         </button>
     )

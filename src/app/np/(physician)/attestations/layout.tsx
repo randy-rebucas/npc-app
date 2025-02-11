@@ -27,7 +27,7 @@ export default function AttestationsLayout({
   }, [session]);
 
   return (
-    <div className="bg-gray-50 min-h-screen w-full">
+    <div className="min-h-screen w-full bg-background">
       {children}
       {modal}
     </div>

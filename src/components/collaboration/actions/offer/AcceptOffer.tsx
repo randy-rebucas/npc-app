@@ -38,7 +38,7 @@ export default function AcceptOffer({ collaboratorId, refetch }: { collaboratorI
     return (
         <button
             onClick={() => handleAcceptOffer(collaboratorId)}
-            className="flex-1 bg-green-50 text-green-600 border border-green-300 rounded-md py-2 px-4 text-sm font-medium hover:bg-green-100"
+            className="flex-1 bg-success/10 text-success border border-success/30 rounded-md py-2 px-4 text-sm font-medium hover:bg-success/20"
         >
             Accept Offer
         </button>

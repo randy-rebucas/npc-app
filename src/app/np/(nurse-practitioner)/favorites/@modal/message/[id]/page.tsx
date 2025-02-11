@@ -8,10 +8,10 @@ export default async function FavoritesMessageModal({
     params: Promise<{ id: string }>
 }) {
     const id = (await params).id;
-    console.log(id);
+    
     return (
         <Modal className="max-w-md">
-            <div className="p-4">
+            <div className="p-4 bg-background text-foreground">
                 <h2 className="text-xl font-semibold mb-4">Message Details</h2>
                 
                 <div className="space-y-4">

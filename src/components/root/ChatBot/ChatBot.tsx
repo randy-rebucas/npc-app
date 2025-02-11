@@ -94,7 +94,7 @@ export default function ChatBot() {
     return (
         <div className="fixed bottom-4 right-4 z-50">
             <button
-                className={`p-3 rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-lg transition-all duration-200`}
+                className={`p-3 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg transition-all duration-200`}
                 onClick={() => setIsOpen(!isOpen)}
                 aria-label={isOpen ? 'Close chat' : 'Open chat'}
             >
@@ -111,12 +111,12 @@ export default function ChatBot() {
             </button>
 
             {isOpen && (
-                <div className={`fixed bottom-20 right-4 w-96 h-[600px] bg-white dark:bg-gray-800 rounded-lg shadow-xl flex flex-col overflow-hidden`} role="dialog" aria-label="Chat window">
-                    <div className={`bg-blue-500 dark:bg-blue-600 text-white p-4 shadow`}>
+                <div className={`fixed bottom-20 right-4 w-96 h-[600px] bg-card rounded-lg shadow-xl flex flex-col overflow-hidden`} role="dialog" aria-label="Chat window">
+                    <div className={`bg-primary text-primary-foreground p-4 shadow`}>
                         <h3 className="text-lg font-semibold">Chat Support</h3>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4" role="log" aria-live="polite">
+                    <div className="border flex-1 overflow-y-auto p-4 space-y-4" role="log" aria-live="polite">
                         {messages.map((message) => (
                             <div
                                 key={message.id}
@@ -129,12 +129,12 @@ export default function ChatBot() {
                             >
                                 <div className={`rounded-lg px-4 py-2 ${
                                     message.sender === 'user'
-                                        ? 'bg-blue-500 text-white'
-                                        : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
+                                        ? 'bg-primary text-primary-foreground'
+                                        : 'bg-muted text-foreground'
                                 }`}>
                                     {message.text}
                                 </div>
-                                <span className={`text-xs text-gray-500 dark:text-gray-400 mt-1`} aria-label={`Sent at ${new Date(message.timestamp).toLocaleTimeString()}`}>
+                                <span className={`text-xs text-muted-foreground mt-1`} aria-label={`Sent at ${new Date(message.timestamp).toLocaleTimeString()}`}>
                                     {new Date(message.timestamp).toLocaleTimeString([], {
                                         hour: '2-digit',
                                         minute: '2-digit'
@@ -145,7 +145,7 @@ export default function ChatBot() {
                         <div ref={messagesEndRef} />
                     </div>
 
-                    <div className={`border-t p-4 bg-gray-50 dark:bg-gray-900`}>
+                    <div className={`border-t border-border p-4 bg-muted`}>
                         <div className="flex gap-2">
                             <input
                                 type="text"
@@ -153,13 +153,13 @@ export default function ChatBot() {
                                 onChange={(e) => setInputText(e.target.value)}
                                 onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
                                 placeholder="Type your message..."
-                                className={`flex-1 rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed dark:bg-gray-800 dark:text-white`}
+                                className={`flex-1 rounded-lg border border-border px-4 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:bg-muted disabled:cursor-not-allowed`}
                                 aria-label="Chat message input"
                                 disabled={isLoading}
                             />
                             <button
                                 onClick={handleSend}
-                                className={`px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200`}
+                                className={`px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200`}
                                 disabled={!inputText.trim() || isLoading}
                                 aria-label={isLoading ? 'Sending message...' : 'Send message'}
                             >

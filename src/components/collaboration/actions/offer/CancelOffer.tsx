@@ -38,7 +38,7 @@ export default function CancelOffer({ collaboratorId, refetch }: { collaboratorI
     return (
         <button
             onClick={() => handleCancelOffer(collaboratorId)}
-            className="flex-1 bg-red-50 text-red-600 border border-red-300 rounded-md py-2 px-4 text-sm font-medium hover:bg-red-100"
+            className="flex-1 bg-destructive/10 text-destructive border border-destructive/30 rounded-md py-2 px-4 text-sm font-medium hover:bg-destructive/20"
         >
             Cancel Offer
         </button>

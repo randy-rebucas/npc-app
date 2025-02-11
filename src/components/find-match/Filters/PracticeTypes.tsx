@@ -44,12 +44,12 @@ export default function PracticeTypes() {
         <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                    <h3 className="font-medium">Practice Types</h3>
+                    <h3 className="font-medium text-foreground">Practice Types</h3>
                 </div>
                 {practiceTypes.length > 0 && (
                     <button
                         onClick={() => setIsExpanded(!isExpanded)}
-                        className="text-gray-500 hover:text-gray-700"
+                        className="text-muted-foreground hover:text-foreground"
                         aria-label={isExpanded ? "Collapse section" : "Expand section"}
                     >
                         <svg
@@ -72,23 +72,23 @@ export default function PracticeTypes() {
                     <div className="space-y-2 transition-all duration-300">
                         {practiceTypes.map((practiceType) => (
                             <label
-                                className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 rounded transition-colors duration-200"
+                                className="flex items-center gap-3 cursor-pointer hover:bg-muted rounded transition-colors duration-200"
                                 key={practiceType._id}
                             >
                                 <input
                                     type="checkbox"
-                                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-colors duration-200"
+                                    className="h-4 w-4 rounded border-border text-primary focus:ring-primary transition-colors duration-200"
                                     checked={isPracticeTypeSelected(practiceType.type)}
                                     onChange={() => handleTogglePracticeType(practiceType.type)}
                                 />
-                                <span className="text-gray-700">{practiceType.type}</span>
+                                <span className="text-foreground">{practiceType.type}</span>
                             </label>
                         ))}
                     </div>
                     {selectedPracticeTypes.length > 0 && (
                         <button
                             onClick={handleClear}
-                            className="text-gray-500 hover:text-gray-700 mt-2 text-sm"
+                            className="text-muted-foreground hover:text-foreground mt-2 text-sm"
                         >
                             Clear all
                         </button>

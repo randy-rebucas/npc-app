@@ -27,7 +27,7 @@ export default function Accept({ collaboratorId, refetch }: { collaboratorId: st
     return (
         <button
             onClick={() => handleAccept(collaboratorId)}
-            className="flex-1 bg-indigo-600 text-white rounded-md py-2 px-4 text-sm font-medium hover:bg-indigo-700"
+            className="flex-1 bg-primary text-primary-foreground rounded-md py-2 px-4 text-sm font-medium hover:bg-primary/90"
         >
             Accept
         </button>

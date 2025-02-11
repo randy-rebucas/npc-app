@@ -60,7 +60,7 @@ export default async function FindMatch(props: {
     const endItem = Math.min(startItem + ITEMS_PER_PAGE - 1, total);
 
     return (
-        <div className="bg-gray-50 min-h-screen w-full">
+        <div className="min-h-screen w-full bg-background">
             <Header showSearch={true} />
             <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 <div className="flex gap-8">

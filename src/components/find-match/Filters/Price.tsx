@@ -38,12 +38,12 @@ export default function Price() {
     }, [priceRange, searchParams, pathname, replace]);
 
     return (
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+        <div className="bg-card p-4 rounded-lg shadow-sm border border-border">
             <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-800">Price Range</h3>
+                <h3 className="text-lg font-semibold text-foreground">Price Range</h3>
                 <button
                     onClick={handleClear}
-                    className="text-sm text-blue-600 hover:text-blue-700 transition-colors"
+                    className="text-sm text-primary hover:text-primary/90 transition-colors"
                 >
                     Reset
                 </button>
@@ -52,24 +52,24 @@ export default function Price() {
             <div className="space-y-6">
                 <div className="flex items-center gap-3">
                     <div className="relative flex-1">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
                         <input
                             type="number"
                             value={priceRange[0]}
                             onChange={handleMinChange}
-                            className="w-full pl-8 pr-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            className="w-full pl-8 pr-3 py-2 rounded-md border border-border focus:border-primary focus:ring-1 focus:ring-primary bg-background text-foreground"
                             placeholder="Min"
                             min="0"
                         />
                     </div>
-                    <span className="text-gray-400">to</span>
+                    <span className="text-muted-foreground">to</span>
                     <div className="relative flex-1">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
                         <input
                             type="number"
                             value={priceRange[1]}
                             onChange={handleMaxChange}
-                            className="w-full pl-8 pr-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            className="w-full pl-8 pr-3 py-2 rounded-md border border-border focus:border-primary focus:ring-1 focus:ring-primary bg-background text-foreground"
                             placeholder="Max"
                             min="0"
                         />
@@ -81,14 +81,14 @@ export default function Price() {
                         type="range"
                         value={priceRange[1]}
                         onChange={handleRangeChange}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                        className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                         min="0"
                         max="1000"
                         step="10"
                     />
                 </div>
 
-                <div className="flex justify-between text-sm text-gray-500">
+                <div className="flex justify-between text-sm text-muted-foreground">
                     <span>${priceRange[0]}</span>
                     <span>${priceRange[1]}</span>
                 </div>

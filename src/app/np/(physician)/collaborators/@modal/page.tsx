@@ -1,3 +1,3 @@
-export default function CollaboratorModal() {
+export default function ListingModal() {
     return null
 }

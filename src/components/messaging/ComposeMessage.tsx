@@ -22,7 +22,7 @@ export function ComposeMessage({ physicianId }: { physicianId: string }) {
 
     return (
         <div>
-            <label htmlFor={filteredMessages.length > 0 ? 'reply' : 'message'} className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor={filteredMessages.length > 0 ? 'reply' : 'message'} className="block text-sm font-medium text-foreground mb-2">
                 {filteredMessages.length > 0 ? 'Reply' : 'Message'}
             </label>
             <textarea
@@ -31,14 +31,14 @@ export function ComposeMessage({ physicianId }: { physicianId: string }) {
                 rows={4}
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary bg-background text-foreground"
                 placeholder={filteredMessages.length > 0 ? 'Type your reply here...' : 'Type your message here...'}
                 required
             />
             <div className="mt-4 flex justify-end space-x-2">
                 <button
                     onClick={handleSend}
-                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+                    className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90"
                 >
                     Send {filteredMessages.length > 0 ? 'Reply' : 'Message'}
                 </button>

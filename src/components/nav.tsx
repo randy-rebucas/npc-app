@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from 'lucide-react'
-import { Key, User, HelpCircle, CreditCardIcon, FileCheck, Settings, MessageCircle, Users, Search, Heart, Shield } from "lucide-react"
+import { Key, User, HelpCircle, CreditCardIcon, FileCheck, Settings, MessageCircle, Users, Search, Heart, File } from "lucide-react"
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 
@@ -52,6 +52,18 @@ export default function Nav() {
                     }
                 ]);
             }
+
+            if (user?.canCreateListings) {
+                setItems(currentItems => [
+                    ...currentItems,
+                    {
+                        title: "Listings",
+                        url: "/np/listings",  
+                        icon: File,
+                    }
+                ]);
+            }
+            
 
             if (user?.role === "PHYSICIAN" && user?.submissionStatus === "APPROVED") {
                 setItems(currentItems => [
@@ -117,17 +129,6 @@ export default function Nav() {
                         title: "Collaborators",
                         url: "/np/collaborators",
                         icon: Users,
-                    },
-                ]);
-            }
-
-            if (user?.role === "ADMIN") {
-                setItems(currentItems => [
-                    ...currentItems,
-                    {
-                        title: "Admin",
-                        url: "/admin",
-                        icon: Shield,
                     },
                 ]);
             }

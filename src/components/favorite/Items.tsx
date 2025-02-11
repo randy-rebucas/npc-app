@@ -28,8 +28,8 @@ export default function Items({ items }: { items: IFavorite[] }) {
     if (items.length === 0) {
         return (
             <div className="text-center py-12">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No Favorites Yet</h3>
-                <p className="text-gray-500">
+                <h3 className="text-lg font-medium text-foreground mb-2">No Favorites Yet</h3>
+                <p className="text-muted-foreground">
                     When you find physicians you&apos;re interested in, save them here for easy access.
                 </p>
             </div>
@@ -38,11 +38,10 @@ export default function Items({ items }: { items: IFavorite[] }) {
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
             {items.map((item) => (
                 <div
                     key={item.id}
-                    className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 p-4"
+                    className="bg-card rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 p-4"
                 >
                     <div className="flex items-start space-x-4">
                         <div className="relative w-24 h-24 flex-shrink-0">
@@ -54,20 +53,20 @@ export default function Items({ items }: { items: IFavorite[] }) {
                             />
                         </div>
                         <div className="flex-1">
-                            <h2 className="text-lg font-medium text-gray-900">
+                            <h2 className="text-lg font-medium text-foreground">
                                 {item.physicianUser.profile.firstName + " " + item.physicianUser.profile.lastName},
                                 <span className="ml-1">{item.physicianUser.profile.title}</span>
                             </h2>
 
                             <div className="mt-2 space-y-2">
                                 <p className="text-sm">
-                                    <span className="text-gray-500">Total Price: </span>
-                                    <span className="font-medium">${item.physicianUser.profile.monthlyCollaborationRate}</span>
+                                    <span className="text-muted-foreground">Total Price: </span>
+                                    <span className="font-medium text-foreground">${item.physicianUser.profile.monthlyCollaborationRate}</span>
                                 </p>
 
                                 <div className="flex flex-wrap gap-2">
                                     {item.physicianUser.profile.practiceTypes && (
-                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
                                             {item.physicianUser.profile.practiceTypes.join(", ")}
                                         </span>
                                     )}
@@ -76,7 +75,7 @@ export default function Items({ items }: { items: IFavorite[] }) {
                                 <div className="flex gap-2 mt-4">
                                     <Link
                                         href={`/np/favorites/message/${item.physicianUser.id}`} 
-                                        className="text-center flex-1 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors"
+                                        className="text-center flex-1 px-3 py-1.5 text-sm font-medium text-primary bg-primary/10 rounded-md hover:bg-primary/20 transition-colors"
                                     >
                                         Message
                                     </Link>
