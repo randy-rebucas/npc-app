@@ -127,7 +127,7 @@ export default function AgreementPage() {
     }, [formFilled, checkMemberstackAlternative]);
 
     return (
-        <div className="bg-gray-50 min-h-screen w-full">
+        <div className="bg-background min-h-screen w-full">
             <Script 
                 src="https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js" 
                 strategy="beforeInteractive"
@@ -137,7 +137,7 @@ export default function AgreementPage() {
                 <div className="flex flex-1 flex-col space-y-8 p-8">
                     <div 
                         id="JotFormEmbedContainer" 
-                        className="w-full h-full" 
+                        className="w-full h-full bg-card rounded-lg border border-border" 
                         style={{ height: "100vh", overflow: "hidden" }}
                     >
                         <iframe
