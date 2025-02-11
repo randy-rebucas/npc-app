@@ -131,17 +131,17 @@ export default function GovidPage() {
     }
 
     return (
-        <div className="bg-white max-w-2xl mx-auto p-6">
+        <div className="bg-background max-w-2xl mx-auto p-6">
             <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Government ID</h2>
-                <p className="text-gray-600 mt-1">
+                <h2 className="text-2xl font-bold text-foreground">Government ID</h2>
+                <p className="text-muted-foreground mt-1">
                     Your record of upload of your Government Issue ID.
                 </p>
             </div>
 
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-foreground">
                         Upload Government ID
                     </label>
                     <div className="relative">
@@ -149,12 +149,12 @@ export default function GovidPage() {
                             type="file"
                             accept="image/*"
                             onChange={(e) => form.setValue('governmentId', e.target.files?.[0])}
-                            className="block w-full text-sm text-gray-500
+                            className="block w-full text-muted-foreground
                                 file:mr-4 file:py-2 file:px-4
                                 file:rounded-full file:border-0
                                 file:text-sm file:font-semibold
-                                file:bg-blue-50 file:text-blue-700
-                                hover:file:bg-blue-100
+                                file:bg-primary/10 file:text-primary
+                                hover:file:bg-primary/20
                                 cursor-pointer"
                         />
                     </div>
@@ -163,23 +163,23 @@ export default function GovidPage() {
                 <div className="flex justify-between items-center">
                     <span className={`px-3 py-1 rounded-full text-sm 
                         ${currentGovId.governmentIdPath 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-gray-100 text-gray-700'}`}>
+                            ? 'bg-success/20 text-success' 
+                            : 'bg-muted text-muted-foreground'}`}>
                         {currentGovId.governmentIdPath ? 'Document Uploaded' : 'No Document'}
                     </span>
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg
-                            hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed
-                            transition duration-150 ease-in-out"
+                        className="px-4 py-2 bg-primary text-primary-foreground rounded-lg
+                            hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed
+                            transition-colors duration-200"
                     >
                         {isSubmitting ? "Saving..." : "Save Changes"}
                     </button>
                 </div>
 
                 {(govIdUrl || currentGovId.governmentIdPath) && (
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                         Uploaded: {govIdUrl || currentGovId.governmentIdPath}
                     </p>
                 )}

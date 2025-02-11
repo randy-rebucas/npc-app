@@ -152,7 +152,7 @@ export default function NotificationsPage() {
     if (isLoading) {
         return (
             <div className="max-w-4xl mx-auto p-6 flex justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
             </div>
         );
     }
@@ -160,13 +160,13 @@ export default function NotificationsPage() {
     return (
         <div className="max-w-4xl mx-auto p-6 space-y-6">
             {/* Notification Preferences Section */}
-            <div className="border rounded-lg p-6">
-                <h2 className="text-lg font-medium mb-4">Notification Preferences</h2>
+            <div className="border rounded-lg p-6 bg-card">
+                <h2 className="text-lg font-medium mb-4 text-foreground">Notification Preferences</h2>
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
                         <div>
-                            <label className="font-medium">Email Notifications</label>
-                            <p className="text-sm text-gray-500">Receive updates via email</p>
+                            <label className="font-medium text-foreground">Email Notifications</label>
+                            <p className="text-sm text-muted-foreground">Receive updates via email</p>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
                             <input
@@ -176,15 +176,18 @@ export default function NotificationsPage() {
                                 onChange={() => handleToggle('emailNotifications')}
                                 disabled={updatingSettings.includes('emailNotifications')}
                             />
-
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                            <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer 
+                                        peer-checked:after:translate-x-full peer-checked:bg-primary 
+                                        after:content-[''] after:absolute after:top-[2px] after:left-[2px] 
+                                        after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all">
+                            </div>
                         </label>
                     </div>
 
                     <div className="flex items-center justify-between">
                         <div>
-                            <label className="font-medium">Push Notifications</label>
-                            <p className="text-sm text-gray-500">Receive push notifications</p>
+                            <label className="font-medium text-foreground">Push Notifications</label>
+                            <p className="text-sm text-muted-foreground">Receive push notifications</p>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
                             <input
@@ -194,14 +197,17 @@ export default function NotificationsPage() {
                                 onChange={() => handleToggle('pushNotifications')}
                                 disabled={updatingSettings.includes('pushNotifications')}
                             />
-
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                            <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer 
+                                        peer-checked:after:translate-x-full peer-checked:bg-primary 
+                                        after:content-[''] after:absolute after:top-[2px] after:left-[2px] 
+                                        after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all">
+                            </div>
                         </label>
                     </div>
                 </div>
             </div>
-            <div className="border rounded-lg p-6">
-                <h2 className="text-lg font-medium mb-4">Notification Types</h2>
+            <div className="border rounded-lg p-6 bg-card">
+                <h2 className="text-lg font-medium mb-4 text-foreground">Notification Types</h2>
                 <div className="space-y-4">
                     {[
                         { id: 'new-messages' as const, label: 'New Messages' },
@@ -216,12 +222,13 @@ export default function NotificationsPage() {
                                 checked={settings.notificationTypes[id]}
                                 onChange={() => handleTypeToggle(id)}
                                 disabled={updatingSettings.includes(id)}
-                                className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary"
                             />
-
                             <label htmlFor={id} className="ml-3">
-                                <div className="font-medium">{label}</div>
-                                <p className="text-sm text-gray-500">Receive notifications for {id.toLowerCase()}</p>
+                                <div className="font-medium text-foreground">{label}</div>
+                                <p className="text-sm text-muted-foreground">
+                                    Receive notifications for {id.toLowerCase()}
+                                </p>
                             </label>
                         </div>
                     ))}

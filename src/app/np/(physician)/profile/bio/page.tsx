@@ -102,55 +102,58 @@ export default function Bio() {
     }
 
     return (
-        <div className="bg-white max-w-2xl mx-auto p-6">
+        <div className="bg-background max-w-2xl mx-auto p-6">
             <div className="mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Bio</h2>
-                <p className="text-sm text-gray-600 mt-1">
+                <h2 className="text-xl font-semibold text-foreground">Bio</h2>
+                <p className="text-sm text-muted-foreground mt-1">
                     This will be shown to prospective Nurse Practitioners seeking a Collaborating Physician after our matching process.
                 </p>
             </div>
 
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-foreground">
                         Your Background:
                     </label>
                     <textarea
                         {...form.register("description")}
-                        className="w-full min-h-[100px] p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                        className="w-full min-h-[100px] p-3 bg-background border border-border rounded-lg 
+                                 focus:ring-2 focus:ring-primary focus:border-primary resize-none"
                         placeholder="Tell us about your medical background and experience..."
                     />
                     {form.formState.errors.description && (
-                        <p className="text-sm text-red-500">{form.formState.errors.description.message}</p>
+                        <p className="text-sm text-destructive">{form.formState.errors.description.message}</p>
                     )}
                 </div>
 
                 <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-foreground">
                         Board Certifications:
                     </label>
                     <input
                         {...form.register("boardCertification")}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full p-3 bg-background border border-border rounded-lg 
+                                 focus:ring-2 focus:ring-primary focus:border-primary"
                         placeholder="e.g., American Board of Internal Medicine (ABIM)"
                     />
                     {form.formState.errors.boardCertification && (
-                        <p className="text-sm text-red-500">{form.formState.errors.boardCertification.message}</p>
+                        <p className="text-sm text-destructive">{form.formState.errors.boardCertification.message}</p>
                     )}
                 </div>
 
                 <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-foreground">
                         LinkedIn Profile:
                     </label>
                     <input
                         type="url"
                         {...form.register("linkedinProfile")}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full p-3 bg-background border border-border rounded-lg 
+                                 focus:ring-2 focus:ring-primary focus:border-primary"
                         placeholder="https://linkedin.com/in/your-profile"
                     />
                     {form.formState.errors.linkedinProfile && (
-                        <p className="text-sm text-red-500">{form.formState.errors.linkedinProfile.message}</p>
+                        <p className="text-sm text-destructive">{form.formState.errors.linkedinProfile.message}</p>
                     )}
                 </div>
 
@@ -158,13 +161,14 @@ export default function Bio() {
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-4 py-2 bg-primary text-primary-foreground rounded-lg 
+                                 hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary 
+                                 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isSubmitting ? "Saving..." : "Save Changes"}
                     </button>
                 </div>
             </form>
-
         </div>
     );
 }

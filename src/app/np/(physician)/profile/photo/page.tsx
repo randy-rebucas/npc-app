@@ -127,17 +127,17 @@ export default function Photo() {
     };
 
     return (
-        <div className="bg-white max-w-2xl mx-auto p-6">
+        <div className="bg-background max-w-2xl mx-auto p-6">
             <div className="mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Profile Picture</h2>
-                <p className="text-sm text-gray-500">
+                <h2 className="text-xl font-semibold text-foreground">Profile Picture</h2>
+                <p className="text-sm text-muted-foreground">
                     Please make sure your information is up to date.
                 </p>
             </div>
 
             <div className="flex flex-col items-center gap-6">
                 {/* Profile Image */}
-                <div className="relative w-32 h-32 rounded-full overflow-hidden bg-gray-100">
+                <div className="relative w-32 h-32 rounded-full overflow-hidden bg-muted">
                     {(photoUrl) ? (
                         <Image
                             src={photoUrl || ''}
@@ -147,7 +147,7 @@ export default function Photo() {
                             height={128}
                         />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center text-2xl font-semibold text-gray-600">
+                        <div className="w-full h-full flex items-center justify-center text-2xl font-semibold text-muted-foreground">
                             {''}
                         </div>
                     )}
@@ -171,8 +171,8 @@ export default function Photo() {
                     <button
                         onClick={() => document.getElementById("profile-upload")?.click()}
                         disabled={isUploading}
-                        className="flex items-center gap-2 px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 
-                                 transition-colors text-gray-700 font-medium disabled:opacity-50"
+                        className="flex items-center gap-2 px-4 py-2 rounded-md bg-card hover:bg-card/80 
+                                 transition-colors text-foreground font-medium disabled:opacity-50"
                     >
                         <svg
                             className="w-5 h-5"

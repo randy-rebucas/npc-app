@@ -133,10 +133,10 @@ export default function EducationPage() {
     }
 
     return (
-        <div className="bg-white max-w-2xl mx-auto p-6">
+        <div className="bg-background max-w-2xl mx-auto p-6">
             <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900">Degree</h2>
-                <p className="text-gray-600 mt-2">
+                <h2 className="text-2xl font-bold text-foreground">Degree</h2>
+                <p className="text-muted-foreground mt-2">
                     This will be shown to prospective Nurse Practitioners seeking a Collaborating Physician
                 </p>
             </div>
@@ -144,23 +144,25 @@ export default function EducationPage() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 {/* Clinical Degree Field */}
                 <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-foreground">
                         Clinical Degree Type
                     </label>
                     <input
                         type="text"
                         {...form.register("clinicalDegree")}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-2 bg-background border border-border rounded-lg 
+                                 focus:ring-2 focus:ring-primary focus:border-primary"
                         placeholder="MD"
                     />
                 </div>
 
                 {/* Practice Types Section */}
                 <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Practice Types</h3>
+                    <h3 className="text-lg font-semibold text-foreground">Practice Types</h3>
                     <div className="flex flex-wrap gap-2">
                         {form.watch("practiceTypes").map((type) => (
-                            <span key={type} className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                            <span key={type} className="inline-flex items-center px-3 py-1 rounded-full 
+                                                      bg-primary/10 text-primary">
                                 {type}
                                 <button
                                     type="button"
@@ -168,7 +170,7 @@ export default function EducationPage() {
                                         const newTypes = form.getValues("practiceTypes").filter(t => t !== type);
                                         form.setValue("practiceTypes", newTypes);
                                     }}
-                                    className="ml-2 text-blue-600 hover:text-blue-800"
+                                    className="ml-2 text-primary hover:text-primary/80"
                                 >×</button>
                             </span>
                         ))}
@@ -180,7 +182,8 @@ export default function EducationPage() {
                                 form.setValue("practiceTypes", [...form.getValues("practiceTypes"), value]);
                             }
                         }}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-2 bg-background border border-border rounded-lg 
+                                 focus:ring-2 focus:ring-primary focus:border-primary"
                     >
                         <option value="">Select practice types</option>
                         {practices
@@ -192,20 +195,21 @@ export default function EducationPage() {
                     </select>
                 </div>
 
-                <hr className="my-8 border-gray-200" />
+                <hr className="border-border" />
 
                 {/* Education Fields */}
                 <div className="space-y-6">
-                    <h3 className="text-lg font-semibold text-gray-900">Education</h3>
+                    <h3 className="text-lg font-semibold text-foreground">Education</h3>
                     {(['undergrad', 'medical', 'residency'] as const).map((field: keyof Education) => (
                         <div key={field} className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-700">
+                            <label className="block text-sm font-medium text-foreground">
                                 {field.charAt(0).toUpperCase() + field.slice(1)} Institution
                             </label>
                             <input
                                 type="text"
                                 {...form.register(`education.${field}`)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-4 py-2 bg-background border border-border rounded-lg 
+                                         focus:ring-2 focus:ring-primary focus:border-primary"
                                 placeholder={`Enter your ${field} institution`}
                             />
                         </div>
@@ -217,7 +221,8 @@ export default function EducationPage() {
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                        className="px-6 py-2 bg-primary text-primary-foreground rounded-lg 
+                                 hover:bg-primary/90 disabled:opacity-50 transition-colors"
                     >
                         {isSubmitting ? "Saving..." : "Save Changes"}
                     </button>

@@ -139,35 +139,34 @@ export default function CredentialsPage() {
     }
 
     return (
-        <div className="bg-white max-w-2xl mx-auto p-6">
+        <div className="bg-background max-w-2xl mx-auto p-6">
             <div className="mb-6">
-                <h2 className="text-xl font-semibold">License Information</h2>
-                <p className="text-gray-600 mt-2">
+                <h2 className="text-xl font-semibold text-foreground">License Information</h2>
+                <p className="text-muted-foreground mt-2">
                     License verification is checked prior to all collaboration initiations.
                 </p>
-                <p className="text-gray-600 mt-2">
-                    <span className="font-medium">NP Collaborator</span> is currently serving{" "}
-                    <span className="font-medium">NJ, MI, OH, TX</span>
+                <p className="text-muted-foreground mt-2">
+                    <span className="font-medium text-foreground">NP Collaborator</span> is currently serving{" "}
+                    <span className="font-medium text-foreground">NJ, MI, OH, TX</span>
                 </p>
             </div>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="">
-
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                 {/* Medical Licenses Section */}
-                <div className="mb-8">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-foreground">
                         Medical Licenses
-                        <span className="block text-sm text-gray-500 font-normal">
+                        <span className="block text-sm font-normal text-muted-foreground">
                             Required for all NP Collaborators
                         </span>
                     </h3>
 
                     {form.watch("medicalLicenseStates").map((license, index) => (
-                        <div key={index} className="mb-4 p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                        <div key={index} className="p-4 border rounded-lg bg-card hover:bg-card/80 transition-colors">
                             <div className="flex gap-4 items-center items-start">
                                 <div className="flex-1">
                                     <select
                                         {...form.register(`medicalLicenseStates.${index}.state`)}
-                                        className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                                        className="w-full p-2 border rounded-md bg-background focus:ring-2 focus:ring-primary focus:border-primary"
                                     >
                                         <option value="">Select State</option>
                                         {states.map(state => {
@@ -186,7 +185,7 @@ export default function CredentialsPage() {
                                         })}
                                     </select>
                                     {form.formState.errors.medicalLicenseStates?.[index]?.state && (
-                                        <p className="text-sm text-red-500 mt-1">
+                                        <p className="text-sm text-destructive mt-1">
                                             {form.formState.errors.medicalLicenseStates[index]?.state?.message}
                                         </p>
                                     )}
@@ -197,7 +196,7 @@ export default function CredentialsPage() {
                                         type="text"
                                         {...form.register(`medicalLicenseStates.${index}.licenseNumber`)}
                                         placeholder="License number"
-                                        className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                                        className="w-full p-2 border rounded-md bg-background focus:ring-2 focus:ring-primary focus:border-primary"
                                     />
                                 </div>
 
@@ -205,7 +204,7 @@ export default function CredentialsPage() {
                                     <input
                                         type="date"
                                         {...form.register(`medicalLicenseStates.${index}.expirationDate`)}
-                                        className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                                        className="w-full p-2 border rounded-md bg-background focus:ring-2 focus:ring-primary focus:border-primary"
                                     />
                                 </div>
 
@@ -219,9 +218,9 @@ export default function CredentialsPage() {
                                                 currentLicenses.filter((_, i) => i !== index)
                                             );
                                         }}
-                                        className="p-2 text-red-500 hover:text-red-700"
+                                        className="p-2 text-destructive hover:text-destructive/80"
                                     >
-                                        <X className="h-4 w-4 text-gray-500" />
+                                        <X className="h-4 w-4" />
                                     </button>
                                 )}
                             </div>
@@ -237,30 +236,30 @@ export default function CredentialsPage() {
                                 { state: "", licenseNumber: "", expirationDate: new Date() }
                             ]);
                         }}
-                        className="mt-4 px-4 py-2 border rounded-md hover:bg-gray-50"
+                        className="mt-4 px-4 py-2 border rounded-md bg-card hover:bg-card/80 transition-colors"
                     >
                         + Add New License
                     </button>
                 </div>
 
-                <hr className="my-8" />
+                <hr className="border-border" />
 
                 {/* DEA Licenses Section */}
-                <div className="mb-8">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-foreground">
                         DEA Licenses
-                        <span className="block text-sm text-gray-500 font-normal">
+                        <span className="block text-sm font-normal text-muted-foreground">
                             Required for prescribing controlled substances
                         </span>
                     </h3>
 
                     {form.watch("deaLicenseStates").map((license, index) => (
-                        <div key={index} className="mb-4 p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                        <div key={index} className="p-4 border rounded-lg bg-card hover:bg-card/80 transition-colors">
                             <div className="flex gap-4 items-center items-start">
                                 <div className="flex-1">
                                     <select
                                         {...form.register(`deaLicenseStates.${index}.state`)}
-                                        className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                                        className="w-full p-2 border rounded-md bg-background focus:ring-2 focus:ring-primary focus:border-primary"
                                     >
                                         <option value="">Select State</option>
                                         {states.map(state => {
@@ -279,7 +278,7 @@ export default function CredentialsPage() {
                                         })}
                                     </select>
                                     {form.formState.errors.deaLicenseStates?.[index]?.state && (
-                                        <p className="text-sm text-red-500 mt-1">
+                                        <p className="text-sm text-destructive mt-1">
                                             {form.formState.errors.deaLicenseStates[index]?.state?.message}
                                         </p>
                                     )}
@@ -290,7 +289,7 @@ export default function CredentialsPage() {
                                         type="text"
                                         {...form.register(`deaLicenseStates.${index}.licenseNumber`)}
                                         placeholder="DEA License number"
-                                        className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                                        className="w-full p-2 border rounded-md bg-background focus:ring-2 focus:ring-primary focus:border-primary"
                                     />
                                 </div>
 
@@ -298,7 +297,7 @@ export default function CredentialsPage() {
                                     <input
                                         type="date"
                                         {...form.register(`deaLicenseStates.${index}.expirationDate`)}
-                                        className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                                        className="w-full p-2 border rounded-md bg-background focus:ring-2 focus:ring-primary focus:border-primary"
                                     />
                                 </div>
 
@@ -312,9 +311,9 @@ export default function CredentialsPage() {
                                                 currentLicenses.filter((_, i) => i !== index)
                                             );
                                         }}
-                                        className="p-2 text-red-500 hover:text-red-700"
+                                        className="p-2 text-destructive hover:text-destructive/80"
                                     >
-                                        <X className="h-4 w-4 text-gray-500" />
+                                        <X className="h-4 w-4" />
                                     </button>
                                 )}
                             </div>
@@ -330,22 +329,22 @@ export default function CredentialsPage() {
                                 { state: "", licenseNumber: "", expirationDate: new Date() }
                             ]);
                         }}
-                        className="mt-4 px-4 py-2 border rounded-md hover:bg-gray-50"
+                        className="mt-4 px-4 py-2 border rounded-md bg-card hover:bg-card/80 transition-colors"
                     >
                         + Add New DEA License
                     </button>
                 </div>
 
-                <div className="flex justify-end gap-4 mt-8">
+                <div className="flex justify-end gap-4">
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                        className="px-6 py-2 bg-primary text-primary-foreground rounded-md 
+                                 hover:bg-primary/90 disabled:opacity-50 transition-colors"
                     >
                         {isSubmitting ? "Saving..." : "Save Changes"}
                     </button>
                 </div>
-
             </form>
         </div>
     )

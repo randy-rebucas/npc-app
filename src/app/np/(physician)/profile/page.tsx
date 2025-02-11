@@ -119,10 +119,10 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="bg-white max-w-2xl mx-auto p-6">
+        <div className="bg-background max-w-2xl mx-auto p-6">
             <div className="mb-6">
-                <h2 className="text-xl font-semibold">Profile Information</h2>
-                <p className="text-sm text-gray-500">
+                <h2 className="text-xl font-semibold text-foreground">Profile Information</h2>
+                <p className="text-sm text-muted-foreground">
                     Please make sure your information is up to date.
                 </p>
             </div>
@@ -131,49 +131,53 @@ export default function ProfilePage() {
                 {/* Name Section */}
                 <div className="flex gap-4">
                     <div className="flex-1">
-                        <label className="block text-sm font-medium mb-1">First Name</label>
+                        <label className="block text-sm font-medium text-foreground mb-1">First Name</label>
                         <input
                             {...form.register("firstName")}
-                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 bg-background border border-border rounded-md 
+                                     focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                             placeholder="First name"
                         />
                         {form.formState.errors.firstName && (
-                            <p className="text-red-500 text-sm mt-1">{form.formState.errors.firstName.message}</p>
+                            <p className="text-destructive text-sm mt-1">{form.formState.errors.firstName.message}</p>
                         )}
                     </div>
                     <div className="flex-1">
-                        <label className="block text-sm font-medium mb-1">Last Name</label>
+                        <label className="block text-sm font-medium text-foreground mb-1">Last Name</label>
                         <input
                             {...form.register("lastName")}
-                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 bg-background border border-border rounded-md 
+                                     focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                             placeholder="Last name"
                         />
                         {form.formState.errors.lastName && (
-                            <p className="text-red-500 text-sm mt-1">{form.formState.errors.lastName.message}</p>
+                            <p className="text-destructive text-sm mt-1">{form.formState.errors.lastName.message}</p>
                         )}
                     </div>
                 </div>
 
                 {/* Phone Section */}
                 <div>
-                    <label className="block text-sm font-medium mb-1">Phone</label>
-                    <p className="text-sm text-gray-500 mb-1">Please include country code (e.g. +1 for US/Canada)</p>
+                    <label className="block text-sm font-medium text-foreground mb-1">Phone</label>
+                    <p className="text-sm text-muted-foreground mb-1">Please include country code (e.g. +1 for US/Canada)</p>
                     <input
                         {...form.register("phone")}
-                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 bg-background border border-border rounded-md 
+                                 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                         placeholder="e.g. +12125551234"
                     />
                     {form.formState.errors.phone && (
-                        <p className="text-red-500 text-sm mt-1">{form.formState.errors.phone.message}</p>
+                        <p className="text-destructive text-sm mt-1">{form.formState.errors.phone.message}</p>
                     )}
                 </div>
 
                 {/* Address Section */}
                 <div>
-                    <label className="block text-sm font-medium mb-1">Address</label>
+                    <label className="block text-sm font-medium text-foreground mb-1">Address</label>
                     <input
                         {...form.register("address")}
-                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 bg-background border border-border rounded-md 
+                                 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                         placeholder="Address"
                     />
                 </div>
@@ -182,21 +186,24 @@ export default function ProfilePage() {
                     <div className="flex-1">
                         <input
                             {...form.register("city")}
-                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 bg-background border border-border rounded-md 
+                                     focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                             placeholder="City"
                         />
                     </div>
                     <div className="flex-1">
                         <input
                             {...form.register("state")}
-                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 bg-background border border-border rounded-md 
+                                     focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                             placeholder="State"
                         />
                     </div>
                     <div className="flex-1">
                         <input
                             {...form.register("zip")}
-                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 bg-background border border-border rounded-md 
+                                     focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                             placeholder="ZIP"
                         />
                     </div>
@@ -204,12 +211,12 @@ export default function ProfilePage() {
 
                 {/* Email Section */}
                 <div>
-                    <label className="block text-sm font-medium mb-1">Email</label>
+                    <label className="block text-sm font-medium text-foreground mb-1">Email</label>
                     <div className="flex items-center gap-4">
                         <input
                             defaultValue={session?.user?.email}
                             readOnly
-                            className="flex-1 px-3 py-2 border rounded-md bg-gray-50"
+                            className="flex-1 px-3 py-2 bg-muted border border-border rounded-md"
                         />
                         <button
                             type="button"
@@ -220,7 +227,7 @@ export default function ProfilePage() {
                                     variant: "destructive",
                                 });
                             }}
-                            className="px-4 py-2 border rounded-md hover:bg-gray-50"
+                            className="px-4 py-2 border border-border rounded-md hover:bg-muted transition-colors"
                         >
                             Change Email Address
                         </button>
@@ -232,7 +239,9 @@ export default function ProfilePage() {
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-4 py-2 bg-primary text-primary-foreground rounded-md 
+                                 hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed 
+                                 transition-colors"
                     >
                         {isSubmitting ? "Saving..." : "Save"}
                     </button>

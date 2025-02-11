@@ -115,11 +115,11 @@ export default function CertificationPage() {
     }
 
     return (
-        <div className="bg-white max-w-2xl mx-auto p-6">
+        <div className="bg-background max-w-2xl mx-auto p-6">
             {/* Header Section */}
-            <div className="p-6 border-b border-gray-200">
-                <h2 className="text-2xl font-bold text-gray-900">Certifications</h2>
-                <p className="text-sm text-gray-500 mt-1">
+            <div className="p-6 border-b border-border">
+                <h2 className="text-2xl font-bold text-foreground">Certifications</h2>
+                <p className="text-sm text-muted-foreground mt-1">
                     Please provide your certification details for verification
                 </p>
             </div>
@@ -128,28 +128,30 @@ export default function CertificationPage() {
                 {/* Primary Information Section */}
                 <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-sm font-medium text-foreground">
                             Board Certifications
                         </label>
                         <input
                             {...form.register("boardCertifications")}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            className="w-full px-4 py-2 bg-background border border-border rounded-lg 
+                                     focus:ring-2 focus:ring-primary focus:border-primary transition-all"
                             placeholder="Enter your board certifications"
                         />
                         {form.formState.errors.boardCertifications && (
-                            <p className="text-sm text-red-500">{form.formState.errors.boardCertifications.message}</p>
+                            <p className="text-sm text-destructive">{form.formState.errors.boardCertifications.message}</p>
                         )}
                     </div>
 
                     <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">NPI Number</label>
+                        <label className="block text-sm font-medium text-foreground">NPI Number</label>
                         <div className="relative">
                             <input
                                 {...form.register("npiNumber")}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                className="w-full px-4 py-2 bg-background border border-border rounded-lg 
+                                         focus:ring-2 focus:ring-primary focus:border-primary transition-all"
                                 placeholder="Enter your 10-digit NPI number"
                             />
-                            <p className="absolute -bottom-5 text-xs text-gray-500">
+                            <p className="absolute -bottom-5 text-xs text-muted-foreground">
                                 Please don&apos;t modify after approval
                             </p>
                         </div>
@@ -159,7 +161,7 @@ export default function CertificationPage() {
                 {/* Additional Certifications Section */}
                 <div className="space-y-4">
                     <div className="flex justify-between items-center">
-                        <label className="text-sm font-medium text-gray-700">Additional Certifications</label>
+                        <label className="text-sm font-medium text-foreground">Additional Certifications</label>
                         <button
                             type="button"
                             onClick={() => {
@@ -174,7 +176,8 @@ export default function CertificationPage() {
                                     },
                                 ]);
                             }}
-                            className="flex items-center gap-2 px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-primary hover:text-primary/80 
+                                     hover:bg-primary/10 rounded-lg transition-colors"
                         >
                             <Plus className="h-4 w-4" />
                             Add Certification
@@ -183,7 +186,8 @@ export default function CertificationPage() {
 
                     <div className="space-y-4">
                         {form.watch("additionalCertifications").map((_, index) => (
-                            <div key={index} className="p-6 bg-gray-50 rounded-xl border border-gray-200 relative hover:border-blue-200 transition-colors">
+                            <div key={index} className="p-6 bg-card rounded-xl border border-border relative 
+                                                      hover:border-primary/50 transition-colors">
                                 <button
                                     type="button"
                                     onClick={() => {
@@ -191,33 +195,36 @@ export default function CertificationPage() {
                                         currentFields.splice(index, 1);
                                         form.setValue("additionalCertifications", currentFields);
                                     }}
-                                    className="absolute right-4 top-4 p-1 rounded-full hover:bg-gray-200 transition-colors"
+                                    className="absolute right-4 top-4 p-1 rounded-full hover:bg-muted transition-colors"
                                 >
-                                    <X className="h-4 w-4 text-gray-500" />
+                                    <X className="h-4 w-4 text-muted-foreground" />
                                 </button>
 
                                 <div className="space-y-4">
                                     <input
                                         {...form.register(`additionalCertifications.${index}.certification`)}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
+                                        className="w-full px-4 py-2 bg-background border border-border rounded-lg 
+                                                 focus:ring-2 focus:ring-primary focus:border-primary transition-all"
                                         placeholder="Certification Name"
                                     />
 
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-1">
-                                            <label className="text-sm text-gray-600">Issue Date</label>
+                                            <label className="text-sm text-muted-foreground">Issue Date</label>
                                             <input
                                                 type="date"
                                                 {...form.register(`additionalCertifications.${index}.issueDate`)}
-                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
+                                                className="w-full px-4 py-2 bg-background border border-border rounded-lg 
+                                                         focus:ring-2 focus:ring-primary focus:border-primary transition-all"
                                             />
                                         </div>
                                         <div className="space-y-1">
-                                            <label className="text-sm text-gray-600">Expiration Date</label>
+                                            <label className="text-sm text-muted-foreground">Expiration Date</label>
                                             <input
                                                 type="date"
                                                 {...form.register(`additionalCertifications.${index}.expirationDate`)}
-                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
+                                                className="w-full px-4 py-2 bg-background border border-border rounded-lg 
+                                                         focus:ring-2 focus:ring-primary focus:border-primary transition-all"
                                             />
                                         </div>
                                     </div>
@@ -225,12 +232,14 @@ export default function CertificationPage() {
                                     <div className="grid grid-cols-2 gap-4">
                                         <input
                                             {...form.register(`additionalCertifications.${index}.certificateNumber`)}
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
+                                            className="w-full px-4 py-2 bg-background border border-border rounded-lg 
+                                                     focus:ring-2 focus:ring-primary focus:border-primary transition-all"
                                             placeholder="Certificate Number"
                                         />
                                         <input
                                             {...form.register(`additionalCertifications.${index}.certificateUrl`)}
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
+                                            className="w-full px-4 py-2 bg-background border border-border rounded-lg 
+                                                     focus:ring-2 focus:ring-primary focus:border-primary transition-all"
                                             placeholder="Certificate URL"
                                         />
                                     </div>
@@ -245,7 +254,8 @@ export default function CertificationPage() {
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                        className="px-6 py-2 bg-primary text-primary-foreground rounded-lg 
+                                 hover:bg-primary/90 disabled:opacity-50 transition-colors"
                     >
                         {isSubmitting ? "Saving..." : "Save Changes"}
                     </button>

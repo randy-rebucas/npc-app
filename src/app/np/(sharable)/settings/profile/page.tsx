@@ -41,17 +41,17 @@ export default function ProfilePage() {
     }, []);
 
     return (
-        <div className="max-w-2xl mx-auto p-6 space-y-6">
+        <div className="max-w-2xl mx-auto space-y-6">
             {profile && (
                 <>
                     {/* User Picture */}
-                    <div className="rounded-lg border p-4">
+                    <div className="rounded-lg border bg-card p-4">
                         <Picture profile={profile} />
                     </div>
 
                     {/* User Information Section */}
-                    <details className="rounded-lg border p-4">
-                        <summary className="text-xl font-semibold cursor-pointer">
+                    <details className="rounded-lg border bg-card p-4">
+                        <summary className="text-xl font-semibold cursor-pointer text-foreground">
                             User Information
                         </summary>
                         <div className="mt-4">
@@ -60,8 +60,8 @@ export default function ProfilePage() {
                     </details>
 
                     {/* Profile Information Section */}
-                    <details className="rounded-lg border p-4">
-                        <summary className="text-xl font-semibold cursor-pointer">
+                    <details className="rounded-lg border bg-card p-4">
+                        <summary className="text-xl font-semibold cursor-pointer text-foreground">
                             Profile Information
                         </summary>
                         <div className="mt-4">

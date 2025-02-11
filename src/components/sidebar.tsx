@@ -11,7 +11,7 @@ export async function AppSidebar() {
     const user = session?.user?.email ? await getUserByEmail(session.user.email) : null
 
     return (
-        <aside className="flex h-screen w-72 flex-col bg-white/50 backdrop-blur-xl border-r border-gray-200/50 dark:bg-gray-900/50 dark:border-gray-800/50">
+        <aside className="flex h-screen w-72 flex-col bg-card/50 backdrop-blur-xl border-r border-border">
             {/* Header */}
             <div className="p-6 flex items-center gap-3">
                 <Avatar className="h-8 w-8 rounded-lg">
@@ -19,8 +19,8 @@ export async function AppSidebar() {
                     <AvatarFallback className="rounded-lg">{user?.username?.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="min-w-0">
-                    <div className="truncate font-semibold text-sm">{user?.username}</div>
-                    <div className="truncate text-xs text-gray-700 dark:text-gray-300">{user?.email}</div>
+                    <div className="truncate font-semibold text-sm text-foreground">{user?.username}</div>
+                    <div className="truncate text-xs text-muted-foreground">{user?.email}</div>
                 </div>
             </div>
 

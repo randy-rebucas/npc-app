@@ -42,24 +42,16 @@ export default function OnboardingPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
-            <div className="max-w-xl w-full space-y-8 p-10 bg-white rounded-xl shadow-lg">
-                <div>
-                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                        Welcome to Healthcare Platform
-                    </h2>
-                    <p className="mt-2 text-center text-sm text-gray-600">
-                        Select your role to personalize your experience
-                    </p>
-                </div>
-                <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <div className="flex items-center justify-center">
+            <div className="max-w-xl w-full space-y-8 p-10">
+
+                <form className="space-y-6" onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div
-                            className={`relative rounded-lg border-2 p-4 cursor-pointer transition-all duration-200 ${
-                                selectedRole === 'PHYSICIAN'
+                            className={`relative rounded-lg border-2 p-4 cursor-pointer transition-all duration-200 ${selectedRole === 'PHYSICIAN'
                                     ? 'border-blue-500 bg-blue-50'
                                     : 'border-gray-200 hover:border-blue-200'
-                            }`}
+                                }`}
                             onClick={() => setSelectedRole('PHYSICIAN')}
                         >
                             <input
@@ -83,11 +75,10 @@ export default function OnboardingPage() {
                         </div>
 
                         <div
-                            className={`relative rounded-lg border-2 p-4 cursor-pointer transition-all duration-200 ${
-                                selectedRole === 'NURSE_PRACTITIONER'
+                            className={`relative rounded-lg border-2 p-4 cursor-pointer transition-all duration-200 ${selectedRole === 'NURSE_PRACTITIONER'
                                     ? 'border-blue-500 bg-blue-50'
                                     : 'border-gray-200 hover:border-blue-200'
-                            }`}
+                                }`}
                             onClick={() => setSelectedRole('NURSE_PRACTITIONER')}
                         >
                             <input

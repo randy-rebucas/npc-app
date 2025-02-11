@@ -64,14 +64,14 @@ export function ConversationList({ receiverId }: { receiverId: string | null }) 
     };
 
     return (
-        <div className="border-r h-full bg-white">
+        <div className="border-r border-border h-full bg-card">
             <div className="py-6 px-4">
-                <h2 className="text-xl font-bold mb-6 text-gray-800">Conversations</h2>
+                <h2 className="text-xl font-bold mb-6 text-foreground">Conversations</h2>
                 <div className="space-y-3">
                     {users.length === 0 ? (
-                        <div className="text-center py-12 bg-gray-50 rounded-lg">
-                            <p className="text-gray-600 font-medium">No conversations available</p>
-                            <p className="text-sm text-gray-500 mt-2">
+                        <div className="text-center py-12 bg-muted rounded-lg">
+                            <p className="text-foreground font-medium">No conversations available</p>
+                            <p className="text-sm text-muted-foreground mt-2">
                                 There are no other users available to message at this time
                             </p>
                         </div>
@@ -82,9 +82,9 @@ export function ConversationList({ receiverId }: { receiverId: string | null }) 
                                 <Button
                                     key={user._id as string}
                                     onClick={() => getMessageThread(user._id as string)}
-                                    className={`block w-full px-4 py-2.5 text-left rounded-lg transition-colors duration-200 hover:bg-gray-50 h-[72px] ${
-                                        user._id === receiverId ? 'bg-gray-50' : 'border-gray-100'
-                                    } border`}
+                                    className={`block w-full px-4 py-2.5 text-left rounded-lg transition-colors 
+                                              duration-200 hover:bg-muted h-[72px] 
+                                              ${user._id === receiverId ? 'bg-muted' : 'border-border'} border`}
                                     variant="ghost"
                                 >
                                     <div className="flex items-start gap-3 h-full">
@@ -96,9 +96,9 @@ export function ConversationList({ receiverId }: { receiverId: string | null }) 
                                         
                                         <div className="flex-1 min-w-0">
                                             <div className="flex justify-between items-center mb-1">
-                                                <p className="font-medium text-gray-900 truncate">{user.username}</p>
+                                                <p className="font-medium text-foreground truncate">{user.username}</p>
                                                 {lastMessage && (
-                                                    <span className="text-xs text-gray-500 flex-shrink-0">
+                                                    <span className="text-xs text-muted-foreground flex-shrink-0">
                                                         {new Date(lastMessage.timestamp).toLocaleDateString()}
                                                     </span>
                                                 )}
@@ -106,15 +106,15 @@ export function ConversationList({ receiverId }: { receiverId: string | null }) 
                                             
                                             <div className="flex justify-between items-center">
                                                 {lastMessage ? (
-                                                    <p className="text-sm text-gray-600 truncate">
+                                                    <p className="text-sm text-muted-foreground truncate">
                                                         {lastMessage.content}
                                                     </p>
                                                 ) : (
-                                                    <p className="text-sm text-gray-400 italic">
+                                                    <p className="text-sm text-muted-foreground italic">
                                                         No messages yet
                                                     </p>
                                                 )}
-                                                <span className="text-xs text-gray-500 ml-2">{user.role}</span>
+                                                <span className="text-xs text-muted-foreground ml-2">{user.role}</span>
                                             </div>
                                         </div>
                                     </div>

@@ -203,52 +203,52 @@ export default function Calendar() {
     };
 
     return (
-
-        <div className="bg-white max-w-2xl mx-auto p-6">
+        <div className="bg-background max-w-2xl mx-auto p-6">
             <Script
                 src="https://accounts.google.com/gsi/client"
                 strategy="lazyOnload"
                 onLoad={handleScriptLoad}
             />
             <div className="rounded-lg">
-                {!isApproved && <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-green-900 mb-8">
-                    <div className="flex items-center gap-2">
+                {!isApproved && (
+                    <div className="rounded-lg border bg-success/10 p-4 text-success-foreground mb-8">
                         <div className="flex items-center gap-2">
-                            <BadgeInfo className="h-4 w-4" />
-                            <h3 className="font-medium">Information</h3>
+                            <div className="flex items-center gap-2">
+                                <BadgeInfo className="h-4 w-4" />
+                                <h3 className="font-medium">Information</h3>
+                            </div>
+                        </div>
+                        <div className="mt-2 text-sm">
+                            You must be approved to connect your Google Calendar.
                         </div>
                     </div>
-                    <div className="mt-2 text-sm">
-                        You must be approved to connect your Google Calendar.
-                    </div>
-                </div>}
+                )}
 
                 <div className="mb-6">
-                    <h2 className="text-xl font-semibold text-gray-900">Calendar</h2>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <h2 className="text-xl font-semibold text-foreground">Calendar</h2>
+                    <p className="text-sm text-muted-foreground mt-1">
                         Connect your Google Calendar to sync your schedule.
                     </p>
                 </div>
 
-
                 <div className="space-y-4">
                     <div>
-                        <h2 className="text-lg font-semibold mb-2">Calendar Sync</h2>
+                        <h2 className="text-lg font-semibold text-foreground mb-2">Calendar Sync</h2>
                         {(error || tokenError) && (
-                            <div className="p-4 border-l-4 border-red-500 bg-red-50 text-red-700 rounded">
+                            <div className="p-4 border-l-4 border-destructive bg-destructive/10 text-destructive rounded">
                                 <p>{error || tokenError}</p>
                             </div>
                         )}
                         {isLoading ? (
-                            <p>Loading...</p>
+                            <p className="text-muted-foreground">Loading...</p>
                         ) : !isConnected ? (
                             <button
                                 onClick={handleGoogleSignIn}
                                 className={cn(
-                                    "px-4 py-2 rounded ",
+                                    "px-4 py-2 rounded",
                                     isApproved
-                                        ? " text-white hover:bg-blue-700 transition-colors bg-blue-600"
-                                        : " bg-gray-300"
+                                        ? "bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                                        : "bg-muted text-muted-foreground cursor-not-allowed"
                                 )}
                                 disabled={!isApproved}
                             >
@@ -257,10 +257,11 @@ export default function Calendar() {
                         ) : (
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center">
-                                    <h3 className="font-medium">Connected</h3>
+                                    <h3 className="font-medium text-foreground">Connected</h3>
                                     <button
                                         onClick={handleDisconnect}
-                                        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                                        className="px-4 py-2 bg-destructive text-destructive-foreground rounded 
+                                                 hover:bg-destructive/90 transition-colors"
                                         disabled={!isConnected}
                                     >
                                         Disconnect
@@ -269,22 +270,21 @@ export default function Calendar() {
                                 {events?.length > 0 ? (
                                     <div className="space-y-2">
                                         {events.map((event: CalendarEvent) => (
-                                            <div key={event.id} className="p-2 border rounded">
-                                                <h3 className="font-medium">{event.summary}</h3>
-                                                <p className="text-sm text-gray-500">
+                                            <div key={event.id} className="p-2 border rounded bg-card">
+                                                <h3 className="font-medium text-foreground">{event.summary}</h3>
+                                                <p className="text-sm text-muted-foreground">
                                                     {new Date(event.start.dateTime).toLocaleString()}
                                                 </p>
                                             </div>
                                         ))}
                                     </div>
                                 ) : (
-                                    <p>No upcoming events</p>
+                                    <p className="text-muted-foreground">No upcoming events</p>
                                 )}
                             </div>
                         )}
                     </div>
                 </div>
-
             </div>
         </div>
     );
