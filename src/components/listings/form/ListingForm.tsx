@@ -11,18 +11,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
-
+import { Checkbox } from "@/components/ui/checkbox";
+import Link from "next/link";
 const formSchema = z.object({
-    category: z.string().min(1, "Category is required"),
     title: z.string().min(3, "Title must be at least 3 characters"),
     description: z.string().min(10, "Description must be at least 10 characters"),
     boardCertification: z.string().min(1, "Board certification is required"),
-    practiceType: z.string().min(1, "Practice type is required"),
-    practiceName: z.string().min(1, "Practice name is required"),
-    stateLicenses: z.string().min(1, "State licenses are required"),
+    practiceTypes: z.array(z.string()).min(1, "At least one practice type is required"),
+    stateLicenses: z.array(z.string()).min(1, "At least one state license is required"),
     specialties: z.string().min(1, "At least one specialty is required"),
     additionalCertifications: z.string(),
-    baseRate: z.number().min(0, "Base rate must be positive"),
+    monthlyBaseRate: z.number().min(0, "Base rate must be positive"),
     multipleNPFee: z.number().min(0, "Fee must be positive"),
     additionalFeePerState: z.number().min(0, "Fee must be positive"),
     controlledSubstanceFee: z.number().min(0, "Fee must be positive"),
@@ -32,25 +31,40 @@ export default function ListingForm() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
+    const [practiceTypesItems, setPracticeTypesItems] = useState<string[]>([]);
+    const [medicalLicenseStates, setMedicalLicenseStates] = useState<string[]>([]);
     const { toast } = useToast();
 
     useEffect(() => {
         setIsMounted(true);
+
+        // Fetch practice types
+        const fetchPracticeTypes = async () => {
+            const response = await fetch("/api/practicetypes");
+            const data = await response.json();
+            setPracticeTypesItems(data);
+        };
+        fetchPracticeTypes();
+
+        const fetchMedicalLicenseStates = async () => {
+            const response = await fetch("/api/medical-license-states");
+            const data = await response.json();
+            setMedicalLicenseStates(data);
+        };
+        fetchMedicalLicenseStates();
     }, []);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            category: "",
             title: "",
             description: "",
             boardCertification: "",
-            practiceType: "",
-            practiceName: "",
-            stateLicenses: "",
+            practiceTypes: [],
+            stateLicenses: [],
             specialties: "",
             additionalCertifications: "",
-            baseRate: 0,
+            monthlyBaseRate: 0,
             multipleNPFee: 0,
             additionalFeePerState: 0,
             controlledSubstanceFee: 0,
@@ -61,7 +75,7 @@ export default function ListingForm() {
         setIsLoading(true);
         try {
             // Handle form submission
-            const response = await fetch("/api/listings/create", {
+            const response = await fetch("/api/listings", {
                 method: "POST",
                 body: JSON.stringify(values),
             });
@@ -71,7 +85,8 @@ export default function ListingForm() {
             if (data.success) {
                 toast({
                     title: "Listing created successfully",
-                    description: "Listing created successfully",
+                    description: "Your listing has been created successfully",
+                    variant: "default",
                 });
                 form.reset();
                 router.push("/np/listings");
@@ -101,62 +116,35 @@ export default function ListingForm() {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                {/* Basic Information Section */}
-                <div className="space-y-6">
-                    <h3 className="text-lg font-medium">Basic Information</h3>
-
-                    <FormField
-                        control={form.control}
-                        name="title"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Title</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        type="text"
-                                        placeholder="Title"
-                                        {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="description"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Description</FormLabel>
-                                <FormControl>
-                                    <Textarea
-                                        placeholder="Provide a detailed description of your practice..."
-                                        className="h-32"
-                                        {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-
-                {/* Practice Details Section */}
-                <div className="space-y-6">
-                    <h3 className="text-lg font-medium">Practice Details</h3>
-                    <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-4xl mx-auto space-y-12">
+                {/* Basic Information */}
+                <section className="space-y-6">
+                    <h2 className="text-2xl font-semibold">Basic Information</h2>
+                    <div className="space-y-4">
                         <FormField
                             control={form.control}
-                            name="category"
+                            name="title"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Category</FormLabel>
+                                    <FormLabel>Title</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            type="text"
-                                            placeholder="Category"
+                                        <Input type="text" placeholder="Title" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="description"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Description</FormLabel>
+                                    <FormControl>
+                                        <Textarea
+                                            placeholder="Provide a detailed description of your practice..."
+                                            className="h-32"
                                             {...field}
                                         />
                                     </FormControl>
@@ -164,6 +152,13 @@ export default function ListingForm() {
                                 </FormItem>
                             )}
                         />
+                    </div>
+                </section>
+
+                {/* Qualifications */}
+                <section className="space-y-6">
+                    <h2 className="text-2xl font-semibold">Qualifications</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <FormField
                             control={form.control}
                             name="boardCertification"
@@ -171,73 +166,7 @@ export default function ListingForm() {
                                 <FormItem>
                                     <FormLabel>Board Certification</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            type="text"
-                                            placeholder="Board Certification"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <FormField
-                            control={form.control}
-                            name="practiceType"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Practice Type</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="text"
-                                            placeholder="Practice Type"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="practiceName"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Practice Name</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="text"
-                                            placeholder="Practice Name"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                </div>
-
-                {/* Qualifications Section */}
-                <div className="space-y-6">
-                    <h3 className="text-lg font-medium">Qualifications</h3>
-                    <div className="grid grid-cols-3 gap-4">
-                        <FormField
-                            control={form.control}
-                            name="stateLicenses"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>State Licenses</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="text"
-                                            placeholder="State Licenses"
-                                            {...field}
-                                        />
+                                        <Input type="text" placeholder="Board Certification" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -251,11 +180,7 @@ export default function ListingForm() {
                                 <FormItem>
                                     <FormLabel>Specialties</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            type="text"
-                                            placeholder="Specialties"
-                                            {...field}
-                                        />
+                                        <Input type="text" placeholder="Specialties" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -269,29 +194,91 @@ export default function ListingForm() {
                                 <FormItem>
                                     <FormLabel>Additional Certifications</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            type="text"
-                                            placeholder="Additional Certifications"
-                                            {...field}
-                                        />
+                                        <Input type="text" placeholder="Additional Certifications" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
                     </div>
-                </div>
+                </section>
 
-                {/* Fees Section */}
-                <div className="space-y-6">
-                    <h3 className="text-lg font-medium">Fee Structure</h3>
-                    <div className="grid grid-cols-2 gap-4">
+                {/* Practice Details */}
+                <section className="space-y-6">
+                    <h2 className="text-2xl font-semibold">Practice Details</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <FormField
                             control={form.control}
-                            name="baseRate"
+                            name="practiceTypes"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Base Rate</FormLabel>
+                                    <FormLabel>Practice Types</FormLabel>
+                                    <div className="space-y-2 p-4 border rounded-md max-h-48 overflow-y-auto">
+                                        {practiceTypesItems.map((type) => (
+                                            <div key={type} className="flex items-center space-x-2">
+                                                <FormControl>
+                                                    <Checkbox
+                                                        checked={field.value.includes(type)}
+                                                        onCheckedChange={(checked) => {
+                                                            if (checked) {
+                                                                field.onChange([...field.value, type]);
+                                                            } else {
+                                                                field.onChange(field.value.filter((item: string) => item !== type));
+                                                            }
+                                                        }}
+                                                    />
+                                                </FormControl>
+                                                <label>{type}</label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="stateLicenses"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>State Licenses</FormLabel>
+                                    <div className="space-y-2 p-4 border rounded-md max-h-48 overflow-y-auto">
+                                        {medicalLicenseStates.map((state) => (
+                                            <div key={state} className="flex items-center space-x-2">
+                                                <FormControl>
+                                                    <Checkbox
+                                                        checked={field.value.includes(state)}
+                                                        onCheckedChange={(checked) => {
+                                                            if (checked) {
+                                                                field.onChange([...field.value, state]);
+                                                            } else {
+                                                                field.onChange(field.value.filter((item: string) => item !== state));
+                                                            }
+                                                        }}
+                                                    />
+                                                </FormControl>
+                                                <label>{state}</label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                </section>
+
+                {/* Fees */}
+                <section className="space-y-6">
+                    <h2 className="text-2xl font-semibold">Fees</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormField
+                            control={form.control}
+                            name="monthlyBaseRate"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Monthly Base Rate</FormLabel>
                                     <FormControl>
                                         <Input
                                             type="number"
@@ -317,16 +304,16 @@ export default function ListingForm() {
                                     <FormControl>
                                         <Input
                                             type="number"
-                                            placeholder="Multiple NP Fee"
+                                            placeholder="0.00"
                                             {...field}
+                                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
                                         />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
+
                         <FormField
                             control={form.control}
                             name="additionalFeePerState"
@@ -336,8 +323,9 @@ export default function ListingForm() {
                                     <FormControl>
                                         <Input
                                             type="number"
-                                            placeholder="Additional Fee Per State"
+                                            placeholder="0.00"
                                             {...field}
+                                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -354,8 +342,9 @@ export default function ListingForm() {
                                     <FormControl>
                                         <Input
                                             type="number"
-                                            placeholder="Controlled Substance Fee"
+                                            placeholder="0.00"
                                             {...field}
+                                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -363,22 +352,25 @@ export default function ListingForm() {
                             )}
                         />
                     </div>
+                </section>
+                <div className="flex justify-between">
+                    <Link href="/np/listings" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-primary-foreground bg-primary hover:bg-primary/90">
+                        Cancel
+                    </Link>
+                    <Button
+                        type="submit"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <div className="flex items-center justify-center">
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                <span>Creating Listing...</span>
+                            </div>
+                        ) : (
+                            "Submit Listing"
+                        )}
+                    </Button>
                 </div>
-
-                <Button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full"
-                >
-                    {isLoading ? (
-                        <div className="flex items-center justify-center">
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            <span>Creating Listing...</span>
-                        </div>
-                    ) : (
-                        "Submit Listing"
-                    )}
-                </Button>
             </form>
         </Form>
     );
