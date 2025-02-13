@@ -1,31 +1,37 @@
-import { IUserProfile } from "@/app/models/UserProfile";
 import Results from "@/components/find-match/Results";
 import Sort from "@/components/find-match/Sort";
-import Header from "@/components/header";
+
 import Pagination from "@/components/ui/member/pagination";
 import { SearchParams } from "@/lib/types/search-params";
-import { getNpUsers } from "@/app/actions/user";
 import Price from "@/components/find-match/Filters/Price";
 import StateLicenses from "@/components/find-match/Filters/StateLicenses";
 import PracticeTypes from "@/components/find-match/Filters/PracticeTypes";
 import { Suspense } from "react";
 import { ResultsSkeleton } from "@/components/skeletons";
+import { getListings } from "@/app/actions/listing";
 
 
-export type SimplifiedUserResponse = {
+export type SimplifiedListingResponse = {
     id: string;
     username: string;
     email: string;
-    role: string;
-    provider: string;
     createdAt: Date;
-    onBoardingStatus: string;
-    metaData?: {
-        [key: string]: string;
+    title: string;
+    description: string;
+    boardCertification: string;
+    practiceTypes: string[];
+    stateLicenses: string[];
+    specialties: string;
+    monthlyBaseRate: number;
+    multipleNPFee: number;
+    additionalFeePerState: number;
+    controlledSubstanceFee: number;
+    status: string;
+    profile: {
+        firstName?: string;
+        lastName?: string;
+        profilePhotoPath?: string;
     };
-    profile?: IUserProfile; 
-    // stripeaccount?: IStripeAccount;
-    submissionStatus: string;
 };
 
 
@@ -45,7 +51,7 @@ export default async function FindMatch(props: {
     const practiceType = params?.practiceType as string | undefined;
     const priceRange = params?.priceRange as string | undefined;
     // get users
-    const { users, total }: { users: SimplifiedUserResponse[], total: number } = await getNpUsers({
+    const { listings, total }: { listings: SimplifiedListingResponse[], total: number } = await getListings({
         page: currentPage,
         search: query,
         limit: ITEMS_PER_PAGE,
@@ -60,40 +66,37 @@ export default async function FindMatch(props: {
     const endItem = Math.min(startItem + ITEMS_PER_PAGE - 1, total);
 
     return (
-        <div className="min-h-screen w-full bg-background">
-            <Header showSearch={true} />
-            <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                <div className="flex gap-8">
-                    {/* Filters Sidebar */}
-                    <div className="w-64 flex-shrink-0">
-                        {/* Practice Types */}
-                        <PracticeTypes /> 
 
-                        {/* State Licenses */}
-                        <StateLicenses /> 
+        <div className="flex gap-8">
+            {/* Filters Sidebar */}
+            <div className="w-64 flex-shrink-0">
+                {/* Practice Types */}
+                <PracticeTypes />
 
-                        {/* Price Range */}
-                        <Price /> 
-                    </div>
-                    {/* Results */}
-                    <div className="flex flex-1 flex-col">
-                        <Sort counts={total} />
-                        
-                        <Suspense fallback={<ResultsSkeleton />}>
-                            <Results results={users} />
-                        </Suspense>
+                {/* State Licenses */}
+                <StateLicenses />
 
-                        <Pagination
-                            startItem={startItem}
-                            endItem={endItem}
-                            totalItems={total}
-                            currentPage={currentPage}
-                            query={query}
-                            totalPages={totalPages}
-                        />
-                    </div>
-                </div>
-            </main>
+                {/* Price Range */}
+                <Price />
+            </div>
+            {/* Results */}
+            <div className="flex flex-1 flex-col">
+                <Sort counts={total} />
+
+                <Suspense fallback={<ResultsSkeleton />}>
+                    <Results results={listings} />
+                </Suspense>
+
+                <Pagination
+                    startItem={startItem}
+                    endItem={endItem}
+                    totalItems={total}
+                    currentPage={currentPage}
+                    query={query}
+                    totalPages={totalPages}
+                />
+            </div>
         </div>
+
     );
 }

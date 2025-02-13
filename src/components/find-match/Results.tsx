@@ -2,41 +2,19 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Certification, Education, License } from "@/lib/types/onboarding";
 import Add from "@/components/favorite/actions/Add";
 import { useEffect, useState } from "react";
 
-interface Profile {
-    firstName?: string;
-    lastName?: string;
-    profilePhotoPath?: string;
-    monthlyCollaborationRate?: number;
-    practiceTypes: string[];
-    description?: string;
-    title?: string;
-    publications?: string;
-    boardCertification?: string;
-    additionalCertifications?: Certification[];
-    medicalLicenseStates?: License[];
-    deaLicenseStates?: License[];
-    linkedinProfile?: string;
-    address?: string;
-    city?: string;
-    state?: string;
-    zip?: string;
-    phone?: string;
-    email?: string;
-    npiNumber?: string;
-    clinicalDegree?: string;
-    education?: Education;
-    governmentIdPath?: string;
-    createdAt?: Date;
-    updatedAt?: Date;
-}
-
 export interface Result {
     id: string;
-    profile?: Profile;
+    description: string;
+    practiceTypes: string[];
+    monthlyBaseRate: number;
+    profile: {
+        firstName?: string;
+        lastName?: string;
+        profilePhotoPath?: string;
+    };
 }
 
 export default function Results({ results }: { results: Result[] }) {
@@ -83,10 +61,10 @@ export default function Results({ results }: { results: Result[] }) {
                             </h2>
                             <Add itemId={result.id} />
                         </div>
-                        <div className="text-lg font-medium mb-2 text-foreground">Total Price: ${result.profile?.monthlyCollaborationRate}</div>
-                        <div className="text-muted-foreground mb-1">{result.profile?.practiceTypes.join(', ')}</div>
+                        <div className="text-lg font-medium mb-2 text-foreground">Total Price: ${result.monthlyBaseRate}</div>
+                        <div className="text-muted-foreground mb-1">{result.practiceTypes.join(', ')}</div>
                         <div className="text-muted-foreground line-clamp-2">
-                            {result.profile?.description}
+                            {result?.description}
                         </div>
                         <div className="flex justify-end">
                             <Link href={`/np/find-match/${result.id}`} className="text-primary hover:underline">View Profile</Link>

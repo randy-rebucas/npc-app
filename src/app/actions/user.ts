@@ -32,6 +32,7 @@ export interface UserQuery {
   "profile.medicalLicenseStates"?: { $in: licenseState[] };
   "profile.practiceTypes"?: { $in: string[] };
   "profile.monthlyCollaborationRate"?: { $gte: number; $lte: number };
+  submissionStatus?: string;
 }
 
 export interface UserDocument {
@@ -48,7 +49,9 @@ export interface UserDocument {
   metaData?: {
     [key: string]: string;
   };
-
+  listingId: string;
+  listingStatus: string;
+  listingCreatedAt: Date;
   profile: {
     // _id: string;
     user: string;
@@ -83,7 +86,7 @@ export interface UserDocument {
   };
 }
 
-interface GetUsersResponse {
+export interface GetUsersResponse {
   users: {
     id: string;
     username: string;
@@ -177,7 +180,9 @@ export async function getUserById(id: string): Promise<UserDocument> {
     submissionStatus: user[0].submissionStatus,
     canCreateListings: user[0].canCreateListings,
     metaData: user[0].metaData,
-
+    listingId: user[0].listingId,
+    listingStatus: user[0].listingStatus,
+    listingCreatedAt: user[0].listingCreatedAt,
     profile: selectedItem(user[0].profile, [
       "firstName",
       "lastName",
@@ -375,6 +380,7 @@ export async function getNpUsers({
         session?.user?.role === "NURSE_PRACTITIONER"
           ? "PHYSICIAN"
           : "NURSE_PRACTITIONER", // Ensure we only get NP users
+      submissionStatus: "APPROVED", // Only show approved listings
     };
 
     if (search) {

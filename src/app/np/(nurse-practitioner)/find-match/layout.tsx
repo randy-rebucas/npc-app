@@ -29,7 +29,7 @@ export default function FindMatchLayout({
 
     return (
         <div className="min-h-screen w-full bg-background">
-            <Header />
+            <Header showSearch={true} />
             <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-1 flex-col space-y-8">
                     <div className="space-y-6">

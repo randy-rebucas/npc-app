@@ -121,17 +121,6 @@ export default function Nav() {
                     }
                 ]);
             }
-
-            if (user?.role === "NURSE_PRACTITIONER" && user?.submissionStatus === "APPROVED") {
-                setItems(currentItems => [
-                    ...currentItems,
-                    {
-                        title: "Collaborators",
-                        url: "/np/collaborators",
-                        icon: Users,
-                    },
-                ]);
-            }
         };
 
         fetchUser();
