@@ -84,7 +84,7 @@ export default async function FindMatch(props: {
                 <Sort counts={total} />
 
                 <Suspense fallback={<ResultsSkeleton />}>
-                    <Results results={listings} />
+                    <Results results={listings} filters={stateLicense || null} />
                 </Suspense>
 
                 <Pagination
