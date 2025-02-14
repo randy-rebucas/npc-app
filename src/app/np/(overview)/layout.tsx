@@ -18,8 +18,12 @@ export default async function DashboardLayout({ children, stats, collaboratorReq
 
     const user = await getUserByEmail(session.user.email);
 
-    if (user.submissionStatus === UserSubmissionStatus.INCOMPLETE || user.submissionStatus === UserSubmissionStatus.INCORRECT || user.submissionStatus === UserSubmissionStatus.PENDING) {
+    if (user.role === "PHYSICIAN" && (user.submissionStatus === UserSubmissionStatus.INCOMPLETE || user.submissionStatus === UserSubmissionStatus.INCORRECT || user.submissionStatus === UserSubmissionStatus.PENDING)) {
         redirect("/np/main");
+    }
+
+    if (user.role === "NURSE_PRACTITIONER" && (user.submissionStatus === UserSubmissionStatus.INCOMPLETE || user.submissionStatus === UserSubmissionStatus.INCORRECT || user.submissionStatus === UserSubmissionStatus.PENDING)) {
+        redirect("/np/find-match");
     }
 
     return (

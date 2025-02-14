@@ -244,7 +244,7 @@ export default function PhysicianOnboardingPage() {
                 description: "Your onboarding information has been submitted.",
             });
 
-            router.push('/');
+            router.push('/np/main');
         } catch (error) {
             console.error('Error:', error);
             toast({

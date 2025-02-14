@@ -21,7 +21,8 @@ export default function SettingsLayout({
 
   const pathname = usePathname();
   const currentTab = pathname.split('/').pop();
-
+  
+  const isSettings = pathname.split('/').pop() === 'settings';
   const isApplication = pathname.split('/').pop() === 'application';
   const isProfile = pathname.split('/').pop() === 'profile';
   const isPassword = pathname.split('/').pop() === 'password';
@@ -33,7 +34,8 @@ export default function SettingsLayout({
 
   const breadcrumbs: Breadcrumb[] = [
     { label: 'Admin', href: '/admin' },
-    { label: 'Settings', href: '/admin/settings', active: true },
+    { label: 'Dashboard', href: '/admin/dashboard' },
+    { label: 'Settings', href: '/admin/dashboard/settings', active: isSettings },
   ];
 
 
@@ -86,7 +88,7 @@ export default function SettingsLayout({
           <div>
             <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
             <p className="text-muted-foreground">
-              Manage your settings
+              Manage your admin preferences and system settings
             </p>
           </div>
         </div>

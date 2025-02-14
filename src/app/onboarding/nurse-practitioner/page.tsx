@@ -244,7 +244,7 @@ export default function NursePractitionerOnboardingPage() {
                 description: "Your onboarding information has been submitted.",
             });
 
-            router.push('/');
+            router.push('/np/find-match');
         } catch (error) {
             console.error('Error:', error);
             toast({

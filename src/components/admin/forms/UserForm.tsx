@@ -211,7 +211,7 @@ export default function UserForm({ id }: { id: string | null }) {
                     name="canCreateListings"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="text-foreground">Can Create Listings</FormLabel>
+                            <FormLabel className="text-foreground gap-2">Can Create Listings</FormLabel>
                             <FormControl>
                                 <Switch checked={field.value} onCheckedChange={field.onChange} />
                             </FormControl>
