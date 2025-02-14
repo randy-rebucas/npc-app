@@ -14,7 +14,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
     const user = await getUserByEmail(session.user.email);
 
     if (user.role !== "NURSE_PRACTITIONER") {
-        redirect("/np/listings");
+        redirect("/np/main");
     }
 
     return (

@@ -2,10 +2,15 @@ import connect from "@/lib/db";
 import Listing from "@/app/models/Listing";
 import { selectedItem } from "@/lib/utils";
 import { Certification, License } from "@/lib/types/onboarding";
+import mongoose from "mongoose";
 
 export interface ListingDocument {
   _id: string;
+  userId: string;
   email: string;
+  metaData: {
+    calendlyLink: string;
+  };
   username: string;
   createdAt: Date;
   title: string;
@@ -56,8 +61,12 @@ export interface ListingDocument {
 interface GetListingResponse {
   listings: {
     id: string;
+    userId: string;
     username: string;
     email: string;
+    metaData: {
+      calendlyLink: string;
+    };
     createdAt: Date;
     title: string;
     description: string;
@@ -214,8 +223,10 @@ export async function getListings({
     return {
       listings: (aggregatedListings as ListingDocument[]).map((listing) => ({
         id: listing._id.toString(),
+        userId: listing.userId,
         username: listing.username,
         email: listing.email,
+        metaData: listing.metaData,
         createdAt: listing.createdAt,
         title: listing.title,
         description: listing.description,
@@ -231,7 +242,7 @@ export async function getListings({
         profile: selectedItem(listing.profile, [
           "firstName",
           "lastName",
-          "profilePhotoPath"
+          "profilePhotoPath",
         ]),
       })),
       total: total || 0,
@@ -240,4 +251,87 @@ export async function getListings({
     console.error("Error fetching listings:", error);
     throw new Error("Failed to fetch listings");
   }
+}
+
+export async function getListingById(id: string): Promise<ListingDocument> {
+  await connect();
+  const listing = await Listing.aggregate([
+    {
+      $lookup: {
+        from: "users",
+        localField: "user",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    {
+      $unwind: "$user",
+    },
+    {
+      $lookup: {
+        from: "userprofiles",
+        localField: "user._id",
+        foreignField: "user",
+        as: "profile",
+      },
+    },
+    {
+      $unwind: "$profile",
+    },
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(id),
+      },
+    },
+    {
+      $limit: 1,
+    },
+    {
+      $sort: { createdAt: -1 },
+    },
+    {
+      $project: {
+        userId: "$user._id",
+        username: "$user.username",
+        email: "$user.email",
+        metaData: "$user.metaData",
+        profile: 1,
+        _id: "$_id",
+        title: "$title",
+        description: "$description",
+        boardCertification: "$boardCertification",
+        practiceTypes: "$practiceTypes",
+        stateLicenses: "$stateLicenses",
+        specialties: "$specialties",
+        monthlyBaseRate: "$monthlyBaseRate",
+        multipleNPFee: "$multipleNPFee",
+        additionalFeePerState: "$additionalFeePerState",
+        controlledSubstanceFee: "$controlledSubstanceFee",
+        status: "$status",
+        createdAt: "$createdAt",
+      },
+    },
+  ]);
+
+  const transformedListing: ListingDocument = {
+    _id: listing[0]._id.toString(),
+    userId: listing[0].userId.toString(),
+    email: listing[0].email,
+    metaData: listing[0].metaData,
+    username: listing[0].username,
+    createdAt: listing[0].createdAt,
+    title: listing[0].title,
+    description: listing[0].description,
+    boardCertification: listing[0].boardCertification,
+    practiceTypes: listing[0].practiceTypes,
+    stateLicenses: listing[0].stateLicenses,
+    specialties: listing[0].specialties,
+    monthlyBaseRate: listing[0].monthlyBaseRate,
+    multipleNPFee: listing[0].multipleNPFee,
+    additionalFeePerState: listing[0].additionalFeePerState,
+    controlledSubstanceFee: listing[0].controlledSubstanceFee,
+    status: listing[0].status,
+    profile: listing[0].profile
+  };
+  return transformedListing;
 }

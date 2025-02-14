@@ -6,6 +6,7 @@ import Add from "@/components/favorite/actions/Add";
 
 export interface Result {
     id: string;
+    userId: string;
     description: string;
     practiceTypes: string[];
     monthlyBaseRate: number;

@@ -13,8 +13,12 @@ import { getListings } from "@/app/actions/listing";
 
 export type SimplifiedListingResponse = {
     id: string;
+    userId: string;
     username: string;
     email: string;
+    metaData: {
+        calendlyLink: string;
+    };
     createdAt: Date;
     title: string;
     description: string;

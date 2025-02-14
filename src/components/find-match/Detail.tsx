@@ -1,6 +1,5 @@
 'use client'
 
-import { getUserById, UserDocument } from '@/app/actions/user';
 import { Certification, License } from '@/lib/types/onboarding';
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
 import Image from 'next/image'
@@ -10,9 +9,10 @@ import Schedule from '../collaboration/actions/Schedule';
 import Favorite from '../collaboration/actions/Favorite';
 import { formatCurrency } from '@/lib/utils';
 import { useBreakdownStore } from '@/lib/store/breakdown';
+import { getListingById, ListingDocument } from '@/app/actions/listing';
 
 export default function FindMatchDetail({ id }: { id: string }) {
-    const [user, setUser] = useState<UserDocument | null>(null);
+    const [listing, setListing] = useState<ListingDocument | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { breakdown, setBreakdown, total } = useBreakdownStore(); 
@@ -23,8 +23,8 @@ export default function FindMatchDetail({ id }: { id: string }) {
             try {
                 setIsLoading(true);
                 setError(null);
-                const user = await getUserById(id);
-                setUser(user);
+                const listing = await getListingById(id); 
+                setListing(listing); 
             } catch (err) {
                 setError('Failed to load user details');
                 console.error(err);
@@ -39,8 +39,8 @@ export default function FindMatchDetail({ id }: { id: string }) {
         const baseRate = Number(process.env.BASE_RATE ?? 0);
         const controlledSubstancesFee = Number(process.env.CONTROLLED_SUBSTANCES_FEE ?? 0);
         const platformFee = Number(process.env.PLATFORM_FEE ?? 0);
-        const additionalStates = (user?.profile?.medicalLicenseStates?.length || 0) * Number(process.env.ADDITIONAL_STATE_FEE ?? 0);
-        const additionalNps = (user?.profile?.additionalNPFee ?? 0)
+        const additionalStates = (listing?.profile?.medicalLicenseStates?.length || 0) * Number(process.env.ADDITIONAL_STATE_FEE ?? 0);
+        const additionalNps = (listing?.profile?.additionalNPFee ?? 0)
         
         const newBreakdown = new Map([
             ['Base Rate', baseRate],
@@ -51,7 +51,7 @@ export default function FindMatchDetail({ id }: { id: string }) {
         ]);
         setBreakdown(newBreakdown);
         
-    }, [user, setBreakdown]);
+    }, [listing, setBreakdown]);
 
     if (isLoading) {
         return (
@@ -82,21 +82,21 @@ export default function FindMatchDetail({ id }: { id: string }) {
                     <div>
                         <div className="relative h-80 w-full rounded-lg overflow-hidden mb-4">
                             <Image
-                                src={user?.profile?.profilePhotoPath || ''}
-                                alt={user?.profile?.firstName || 'Photo not found'}
+                                src={listing?.profile?.profilePhotoPath || ''}
+                                alt={listing?.profile?.firstName || 'Photo not found'}
                                 fill
                                 className="object-cover"
                             />
                         </div>
-                        <h1 className="text-2xl font-bold mb-3 text-foreground">{user?.profile?.title ?? 'MD - Backup Collaborator for PA'}</h1>
+                        <h1 className="text-2xl font-bold mb-3 text-foreground">{listing?.title ?? 'MD - Backup Collaborator for PA'}</h1>
                         <div className="flex items-center gap-3">
                             <Avatar>
-                                <AvatarImage src={user?.profile?.profilePhotoPath || ''} alt={user?.profile?.firstName || 'Photo not found'} className="w-12 h-12 rounded-full" />
-                                <AvatarFallback>{user?.profile?.firstName?.charAt(0)} {user?.profile?.lastName?.charAt(0)}</AvatarFallback>
+                                <AvatarImage src={listing?.profile?.profilePhotoPath || ''} alt={listing?.profile?.firstName || 'Photo not found'} className="w-12 h-12 rounded-full" />
+                                <AvatarFallback>{listing?.profile?.firstName?.charAt(0)} {listing?.profile?.lastName?.charAt(0)}</AvatarFallback>
                             </Avatar>
                             <div>
-                                <p className="font-semibold text-foreground">{user?.profile?.firstName} {user?.profile?.lastName}</p>
-                                <p className="text-muted-foreground">{user?.profile?.boardCertification}</p>
+                                <p className="font-semibold text-foreground">{listing?.profile?.firstName} {listing?.profile?.lastName}</p>
+                                <p className="text-muted-foreground">{listing?.profile?.boardCertification}</p>
                             </div>
                         </div>
                     </div>
@@ -104,11 +104,11 @@ export default function FindMatchDetail({ id }: { id: string }) {
                     {/* About Section */}
                     <div className="bg-card p-6 rounded-lg border border-border">
                         <h2 className="text-xl font-bold mb-4 text-foreground">About</h2>
-                        <p className="text-muted-foreground mb-4">{user?.profile?.description}</p>
-                        {user?.profile?.publications && (
+                        <p className="text-muted-foreground mb-4">{listing?.description}</p>
+                        {listing?.description && (
                             <div className="mt-4">
                                 <h3 className="font-semibold mb-2 text-foreground">Publications</h3>
-                                <div className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: user?.profile?.publications }}></div>
+                                <div className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: listing?.description }}></div>
                             </div>
                         )}
                     </div>
@@ -117,7 +117,7 @@ export default function FindMatchDetail({ id }: { id: string }) {
                     <div className="bg-card p-6 rounded-lg border border-border">
                         <h2 className="text-xl font-bold mb-4 text-foreground">Practice Types</h2>
                         <div className="flex flex-wrap gap-2">
-                            {user?.profile?.practiceTypes?.map((type) => (
+                            {listing?.practiceTypes?.map((type) => (
                                 <span key={type} className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
                                     {type}
                                 </span>
@@ -133,7 +133,7 @@ export default function FindMatchDetail({ id }: { id: string }) {
                         <div className="mb-6">
                             <h3 className="font-semibold mb-3 text-foreground">Medical Licenses</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {user?.profile?.medicalLicenseStates?.map((state: License) => (
+                                {listing?.profile?.medicalLicenseStates?.map((state: License) => (
                                     <div key={state.state} className="border border-border p-3 rounded-lg bg-card">
                                         <p className="font-medium text-foreground">{state.state}</p>
                                         <p className="text-sm text-muted-foreground">License: {state.licenseNumber}</p>
@@ -147,7 +147,7 @@ export default function FindMatchDetail({ id }: { id: string }) {
                         <div className="mb-6">
                             <h3 className="font-semibold mb-3 text-foreground">DEA Licenses</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {user?.profile?.deaLicenseStates?.map((state: License) => (
+                                {listing?.profile?.deaLicenseStates?.map((state: License) => (
                                     <div key={state.state} className="border border-border p-3 rounded-lg bg-card">
                                         <p className="font-medium text-foreground">{state.state}</p>
                                         <p className="text-sm text-muted-foreground">License: {state.licenseNumber}</p>
@@ -161,7 +161,7 @@ export default function FindMatchDetail({ id }: { id: string }) {
                         <div>
                             <h3 className="font-semibold mb-3 text-foreground">Additional Certifications</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {user?.profile?.additionalCertifications?.map((cert: Certification) => (
+                                {listing?.profile?.additionalCertifications?.map((cert: Certification) => (
                                     <div key={cert.certification} className="border border-border p-3 rounded-lg bg-card">
                                         <p className="font-medium text-foreground">{cert.certification}</p>
                                         <p className="text-sm text-muted-foreground">Issued: {cert.issueDate ? new Date(cert.issueDate).toLocaleDateString() : 'N/A'}</p>
@@ -177,14 +177,14 @@ export default function FindMatchDetail({ id }: { id: string }) {
                 <div className="md:w-[30%] space-y-6">
                     {/* Header and Action Buttons */}
                     <div className="bg-card rounded-lg p-6 shadow-sm border border-border">
-                        <h2 className="text-2xl font-bold text-foreground mb-2">{user?.profile?.title}</h2>
+                        <h2 className="text-2xl font-bold text-foreground mb-2">{listing?.profile?.title}</h2>
                         <p className="text-2xl font-bold text-primary mb-4">
-                            {user?.profile?.monthlyCollaborationRate
-                                ? `$${user.profile.monthlyCollaborationRate.toFixed(2)}`
+                            {listing?.profile?.monthlyCollaborationRate
+                                ? `$${listing.profile.monthlyCollaborationRate.toFixed(2)}`
                                 : 'Price not available'}<span className="text-sm text-muted-foreground font-normal">/month</span>
                         </p>
                         <div className="space-y-3">
-                            <Schedule calendlyLink={user?.metaData?.calendlyLink || ''} /> 
+                            <Schedule calendlyLink={listing?.metaData?.calendlyLink || ''} /> 
                             <Request id={id} /> 
                             <Favorite id={id} />
                         </div>
