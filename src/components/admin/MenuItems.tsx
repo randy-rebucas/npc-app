@@ -19,6 +19,7 @@ const iconMap: { [key: string]: React.ElementType } = {
     help: HelpCircle,
     miscellaneous: Hash,
     settings: Settings,
+    listings: List,
 };
 
 interface MenuItem {

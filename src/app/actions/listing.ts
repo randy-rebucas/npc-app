@@ -3,6 +3,8 @@ import Listing from "@/app/models/Listing";
 import { selectedItem } from "@/lib/utils";
 import { Certification, License } from "@/lib/types/onboarding";
 import mongoose from "mongoose";
+import { revalidateTag } from "next/cache";
+
 
 export interface ListingDocument {
   _id: string;
@@ -95,6 +97,7 @@ interface ListingQuery {
     "profile.firstName"?: { $regex: string; $options: string } | string;
     "profile.lastName"?: { $regex: string; $options: string } | string;
   }[];
+  status?: string;
   stateLicenses?: { $in: string[] };
   practiceTypes?: { $in: string[] };
   monthlyBaseRate?: { $gte: number; $lte: number };
@@ -105,6 +108,7 @@ export async function getListings({
   search = "",
   limit = 10,
   sort = "lowest_price",
+  status = "all",
   stateLicense = "",
   practiceType = "",
   priceRange = "",
@@ -113,6 +117,7 @@ export async function getListings({
   search?: string;
   limit?: number;
   sort?: "lowest_price" | "highest_price" | "most_recent";
+  status?: string;
   stateLicense?: string;
   practiceType?: string;
   priceRange?: string;
@@ -129,6 +134,10 @@ export async function getListings({
         { "profile.firstName": { $regex: search, $options: "i" } },
         { "profile.lastName": { $regex: search, $options: "i" } },
       ];
+    }
+
+    if (status !== "all") {
+      query.status = status;
     }
 
     if (stateLicense) {
@@ -331,7 +340,19 @@ export async function getListingById(id: string): Promise<ListingDocument> {
     additionalFeePerState: listing[0].additionalFeePerState,
     controlledSubstanceFee: listing[0].controlledSubstanceFee,
     status: listing[0].status,
-    profile: listing[0].profile
+    profile: listing[0].profile,
   };
   return transformedListing;
+}
+
+export async function deleteListing(id: string) {
+  try {
+    await connect();
+    await Listing.findByIdAndDelete(id);
+    revalidateTag("listings"); // Update cached listings
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { error: "Failed to delete listing" };
+  }
 }
