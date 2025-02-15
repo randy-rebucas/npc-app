@@ -8,7 +8,7 @@ import Notification from "@/app/models/Notification";
 import User, { UserSubmissionStatus } from "@/app/models/User";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { getServerSession } from "next-auth";
-import { sendEmail } from "@/lib/email";
+import { EmailService } from "@/lib/email";
 
 export async function POST(
   request: Request,
@@ -80,10 +80,16 @@ export async function POST(
     });
 
     // Send email to NP
-    await sendEmail({
-      to: physicianUser.email,
+    const emailService = new EmailService();
+    await emailService.sendEmail({
+      to: { email: physicianUser.email },
       subject: "Collaboration Request from NP",
-      body: "NP has requested collaboration",
+      htmlContent: "<p>NP has requested collaboration</p>",
+      textContent: "NP has requested collaboration",
+      sender: {
+        name: "npcollaborator",
+        email: "noreply@npcollaborator.com",
+      },
     });
 
     return NextResponse.json({

@@ -1,6 +1,6 @@
 "use client"
 
-import { LayoutDashboard, Settings, Users, List, HelpCircle, Info, Hash, ArrowLeftRight } from "lucide-react"
+import { LayoutDashboard, Settings, Users, List, HelpCircle, Info, Hash, ArrowLeftRight, TicketPercent } from "lucide-react"
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import {
@@ -20,6 +20,7 @@ const iconMap: { [key: string]: React.ElementType } = {
     miscellaneous: Hash,
     settings: Settings,
     listings: List,
+    offers: TicketPercent,
 };
 
 interface MenuItem {

@@ -7,6 +7,7 @@ import User, {
   UserSubmissionStatus,
 } from "@/app/models/User";
 import UserProfile from "@/app/models/UserProfile";
+import { EmailService } from "@/lib/email";
 
 interface MemberstackCustomFields {
   "first-name": string;
@@ -143,6 +144,22 @@ export async function POST(
       }
     );
 
+    const emailService = new EmailService(); 
+    await emailService.sendEmail({
+      to: { email: data.auth.email },
+      subject: "Welcome to NP Collaborator",
+      htmlContent: "<p>Welcome to NP Collaborator</p>",
+      textContent: "Welcome to NP Collaborator",
+      sender: {
+        name: "npcollaborator",
+        email: "noreply@npcollaborator.com",
+      },
+      replyTo: {
+        name: "npcollaborator",
+        email: "noreply@npcollaborator.com",
+      },
+    });
+    
     return NextResponse.json({ success: true, user, userProfile });
 
   } catch (error) {

@@ -53,13 +53,17 @@ export default async function AdminUsers(props: {
     const currentPage = Number(params?.page) || 1;
     // filters
     const role = String(params?.role || 'all');
+    const onBoardingStatus = String(params?.onBoardingStatus || 'all');
+    const submissionStatus = String(params?.submissionStatus || 'all');
 
     // get users
     const { users, total }: { users: SimplifiedUserResponse[], total: number } = await getUsers({
         page: currentPage,
         search: query,
         role: role,
-        limit: ITEMS_PER_PAGE
+        limit: ITEMS_PER_PAGE,
+        onBoardingStatus: onBoardingStatus,
+        submissionStatus: submissionStatus
     });
 
     const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
@@ -74,7 +78,9 @@ export default async function AdminUsers(props: {
 
             <div className="flex items-center gap-4">
                 <Search placeholder='Search users...' />
-                <Filter target="role" options={[{ 'ADMIN': 'Admin' }, { 'CUSTOMER': 'Customer' }]} placeholder="Role" defaultValue="all" />
+                <Filter target="role" options={[{ 'ADMIN': 'Admin' }, { 'PHYSICIAN': 'Physician' }, { 'NURSE_PRACTITIONER': 'Nurse Practitioner' }]} placeholder="Role" defaultValue="all" />
+                <Filter target="onBoardingStatus" options={[{ 'COMPLETED': 'Completed' }, { 'INCOMPLETE': 'Incomplete' }]} placeholder="Onboarding Status" defaultValue="all" />
+                <Filter target="submissionStatus" options={[{ 'PENDING': 'Pending' }, { 'APPROVED': 'Approved' }, { 'REJECTED': 'Rejected' }, { 'INCOMPLETE': 'Incomplete' }, { 'INCORRECT': 'Incorrect' }]} placeholder="Submission Status" defaultValue="all" />
             </div>
 
             <div className="rounded-md border">

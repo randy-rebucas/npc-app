@@ -15,6 +15,8 @@ interface GetUsersParams {
   search?: string;
   role?: string;
   limit?: number;
+  onBoardingStatus?: string;
+  submissionStatus?: string;
 }
 
 interface licenseState {
@@ -33,6 +35,7 @@ export interface UserQuery {
   "profile.practiceTypes"?: { $in: string[] };
   "profile.monthlyCollaborationRate"?: { $gte: number; $lte: number };
   submissionStatus?: string;
+  onBoardingStatus?: string;
 }
 
 export interface UserDocument {
@@ -286,6 +289,8 @@ export async function getUsers({
   search = "",
   role = "all",
   limit = 10,
+  onBoardingStatus = "all",
+  submissionStatus = "all",
 }: GetUsersParams): Promise<GetUsersResponse> {
   try {
     await connect();
@@ -304,6 +309,14 @@ export async function getUsers({
     console.log(role);
     if (role !== "all") {
       query.role = role;
+    }
+
+    if (onBoardingStatus !== "all") {
+      query.onBoardingStatus = onBoardingStatus;
+    }
+
+    if (submissionStatus !== "all") {
+      query.submissionStatus = submissionStatus;
     }
 
     const skip = (page - 1) * limit;

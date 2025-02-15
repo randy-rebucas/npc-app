@@ -25,39 +25,41 @@ export default function CollaboratorsLayout({ children, modal }: { children: Rea
     }, [session]);
 
     return (
-        <div className="bg-gray-50 min-h-screen w-full">
+        <div className="min-h-screen w-full bg-background">
             <Header />
-            <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <main className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-1 flex-col space-y-8">
                     <div className="space-y-6">
                         <div className="mb-4 flex justify-between items-center">
-                            <h1 className="text-2xl font-bold">Collaborators</h1>
+                            <h1 className="text-2xl font-bold text-foreground">Collaborators</h1>
                             <Link
                                 href="/np/collaborators/form"
-                                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+                                className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
                             >
                                 Add Collaborator
                             </Link>
                         </div>
 
                         {/* Filter Tabs */}
-                        <div className="border-b border-gray-200">
+                        <div className="border-b border-border">
                             <nav className="-mb-px flex space-x-8">
                                 <Link
                                     href="/np/collaborators/active"
-                                    className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium ${currentTab === 'active'
-                                        ? 'border-indigo-500 text-indigo-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                        }`}
+                                    className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium ${
+                                        currentTab === 'active'
+                                            ? 'border-primary text-primary'
+                                            : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+                                    }`}
                                 >
                                     Active Collaborators
                                 </Link>
                                 <Link
                                     href="/np/collaborators/request"
-                                    className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium ${currentTab === 'request'
-                                        ? 'border-indigo-500 text-indigo-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                        }`}
+                                    className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium ${
+                                        currentTab === 'request'
+                                            ? 'border-primary text-primary'
+                                            : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+                                    }`}
                                 >
                                     Pending Requests
                                 </Link>

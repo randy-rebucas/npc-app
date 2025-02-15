@@ -3,7 +3,7 @@ import { CollaborationRequest } from "@/app/models/Collaboration";
 import connect from "@/lib/db";
 import User from "@/app/models/User";
 import Notification from "@/app/models/Notification";
-import { sendEmail } from "@/lib/email";
+import { EmailService } from "@/lib/email";
 
 export const DELETE = async (
   req: Request,
@@ -39,10 +39,20 @@ export const DELETE = async (
     });
 
     // Send email to NP
-    await sendEmail({
-      to: npUser.email,
+    const emailService = new EmailService();
+    await emailService.sendEmail({
+      to: { email: npUser.email },
       subject: "Collaboration Request Removed",
-      body: "Your collaboration request has been removed",
+      htmlContent: "<p>Your collaboration request has been removed</p>",
+      textContent: "Your collaboration request has been removed",
+      sender: {
+        name: "npcollaborator",
+        email: "noreply@npcollaborator.com",
+      },
+      replyTo: {
+        name: "npcollaborator",
+        email: "noreply@npcollaborator.com",
+      },
     });
 
     return NextResponse.json({ 

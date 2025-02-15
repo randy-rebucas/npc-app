@@ -1,6 +1,7 @@
 import UserProfile from "@/app/models/UserProfile";
 import User, { UserOnBoardingStatus } from "@/app/models/User";
 import connect from "@/lib/db";
+import { EmailService } from "@/lib/email";
 
 export const config = {
   api: {
@@ -40,6 +41,22 @@ export async function POST(request: Request) {
       { _id: userId },
       { $set: { onBoardingStatus: UserOnBoardingStatus.COMPLETED } }
     );
+
+    const emailService = new EmailService();
+    await emailService.sendEmail({
+      to: { email: user.email! },
+      subject: "Onboarding Complete",
+      htmlContent: "<p>Your onboarding is complete. You can now start collaborating with other NPs.</p>",
+      textContent: "Your onboarding is complete. You can now start collaborating with other NPs.",
+      sender: {
+        name: "npcollaborator",
+        email: "noreply@npcollaborator.com",
+      },
+      replyTo: {
+        name: "npcollaborator",
+        email: "noreply@npcollaborator.com",
+      },
+    });
 
     return Response.json({ user });
   } catch (error) {

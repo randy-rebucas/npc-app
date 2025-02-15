@@ -4,6 +4,7 @@ import Listing from "@/app/models/Listing";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/options";
 import Notification from "@/app/models/Notification";
+import { EmailService } from "@/lib/email";
 
 export async function GET() {
   try {
@@ -51,6 +52,23 @@ export async function POST(request: NextRequest) {
       message: "A new listing has been created",
       link: `/np/listings/${listing._id}`,
     });
+
+    const emailService = new EmailService();
+    await emailService.sendEmail({
+      to: { email: session.user.email },
+      subject: "New Listing Created",
+      htmlContent: "<p>A new listing has been created</p>",
+      textContent: "A new listing has been created",
+      sender: {
+        name: "npcollaborator",
+        email: "noreply@npcollaborator.com",
+      },
+      replyTo: {
+        name: "npcollaborator",
+        email: "noreply@npcollaborator.com",
+      },
+    });
+
     return NextResponse.json({
       success: true,
       message: "Listing created successfully",

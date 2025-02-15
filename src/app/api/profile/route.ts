@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import User from "@/app/models/User";
 import { createEvent } from "@/app/actions/events";
 import { EventType } from "@/app/models/Event";
+import { EmailService } from "@/lib/email";
 
 export async function POST(request: Request) {
   try {
@@ -31,6 +32,23 @@ export async function POST(request: Request) {
       email: user.email!,
       type: EventType.MEMBER_UPDATED,
     });
+
+    const emailService = new EmailService();
+    await emailService.sendEmail({
+      to: { email: user.email! },
+      subject: "Profile Updated",
+      htmlContent: "<p>Your profile has been updated</p>",
+      textContent: "Your profile has been updated",
+      sender: {
+        name: "npcollaborator",
+        email: "noreply@npcollaborator.com",
+      },
+      replyTo: {
+        name: "npcollaborator",
+        email: "noreply@npcollaborator.com",
+      },
+    });
+
     return NextResponse.json({ userProfile });
   } catch (error) {
     console.error(error);

@@ -1,19 +1,28 @@
-Listings Entity:
-- Category
-- Title
-- Description
-- Board Certification
-- Practice Type
-- Practice Name
-- State licenses
-- Specialties
-- Additional Certifications
+const emailService = new EmailService();
 
-Pricing:
-- Monthly Base Rate
-- Multiple NP fee in same practice
-- Additional fee per state
-- Controlled substance fee
+// Simple usage
+await emailService.sendEmail({
+  to: { email: 'recipient@example.com' },
+  subject: 'Hello',
+  htmlContent: '<h1>Hello World</h1>'
+});
 
-Photos:
-- Upload 2 to 3 photos
+// Advanced usage
+await emailService.sendEmail({
+  to: [
+    { email: 'recipient1@example.com', name: 'John' },
+    { email: 'recipient2@example.com', name: 'Jane' }
+  ],
+  subject: 'Hello',
+  htmlContent: '<h1>Hello World</h1>',
+  textContent: 'Hello World',
+  replyTo: {
+    name: 'Support',
+    email: 'support@yourdomain.com'
+  },
+  attachments: [{
+    name: 'document.pdf',
+    content: 'base64-encoded-content',
+    contentType: 'application/pdf'
+  }]
+});

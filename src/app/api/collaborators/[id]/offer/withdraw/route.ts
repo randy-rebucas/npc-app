@@ -6,7 +6,7 @@ import Offer from "@/app/models/Offer";
 import { OfferStatus } from "@/app/models/Offer";
 import User from "@/app/models/User";
 import Notification from "@/app/models/Notification";
-import { sendEmail } from "@/lib/email";
+import { EmailService } from "@/lib/email";
 
 import { NextResponse } from "next/server";
 
@@ -49,10 +49,16 @@ export async function POST(
         });
 
         // Send email to NP
-        await sendEmail({
-          to: npUser.email,
+        const emailService = new EmailService();
+        await emailService.sendEmail({
+          to: { email: npUser.email },
           subject: "Offer Withdrawn",
-          body: "Your offer has been withdrawn"
+          htmlContent: "<p>Your offer has been withdrawn</p>",
+          textContent: "Your offer has been withdrawn",
+          sender: {
+            name: "npcollaborator",
+            email: "noreply@npcollaborator.com",
+          },
         });
 
         return NextResponse.json({

@@ -6,7 +6,7 @@ import {
 import connect from "@/lib/db";
 import User from "@/app/models/User";
 import Notification from "@/app/models/Notification";
-import { sendEmail } from "@/lib/email";
+import { EmailService } from "@/lib/email";
 
 export async function POST(
   request: Request,
@@ -53,10 +53,16 @@ export async function POST(
     });
 
     // Send email to NP
-    await sendEmail({
-      to: npUser.email,
+    const emailService = new EmailService();
+    await emailService.sendEmail({
+      to: { email: npUser.email },
       subject: "Collaboration Request Declined",
-      body: "Your collaboration request has been declined",
+      htmlContent: "<p>Your collaboration request has been declined</p>",
+      textContent: "Your collaboration request has been declined",
+      sender: {
+        name: "npcollaborator",
+        email: "noreply@npcollaborator.com",
+      },
     });
 
     return NextResponse.json({ 

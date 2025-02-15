@@ -7,6 +7,7 @@ import connect from "@/lib/db";
 import User, { UserOnBoardingStatus } from "@/app/models/User";
 import { createEvent } from "@/app/actions/events";
 import { EventType } from "@/app/models/Event";
+import { EmailService } from "@/lib/email";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -44,7 +45,7 @@ export const authOptions: NextAuthOptions = {
           image: profile.picture,
           role: undefined,
         };
-      }
+      },
     }),
     {
       id: "logto",
@@ -89,10 +90,27 @@ export const authOptions: NextAuthOptions = {
             provider: account?.provider,
             onBoardingStatus: UserOnBoardingStatus.INCOMPLETE,
           });
-          
+
           user.id = newUser._id.toString();
           user.role = undefined;
           user.username = newUser.username;
+
+          // Send email to NP
+          const emailService = new EmailService();
+          await emailService.sendEmail({
+            to: { email: user.email! },
+            subject: "Welcome to NP Collaborator",
+            htmlContent: "<p>Welcome to NP Collaborator</p>",
+            textContent: "Welcome to NP Collaborator",
+            sender: {
+              name: "npcollaborator",
+              email: "noreply@npcollaborator.com",
+            },
+            replyTo: {
+              name: "npcollaborator",
+              email: "noreply@npcollaborator.com",
+            },
+          });
         } else {
           user.id = existingUser._id.toString();
           user.role = existingUser.role;
@@ -107,7 +125,7 @@ export const authOptions: NextAuthOptions = {
       await createEvent({
         user: user.id,
         email: user.email!,
-        type: EventType.LOGGED_IN, 
+        type: EventType.LOGGED_IN,
       });
       return true;
     },

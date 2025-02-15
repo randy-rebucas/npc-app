@@ -12,7 +12,7 @@ import Offer, {
 import { OfferStatus } from "@/app/models/Offer";
 import User from "@/app/models/User";
 import Notification from "@/app/models/Notification";
-import { sendEmail } from "@/lib/email";
+import { EmailService } from "@/lib/email";
 import { getServerSession } from "next-auth/next";
 import { NextResponse } from "next/server";
 
@@ -120,10 +120,17 @@ export async function POST(
       });
 
       // Send email to NP
-      await sendEmail({
-        to: npUser.email,
+      const emailService = new EmailService(); 
+      await emailService.sendEmail({
+        to: { email: npUser.email },
         subject: "Offer Sent",
-        body: "Your offer has been sent",
+        htmlContent: "<p>Your offer has been sent</p>",
+        textContent: "Your offer has been sent",
+        sender: {
+          name: "npcollaborator",
+          email: "noreply@npcollaborator.com",
+        },
+        
       });
 
       return NextResponse.json({

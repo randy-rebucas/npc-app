@@ -5,7 +5,7 @@ import connect from "@/lib/db";
 import { CollaborationRequest } from "@/app/models/Collaboration";
 import User, { UserRole, UserSubmissionStatus } from "@/app/models/User";
 import Notification from "@/app/models/Notification";
-import { sendEmail } from "@/lib/email";
+import { EmailService } from "@/lib/email";
 
 export async function POST(request: Request) {
   try {
@@ -69,15 +69,21 @@ export async function POST(request: Request) {
     await Notification.create({
       user: npUser.id,
       title: "New Collaboration Invitation",
-      message: `You have received a collaboration invitation from Dr. ${session.user.name}`,
+      message: `You have received a collaboration invitation from Dr. ${session.user.email}`,
       link: `/collaborators/request`,
     });
 
     // Send email to NP
-    await sendEmail({
-      to: npUser.email,
+    const emailService = new EmailService();
+    await emailService.sendEmail({
+      to: { email: npUser.email },
       subject: "New Collaboration Invitation",
-      body: `You have received a collaboration invitation from Dr. ${session.user.name}. Please log in to your account to review and respond to this request.`,
+      htmlContent: `<p>You have received a collaboration invitation from Dr. ${session.user.email}. Please log in to your account to review and respond to this request.</p>`,
+      textContent: `You have received a collaboration invitation from Dr. ${session.user.email}. Please log in to your account to review and respond to this request.`,
+      sender: {
+        name: "npcollaborator",
+        email: "noreply@npcollaborator.com",
+      },
     });
 
     return NextResponse.json({ success: true, message: "Invitation sent successfully" });

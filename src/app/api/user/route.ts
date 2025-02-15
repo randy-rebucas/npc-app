@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import User from "@/app/models/User";
 import connect from "@/lib/db";
+import { EmailService } from "@/lib/email";
 
 export async function GET() {
   try {
@@ -30,6 +31,22 @@ export async function PUT(request: Request) {
     user.username = data.username;
     user.email = data.email;
     await user.save();
+
+    const emailService = new EmailService();
+    await emailService.sendEmail({
+      to: { email: user.email! },
+      subject: "Profile Updated",
+      htmlContent: "<p>Your profile has been updated</p>",
+      textContent: "Your profile has been updated",
+      sender: {
+        name: "npcollaborator",
+        email: "noreply@npcollaborator.com",
+      },
+      replyTo: {
+        name: "npcollaborator",
+        email: "noreply@npcollaborator.com",
+      },
+    });
 
     return NextResponse.json(user); 
   } catch (error) {

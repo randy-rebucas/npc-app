@@ -5,6 +5,7 @@ import { createEvent } from "@/app/actions/events";
 import User from "@/app/models/User";
 import { EventType } from "@/app/models/Event";
 import { getUserById } from "@/app/actions/user";
+import { EmailService } from "@/lib/email";
 
 export async function POST(request: Request) {
   try {
@@ -57,6 +58,22 @@ export async function POST(request: Request) {
       user: user._id,
       email: user.email,
       type: EventType.USER_SYNCED,
+    });
+
+    const emailService = new EmailService();
+    await emailService.sendEmail({
+      to: { email: user.email! },
+      subject: "Account Synced",
+      htmlContent: "<p>Your account has been synced to Sharetribe</p>",
+      textContent: "Your account has been synced to Sharetribe",
+      sender: {
+        name: "npcollaborator",
+        email: "noreply@npcollaborator.com",
+      },
+      replyTo: {
+        name: "npcollaborator",
+        email: "noreply@npcollaborator.com",
+      },
     });
 
     return Response.json({ success: true, user: sharetribeUser });
