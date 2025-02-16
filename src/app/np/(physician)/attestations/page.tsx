@@ -48,112 +48,85 @@ export default function AttestationsPage() {
     }
 
     return (
-        <div className="bg-gray-50 min-h-screen w-full">
+        <div className="min-h-screen w-full bg-background">
             <Header />
-            <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <main className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-1 flex-col space-y-8">
-
                     <div className="space-y-6">
                         <div className="mb-4 flex justify-between items-center">
                             <input
                                 type="text"
                                 placeholder="Search attestations..."
-                                className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg"
+                                className="w-full max-w-md px-4 py-2 rounded-lg border border-input bg-background"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
-                            {/* <Link
-                                href="/np/attestations/create"
-                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                            >
-                                Create Attestation
-                            </Link> */}
                         </div>
 
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full bg-white border border-gray-200">
-                                <thead className="bg-gray-50">
+                        <div className="rounded-md border border-border">
+                            <table className="w-full">
+                                <thead className="border-b border-border bg-muted">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                                             Schema
                                         </th>
-                                        {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Recipient
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Attester
-                                        </th> */}
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                                             Timestamp
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                                             Status
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-200">
+                                <tbody className="divide-y divide-border bg-background">
                                     {filteredAttestations.map((attestation) => (
-                                        <tr key={attestation._id} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        <tr key={attestation._id} className="hover:bg-muted/50">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                                                 {attestation.schema}
                                             </td>
-                                            {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {attestation.recipient}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {attestation.attester}
-                                            </td> */}
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                                                 {attestation.timestamp.toLocaleString()}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span
-                                                    className={`px-2 py-1 text-xs rounded-full ${attestation.status === 'verified'
-                                                        ? 'bg-green-100 text-green-800'
+                                                <span className={`px-2 py-1 text-xs rounded-full ${
+                                                    attestation.status === 'verified'
+                                                        ? 'bg-success/20 text-success'
                                                         : attestation.status === 'rejected'
-                                                            ? 'bg-red-100 text-red-800'
-                                                            : 'bg-yellow-100 text-yellow-800'
-                                                        }`}
-                                                >
+                                                        ? 'bg-destructive/20 text-destructive'
+                                                        : 'bg-warning/20 text-warning'
+                                                }`}>
                                                     {attestation.status}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                 <Link
                                                     href={`/np/attestations/${attestation._id}`}
-                                                    className="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                                                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
                                                 >
                                                     View
                                                 </Link>
                                             </td>
                                         </tr>
                                     ))}
+                                    {/* Empty state */}
                                     {filteredAttestations.length === 0 && (
                                         <tr>
                                             <td colSpan={6} className="px-6 py-16 text-center">
                                                 <div className="flex flex-col items-center justify-center space-y-4">
-                                                    <div className="text-gray-400">
+                                                    <div className="text-muted-foreground">
                                                         <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                                         </svg>
                                                     </div>
-                                                    <div className="text-gray-500 text-lg font-medium">No attestations found</div>
-                                                    <p className="text-gray-400 text-sm">
+                                                    <div className="text-foreground text-lg font-medium">No attestations found</div>
+                                                    <p className="text-muted-foreground text-sm">
                                                         {searchTerm
                                                             ? "Try adjusting your search terms or clear the search"
                                                             : "Get started by creating your first attestation"}
                                                     </p>
-                                                    {/* {!searchTerm && (
-                                                        <Link
-                                                            href="/np/attestations/create"
-                                                            className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                                                        >
-                                                            Create Attestation
-                                                        </Link>
-                                                    )} */}
                                                 </div>
                                             </td>
                                         </tr>
@@ -161,7 +134,6 @@ export default function AttestationsPage() {
                                 </tbody>
                             </table>
                         </div>
-
                     </div>
                 </div>
             </main>

@@ -78,7 +78,7 @@ export default function CreateAttestationModal() {
   return (
     <Modal>
       <div className="p-6">
-        <h2 className="text-2xl font-semibold mb-4">Monthly Attestation</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-foreground">Monthly Attestation</h2>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField control={form.control} name="stateRequirements" render={({ field }) => (
@@ -171,7 +171,11 @@ export default function CreateAttestationModal() {
             )}
             />
 
-            <Button type="submit" disabled={isLoading}>
+            <Button 
+              type="submit" 
+              disabled={isLoading}
+              className="w-full"
+            >
               {isLoading ? "Submitting..." : "Submit"}
             </Button>
           </form>

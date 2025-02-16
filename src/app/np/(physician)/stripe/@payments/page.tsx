@@ -37,8 +37,8 @@ export default function PaymentsPage() {
         return (
             <div className="flex items-center justify-center h-[400px]">
                 <div className="flex flex-col items-center gap-4">
-                    <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
-                    <p className="text-sm text-gray-500">Loading payments...</p>
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">Loading payments...</p>
                 </div>
             </div>
         );
@@ -48,11 +48,11 @@ export default function PaymentsPage() {
         return (
             <div className="text-center py-20">
                 <div className="flex flex-col items-center gap-4">
-                    <div className="rounded-full bg-gray-100 p-6">
-                        <CreditCard className="w-8 h-8 text-gray-500" />
+                    <div className="rounded-full bg-muted p-6">
+                        <CreditCard className="w-8 h-8 text-muted-foreground" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900">No payments yet</h3>
-                    <p className="text-gray-500 max-w-sm">
+                    <h3 className="text-lg font-semibold text-foreground">No payments yet</h3>
+                    <p className="text-muted-foreground max-w-sm">
                         When you receive payments, they will appear here.
                     </p>
                 </div>
@@ -62,34 +62,34 @@ export default function PaymentsPage() {
 
     return (
         <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-border">
+                <thead className="bg-muted">
                     <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                             Amount
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                             Status
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                             Date
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                             Customer
                         </th>
                     </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-card divide-y divide-border">
                     {payments.map((payment) => (
-                        <tr key={payment.id}>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                        <tr key={payment.id} className="hover:bg-muted/50">
+                            <td className="px-6 py-4 whitespace-nowrap text-foreground">
                                 {formatCurrency(payment.amount)}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                    payment.status === 'succeeded' ? 'bg-green-100 text-green-800' : 
-                                    payment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                                    'bg-red-100 text-red-800'
+                                    payment.status === 'succeeded' ? 'bg-success/20 text-success' : 
+                                    payment.status === 'pending' ? 'bg-warning/20 text-warning' : 
+                                    'bg-destructive/20 text-destructive'
                                 }`}>
                                     {payment.status}
                                 </span>
@@ -97,7 +97,7 @@ export default function PaymentsPage() {
                             <td className="px-6 py-4 whitespace-nowrap">
                                 {new Date(payment.created * 1000).toLocaleDateString()}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                                 {payment.customer}
                             </td>
                         </tr>

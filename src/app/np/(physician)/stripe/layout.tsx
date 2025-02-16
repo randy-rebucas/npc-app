@@ -54,13 +54,13 @@ export default function PaymentLayout({
     }, [stripeConnected]);
 
     return (
-        <div className="bg-gray-50 min-h-screen w-full">
+        <div className="min-h-screen w-full bg-background">
             <Header />
-            <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <main className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 {isLoading &&
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         {[1, 2, 3].map((i) => (
-                            <div key={i} className="bg-white p-6 rounded-lg shadow">
+                            <div key={i} className="bg-card p-6 rounded-lg border border-border">
                                 <Skeleton className="h-4 w-24 mb-4" />
                                 <Skeleton className="h-8 w-32 mb-2" />
                                 <Skeleton className="h-4 w-40" />
@@ -74,13 +74,13 @@ export default function PaymentLayout({
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                             {statsCard}
                         </div>
-                        <div className="border-b border-gray-200 mb-6">
+                        <div className="border-b border-border mb-6">
                             <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                                 <button
                                     onClick={() => setActiveTab('payments')}
                                     className={`${activeTab === 'payments'
-                                        ? 'border-blue-500 text-blue-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                        ? 'border-primary text-primary'
+                                        : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
                                         } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
                                 >
                                     Payments
@@ -88,8 +88,8 @@ export default function PaymentLayout({
                                 <button
                                     onClick={() => setActiveTab('payouts')}
                                     className={`${activeTab === 'payouts'
-                                        ? 'border-blue-500 text-blue-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                        ? 'border-primary text-primary'
+                                        : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
                                         } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
                                 >
                                     Payouts
@@ -97,19 +97,13 @@ export default function PaymentLayout({
                             </nav>
                         </div>
 
-                        <div className="bg-white rounded-lg shadow mb-8">
-                            {activeTab === 'payments' && (
-                                payments
-                            )}
-                            {activeTab === 'payouts' && (
-                                payouts
-                            )}
+                        <div className="bg-card rounded-lg border border-border mb-8">
+                            {activeTab === 'payments' && payments}
+                            {activeTab === 'payouts' && payouts}
                         </div>
                     </>
                 }
-                {!stripeConnected &&
-                    connect
-                }
+                {!stripeConnected && connect}
             </main>
         </div>
     );
