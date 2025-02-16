@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/options";
 import Notification from "@/app/models/Notification";
 import { EmailService } from "@/lib/email";
+import Template from "@/app/models/Template";
 
 export async function GET() {
   try {
@@ -53,19 +54,24 @@ export async function POST(request: NextRequest) {
       link: `/np/listings/${listing._id}`,
     });
 
+    // Get the default template for new listing created
+    let template = await Template.findOne({ isDefault: true, type: "email", code: "new-listing-created" });
+    if (!template) {
+      template = await Template.findOne({ type: "email", code: "new-listing-created" });
+    }
+
     const emailService = new EmailService();
     await emailService.sendEmail({
       to: { email: session.user.email },
-      subject: "New Listing Created",
-      htmlContent: "<p>A new listing has been created</p>",
-      textContent: "A new listing has been created",
+      subject: template?.name || "New Listing Created",
+      htmlContent: template?.content || "<p>A new listing has been created</p>",
       sender: {
-        name: "npcollaborator",
-        email: "noreply@npcollaborator.com",
+        name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+        email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
       },
       replyTo: {
-        name: "npcollaborator",
-        email: "noreply@npcollaborator.com",
+        name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+        email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
       },
     });
 

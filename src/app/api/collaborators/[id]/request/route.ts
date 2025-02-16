@@ -9,6 +9,7 @@ import User, { UserSubmissionStatus } from "@/app/models/User";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { getServerSession } from "next-auth";
 import { EmailService } from "@/lib/email";
+import Template from "@/app/models/Template";
 
 export async function POST(
   request: Request,
@@ -79,16 +80,25 @@ export async function POST(
       link: `/np/collaborators/request`,
     });
 
+    // Get the default template for collaboration request from NP
+    let template = await Template.findOne({ isDefault: true, type: "email", code: "collaboration-request-from-np" });
+    if (!template) {
+      template = await Template.findOne({ type: "email", code: "collaboration-request-from-np" });
+    }
+
     // Send email to NP
     const emailService = new EmailService();
     await emailService.sendEmail({
       to: { email: physicianUser.email },
-      subject: "Collaboration Request from NP",
-      htmlContent: "<p>NP has requested collaboration</p>",
-      textContent: "NP has requested collaboration",
+      subject: template?.name || "Collaboration Request from NP",
+      htmlContent: template?.content || "<p>NP has requested collaboration</p>",
       sender: {
-        name: "npcollaborator",
-        email: "noreply@npcollaborator.com",
+        name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+        email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
+      },
+      replyTo: {
+        name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+        email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
       },
     });
 

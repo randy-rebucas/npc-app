@@ -4,7 +4,7 @@ import connect from "@/lib/db";
 import User from "@/app/models/User";
 import Notification from "@/app/models/Notification";
 import { EmailService } from "@/lib/email";
-
+import Template from "@/app/models/Template";
 export const DELETE = async (
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -38,20 +38,24 @@ export const DELETE = async (
       link: `/collaborators/request`,
     });
 
+    // Get the default template for collaboration request removed
+    let template = await Template.findOne({ isDefault: true, type: "email", code: "collaboration-request-removed" });
+    if (!template) {
+      template = await Template.findOne({ type: "email", code: "collaboration-request-removed" });
+    }
     // Send email to NP
     const emailService = new EmailService();
     await emailService.sendEmail({
       to: { email: npUser.email },
-      subject: "Collaboration Request Removed",
-      htmlContent: "<p>Your collaboration request has been removed</p>",
-      textContent: "Your collaboration request has been removed",
+      subject: template?.name || "Collaboration Request Removed",
+      htmlContent: template?.content || "<p>Your collaboration request has been removed</p>",
       sender: {
-        name: "npcollaborator",
-        email: "noreply@npcollaborator.com",
+        name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+        email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
       },
       replyTo: {
-        name: "npcollaborator",
-        email: "noreply@npcollaborator.com",
+        name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+        email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
       },
     });
 

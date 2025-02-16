@@ -2,6 +2,7 @@ import UserProfile from "@/app/models/UserProfile";
 import User, { UserOnBoardingStatus } from "@/app/models/User";
 import connect from "@/lib/db";
 import { EmailService } from "@/lib/email";
+import Template from "@/app/models/Template";
 
 export const config = {
   api: {
@@ -42,19 +43,24 @@ export async function POST(request: Request) {
       { $set: { onBoardingStatus: UserOnBoardingStatus.COMPLETED } }
     );
 
+    // Get the default template for onboarding complete
+    let template = await Template.findOne({ isDefault: true, type: "email", code: "onboarding-complete" });
+    if (!template) {
+      template = await Template.findOne({ type: "email", code: "onboarding-complete" });
+    }
+
     const emailService = new EmailService();
     await emailService.sendEmail({
       to: { email: user.email! },
-      subject: "Onboarding Complete",
-      htmlContent: "<p>Your onboarding is complete. You can now start collaborating with other NPs.</p>",
-      textContent: "Your onboarding is complete. You can now start collaborating with other NPs.",
+      subject: template?.name || "Onboarding Complete",
+      htmlContent: template?.content || "<p>Your onboarding is complete. You can now start collaborating with other NPs.</p>",
       sender: {
-        name: "npcollaborator",
-        email: "noreply@npcollaborator.com",
+        name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+        email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
       },
       replyTo: {
-        name: "npcollaborator",
-        email: "noreply@npcollaborator.com",
+        name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+        email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
       },
     });
 

@@ -15,6 +15,7 @@ import Notification from "@/app/models/Notification";
 import { EmailService } from "@/lib/email";
 import { getServerSession } from "next-auth/next";
 import { NextResponse } from "next/server";
+import Template from "@/app/models/Template";
 
 export async function POST(
   request: Request,
@@ -119,18 +120,26 @@ export async function POST(
         link: `/collaborators/${id}/offer/accept`,
       });
 
+      // Get the default template for offer sent
+      let template = await Template.findOne({ isDefault: true, type: "email", code: "offer-sent" });
+      if (!template) {
+        template = await Template.findOne({ type: "email", code: "offer-sent" });
+      }
+
       // Send email to NP
       const emailService = new EmailService(); 
       await emailService.sendEmail({
         to: { email: npUser.email },
-        subject: "Offer Sent",
-        htmlContent: "<p>Your offer has been sent</p>",
-        textContent: "Your offer has been sent",
+        subject: template?.name || "Offer Sent",
+        htmlContent: template?.content || "<p>Your offer has been sent</p>",
         sender: {
-          name: "npcollaborator",
-          email: "noreply@npcollaborator.com",
+          name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+          email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
         },
-        
+        replyTo: {
+          name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+          email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
+        },
       });
 
       return NextResponse.json({

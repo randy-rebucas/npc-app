@@ -63,6 +63,16 @@ export async function AdminSidebar() {
             icon: "offers",
         },
         {
+            title: "Notifications",
+            url: "/admin/dashboard/notifications",
+            icon: "notifications",
+        },
+        {
+            title: "Templates",
+            url: "/admin/dashboard/templates",
+            icon: "templates",
+        },
+        {
             title: "Miscellaneous",
             url: "/admin/dashboard/miscellaneous",
             icon: "miscellaneous",

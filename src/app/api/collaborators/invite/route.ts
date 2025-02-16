@@ -6,6 +6,7 @@ import { CollaborationRequest } from "@/app/models/Collaboration";
 import User, { UserRole, UserSubmissionStatus } from "@/app/models/User";
 import Notification from "@/app/models/Notification";
 import { EmailService } from "@/lib/email";
+import Template from "@/app/models/Template";
 
 export async function POST(request: Request) {
   try {
@@ -73,16 +74,25 @@ export async function POST(request: Request) {
       link: `/collaborators/request`,
     });
 
+    // Get the default template for collaboration invitation
+    let template = await Template.findOne({ isDefault: true, type: "email", code: "collaboration-invitation" });
+    if (!template) {
+      template = await Template.findOne({ type: "email", code: "collaboration-invitation" });
+    }
+
     // Send email to NP
     const emailService = new EmailService();
     await emailService.sendEmail({
       to: { email: npUser.email },
-      subject: "New Collaboration Invitation",
-      htmlContent: `<p>You have received a collaboration invitation from Dr. ${session.user.email}. Please log in to your account to review and respond to this request.</p>`,
-      textContent: `You have received a collaboration invitation from Dr. ${session.user.email}. Please log in to your account to review and respond to this request.`,
+      subject: template?.name || "New Collaboration Invitation",
+      htmlContent: template?.content || `<p>You have received a collaboration invitation from Physician. Please log in to your account to review and respond to this request.</p>`,
       sender: {
-        name: "npcollaborator",
-        email: "noreply@npcollaborator.com",
+        name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+        email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
+      },
+      replyTo: {
+        name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+        email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
       },
     });
 

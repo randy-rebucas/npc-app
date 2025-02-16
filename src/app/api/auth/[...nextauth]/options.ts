@@ -8,6 +8,7 @@ import User, { UserOnBoardingStatus } from "@/app/models/User";
 import { createEvent } from "@/app/actions/events";
 import { EventType } from "@/app/models/Event";
 import { EmailService } from "@/lib/email";
+import Template from "@/app/models/Template";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -95,20 +96,25 @@ export const authOptions: NextAuthOptions = {
           user.role = undefined;
           user.username = newUser.username;
 
+          // Get the default template for welcome email
+          let template = await Template.findOne({ isDefault: true, type: "email", code: "welcome-email" });
+          if (!template) {
+            template = await Template.findOne({ type: "email", code: "welcome-email" });
+          }
+
           // Send email to NP
           const emailService = new EmailService();
           await emailService.sendEmail({
             to: { email: user.email! },
-            subject: "Welcome to NP Collaborator",
-            htmlContent: "<p>Welcome to NP Collaborator</p>",
-            textContent: "Welcome to NP Collaborator",
+            subject: template?.name || "Welcome to NP Collaborator",
+            htmlContent: template?.content || "<p>Welcome to NP Collaborator</p>",
             sender: {
-              name: "npcollaborator",
-              email: "noreply@npcollaborator.com",
+              name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+              email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
             },
             replyTo: {
-              name: "npcollaborator",
-              email: "noreply@npcollaborator.com",
+              name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+              email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
             },
           });
         } else {
