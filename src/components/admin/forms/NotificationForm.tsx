@@ -18,20 +18,21 @@ import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { Editor } from '@tinymce/tinymce-react';
 import { useTheme } from "next-themes";
-
+import { Checkbox } from "@/components/ui/checkbox";
 const formSchema = z.object({
-    name: z.string().min(1, "Name is required"),
-    code: z.string().min(1, "Code is required"),
-    content: z.string().min(1, "Content is required").regex(/^[\s\S]*$/, {
+    title: z.string().min(1, "Title is required"),
+    message: z.string().min(1, "Message is required").regex(/^[\s\S]*$/, {
         message: "Invalid HTML content",
     }),
+    link: z.string().optional(),
+    autoSend: z.boolean().optional(),
 });
 
-interface TemplateFormProps {
+interface NotificationFormProps {
     id: string | null;
 }
 
-export default function TemplateForm({ id }: TemplateFormProps) {
+export default function NotificationForm({ id }: NotificationFormProps) {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
@@ -40,73 +41,75 @@ export default function TemplateForm({ id }: TemplateFormProps) {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            name: "",
-            code: "",
-            content: "",
+            title: "",
+            link: "",
+            message: "",
+            autoSend: false,
         },
     });
 
     if (id) {
-        const getTemplate = async () => {
-            const template = await fetch(`/api/admin/template/${id}`)
-            const data = await template.json();
-            form.setValue("name", data?.name || "");
-            form.setValue("code", data?.code || "");
-            form.setValue("content", data?.content || "");
+        const getNotification = async () => {
+            const notification = await fetch(`/api/admin/notification/${id}`)
+            const data = await notification.json();
+            form.setValue("title", data?.title || "");
+            form.setValue("link", data?.link || "");
+            form.setValue("message", data?.message || "");
+            form.setValue("autoSend", data?.autoSend || false);
         }
-        getTemplate()
+        getNotification()
     }
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsLoading(true);
         try {
             if (id) {
-                const response = await fetch(`/api/admin/template/${id}`, {
+                const response = await fetch(`/api/admin/notification/${id}`, {
                     method: "PUT",
                     body: JSON.stringify(values),
                 });
                 if (response.ok) {
                     toast({
-                        title: "Template updated successfully",
-                        description: "Template updated successfully",
+                        title: "Notification updated successfully",
+                        description: "Notification updated successfully",
                     });
                     form.reset();
-                    router.push("/admin/dashboard/templates");
+                    router.push("/admin/dashboard/notifications");
                 } else {
                     toast({
-                        title: "Failed to update template",
+                        title: "Failed to update notification",
                         description: "Please try again later.",
                         variant: "destructive",
                     });
                 }
             } else {
                 // Handle form submission
-                const response = await fetch("/api/admin/template", {
+                const response = await fetch("/api/admin/notification", {
                     method: "POST",
                     body: JSON.stringify(values),
                 });
                 if (response.ok) {
                     toast({
-                        title: "Template added successfully",
-                        description: "Template added successfully",
+                        title: "Notification added successfully",
+                        description: "Notification added successfully",
                     });
                     form.reset();
-                    router.push("/admin/dashboard/templates");
+                    router.push("/admin/dashboard/notifications");
                 } else {
-                    console.error("Failed to add template");
+                    console.error("Failed to add notification");
                     toast({
-                        title: "Failed to add template",
+                        title: "Failed to add notification",
                         description: "Please try again later.",
                         variant: "destructive",
                     });
                 }
             }
         } catch (error) {
-            console.error("Error in template:", error);
+            console.error("Error in notification:", error);
             toast({
                 title: "Error",
                 description: "Please try again later.",
-                variant: "destructive", 
+                variant: "destructive",
             });
         } finally {
             setIsLoading(false);
@@ -117,26 +120,12 @@ export default function TemplateForm({ id }: TemplateFormProps) {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
                     control={form.control}
-                    name="name"
+                    name="title"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Name</FormLabel>
+                            <FormLabel>Title</FormLabel>
                             <FormControl>
-                                <Input placeholder="Enter template name..." {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                
-                <FormField
-                    control={form.control}
-                    name="code"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Code</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Enter template code..." {...field} />
+                                <Input placeholder="Enter notification title..." {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -145,10 +134,24 @@ export default function TemplateForm({ id }: TemplateFormProps) {
 
                 <FormField
                     control={form.control}
-                    name="content"
+                    name="link"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Content</FormLabel>
+                            <FormLabel>Link</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Enter notification link..." {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="message"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Message</FormLabel>
                             <FormControl>
                                 <Editor
                                     apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY || ""}
@@ -177,8 +180,24 @@ export default function TemplateForm({ id }: TemplateFormProps) {
                     )}
                 />
 
+                <FormField
+                    control={form.control}
+                    name="autoSend"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Auto Send</FormLabel>
+                            <FormControl>
+                                <Checkbox
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                />
+                            </FormControl>
+                        </FormItem>
+                    )}
+                />
+
                 <Button type="submit" disabled={isLoading}>
-                    {isLoading ? "Submitting..." : id ? "Update Template" : "Add Template"}
+                    {isLoading ? "Submitting..." : id ? "Update Notification" : "Add Notification"}
                 </Button>
             </form>
         </Form>

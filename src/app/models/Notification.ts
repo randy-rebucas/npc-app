@@ -8,6 +8,7 @@ export interface INotification {
   message: string;
   read: boolean;
   link?: string;
+  type: string; // email, push, in-app
   createdAt: Date;
 }
 
@@ -17,6 +18,7 @@ const notificationSchema = new Schema<INotification>({
   message: { type: String, required: true },
   read: { type: Boolean, default: false },
   link: { type: String },
+  type: { type: String, enum: ['email', 'push', 'in-app'], default: 'in-app' },
   createdAt: { type: Date, default: Date.now },
 });
 

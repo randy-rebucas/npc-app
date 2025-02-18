@@ -3,7 +3,7 @@ import Search from "@/components/ui/member/search";
 import Filter from "@/components/ui/member/filter";
 import { Table, TableHeader, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table";
 import { SearchParams } from '@/lib/types/search-params';
-import { deleteMedicalLicenseState, getMedicalLicenseStatesPaginated } from '@/app/actions/medicallicensestates'; 
+import { deleteMedicalLicenseState, getMedicalLicenseStatesPaginated } from '@/app/actions/medicalLicenseStates'; 
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { PencilIcon, TrashIcon } from "lucide-react";

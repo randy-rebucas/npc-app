@@ -58,9 +58,7 @@ export function Notifications() {
                     {new Date(notification.createdAt).toLocaleDateString()}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                  {notification.message}
-                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mt-1" dangerouslySetInnerHTML={{ __html: notification.message }} />
                 {notification.link && (
                   <Link
                     href={notification.link}

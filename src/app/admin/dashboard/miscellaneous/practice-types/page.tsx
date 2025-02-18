@@ -3,7 +3,7 @@ import Search from "@/components/ui/member/search";
 import Filter from "@/components/ui/member/filter";
 import { Table, TableHeader, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table";
 import { SearchParams } from '@/lib/types/search-params';
-import { getPracticeTypesPaginated, deletePracticeType } from '@/app/actions/practicetypes';
+import { getPracticeTypesPaginated, deletePracticeType } from '@/app/actions/practiceTypes';
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { PencilIcon, TrashIcon } from "lucide-react";
