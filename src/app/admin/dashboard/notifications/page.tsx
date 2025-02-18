@@ -7,7 +7,7 @@ import { SearchParams } from "@/lib/types/search-params";
 import Pagination from "@/components/ui/member/pagination";
 import Search from "@/components/ui/member/search";
 import { deleteNotification, getNotifications } from "@/app/actions/emailNotifications";
-import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
+import { PencilIcon, PlusIcon, TrashIcon, SendIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -64,7 +64,6 @@ export default async function NotificationsPage(props: {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Title</TableHead>
-                                    <TableHead>Counts</TableHead>
                                     <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -87,8 +86,10 @@ export default async function NotificationsPage(props: {
                                         return (
                                             <TableRow key={notification._id}>
                                                 <TableCell className="text-sm font-medium text-foreground truncate">{notification.title}</TableCell>
-                                                <TableCell>{3}</TableCell>
                                                 <TableCell className="flex items-center justify-end gap-2 p-3">
+                                                    <Link href={`/admin/dashboard/notifications/${notification._id}/send`}>
+                                                        <SendIcon className="w-4 h-4 text-foreground hover:text-primary" />
+                                                    </Link>
                                                     <Link href={`/admin/dashboard/notifications/${notification._id}`}>
                                                         <PencilIcon className="w-4 h-4 text-foreground hover:text-primary" />
                                                     </Link>
