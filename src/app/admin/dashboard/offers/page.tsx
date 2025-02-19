@@ -102,7 +102,7 @@ export default async function OffersPage(props: {
                                                 <TableCell>{formatCurrency(offer.baseSalary * 100)}</TableCell>
                                                 <TableCell>{offer.status}</TableCell>
                                                 <TableCell className="flex items-center justify-end gap-2 p-3">
-                                                    <Link href={`/admin/dashboard/offers/${offer._id}/view`}>
+                                                    <Link href={`/admin/dashboard/offers/${offer._id}`}>
                                                         <Eye className="w-4 h-4 text-foreground hover:text-primary" />
                                                     </Link>
                                                 </TableCell>

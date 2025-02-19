@@ -27,7 +27,7 @@ export default async function EnquiriesPage(props: {
 
     const status = String(searchParams?.status || 'all');
 
-    const { enquiries, total } = await getEnquiries({ page: currentPage, search: query, status: status, limit: ITEMS_PER_PAGE });;
+    const { enquiries, total } = await getEnquiries({ page: currentPage, search: query, status: status, limit: ITEMS_PER_PAGE });
 
     const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
     const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;

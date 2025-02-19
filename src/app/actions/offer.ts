@@ -110,3 +110,16 @@ export async function deleteOffer(id: string) {
     return { error: "Failed to delete offer" };
   }
 }
+
+export async function getOffer(id: string) {
+  try {
+    await connect();
+
+    const offer = await Offer.findById(id);
+
+    return offer;
+  } catch (error) {
+    console.error(error);
+    return { error: "Failed to delete offer" };
+  }
+}
