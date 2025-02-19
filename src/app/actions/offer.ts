@@ -1,6 +1,7 @@
 import connect from "@/lib/db";
-import Offer from "../models/Offer";
+import Offer, { IPosition } from "../models/Offer";
 import { revalidateTag } from "next/cache";
+import { IUser } from "../models/User";
 
 interface GetOffersParams {
   page: number;
@@ -21,11 +22,16 @@ interface OfferQuery {
 
 export interface OfferDocument {
   _id: string; // We'll cast this to string anyway
-  physicianUser: string;
-  nursePractitionerUser: string;
-  status: string;
+  physicianUser: IUser;
+  nursePractitionerUser: IUser;
+  offerDate: Date;
+  expirationDate: Date;
+  position: IPosition;
+  compensationType: string;
+  baseSalary: number;
   createdAt: Date;
   updatedAt: Date;
+  status: string;
 }
 
 interface GetOffersResponse {
@@ -71,15 +77,19 @@ export async function getOffers({
       Offer.countDocuments(query),
     ]);
 
-    console.log(offers);
     return {
       offers: (offers as unknown as OfferDocument[]).map((offer) => ({
         _id: offer._id.toString(),
         physicianUser: offer.physicianUser,
         nursePractitionerUser: offer.nursePractitionerUser,
-        status: offer.status,
+        baseSalary: offer.baseSalary,
+        offerDate: offer.offerDate,
+        expirationDate: offer.expirationDate,
+        position: offer.position,
+        compensationType: offer.compensationType,
         createdAt: offer.createdAt,
         updatedAt: offer.updatedAt,
+        status: offer.status,
       })),
       total,
     };

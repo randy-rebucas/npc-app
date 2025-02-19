@@ -8,10 +8,9 @@ import Search from "@/components/ui/member/search";
 import Filter from "@/components/ui/member/filter";
 import AdminHeader from "@/components/admin/Header";
 import { getOffers } from "@/app/actions/offer";
-// import { deleteOffer, getOffers } from "@/app/actions/offer";
-// import { formatCurrency } from "@/lib/utils";
-// import { PencilIcon, TrashIcon } from "lucide-react";
-// import Link from "next/link";
+import { formatCurrency } from "@/lib/utils";
+import { Eye } from "lucide-react";
+import Link from "next/link";
 
 
 export default async function OffersPage(props: {
@@ -31,13 +30,6 @@ export default async function OffersPage(props: {
     const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
     const endItem = Math.min(currentPage * ITEMS_PER_PAGE, total);
 
-
-    // const handleDelete = async (data: FormData) => {
-    //     "use server";
-    //     const itemId = data.get("itemId");
-    //     await deleteOffer(itemId as string); 
-    // };
-    
     return (
         <SidebarInset>
             <AdminHeader breadcrumbs={[
@@ -62,11 +54,12 @@ export default async function OffersPage(props: {
                                 <TableRow>
                                     <TableHead>Physician</TableHead>
                                     <TableHead>NP</TableHead>
+                                    <TableHead>Offer Date</TableHead>
+                                    <TableHead>Exp Date</TableHead>
+                                    <TableHead>Position</TableHead>
+                                    <TableHead>Comp Type</TableHead>
+                                    <TableHead>Basic Salary</TableHead>
                                     <TableHead>Status</TableHead>
-                                    <TableHead>Time</TableHead> 
-                                    <TableHead>Base Rate</TableHead>    
-                                    <TableHead>Practice Type</TableHead>
-                                    <TableHead>State License</TableHead>
                                     <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -99,27 +92,21 @@ export default async function OffersPage(props: {
                                 ) : (
                                     offers.map((offer) => {
                                         return (
-                                            <>{offer.status}</>
-                                            // <TableRow key={offer._id}>
-                                            //     <TableCell>{offer.physicianUser.name}</TableCell>
-                                            //     <TableCell>{offer.nursePractitionerUser.name}</TableCell>
-                                            //     <TableCell>{offer.status}</TableCell>
-                                            //     <TableCell>{offer.createdAt.toLocaleString()}</TableCell>
-                                            //     <TableCell>{formatCurrency(offer.baseSalary * 100)}</TableCell>
-                                            //     <TableCell>{offer.position.practiceType}</TableCell>
-                                            //     <TableCell>{offer.position.stateLicense}</TableCell>
-                                            //     <TableCell className="flex items-center justify-end gap-2 p-3">
-                                            //         <Link href={`/admin/dashboard/offers/${offer.id}`}> 
-                                            //             <PencilIcon className="w-4 h-4 text-foreground hover:text-primary" />
-                                            //         </Link>
-                                            //         <form action={handleDelete} className="flex justify-center items-center">
-                                            //             <input type="hidden" name="itemId" value={offer.id} />
-                                            //             <button type="submit" className="flex justify-center items-center">
-                                            //                 <TrashIcon className="w-4 h-4 text-destructive hover:text-destructive/80" /> 
-                                            //             </button>
-                                            //         </form>
-                                            //     </TableCell>
-                                            // </TableRow>
+                                            <TableRow key={offer._id}>
+                                                <TableCell>{offer.physicianUser.email}</TableCell>
+                                                <TableCell>{offer.nursePractitionerUser.email}</TableCell>
+                                                <TableCell>{offer.offerDate.toLocaleString()}</TableCell>
+                                                <TableCell>{offer.expirationDate.toLocaleString()}</TableCell>
+                                                <TableCell>{offer.position.title}</TableCell>
+                                                <TableCell>{offer.compensationType}</TableCell>
+                                                <TableCell>{formatCurrency(offer.baseSalary * 100)}</TableCell>
+                                                <TableCell>{offer.status}</TableCell>
+                                                <TableCell className="flex items-center justify-end gap-2 p-3">
+                                                    <Link href={`/admin/dashboard/offers/${offer._id}/view`}>
+                                                        <Eye className="w-4 h-4 text-foreground hover:text-primary" />
+                                                    </Link>
+                                                </TableCell>
+                                            </TableRow>
                                         );
                                     })
                                 )}
