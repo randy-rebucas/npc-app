@@ -48,11 +48,6 @@ export async function AdminSidebar() {
             icon: "help",
         },
         {
-            title: "Transactions",
-            url: "/admin/dashboard/transactions",
-            icon: "transactions",
-        },
-        {
             title: "Listings",
             url: "/admin/dashboard/listings",
             icon: "listings",
@@ -71,6 +66,16 @@ export async function AdminSidebar() {
             title: "Templates",
             url: "/admin/dashboard/templates",
             icon: "templates",
+        },
+        {
+            title: "Roles",
+            url: "/admin/dashboard/roles",
+            icon: "roles",
+        },
+        {
+            title: "Permissions",
+            url: "/admin/dashboard/permissions",
+            icon: "permissions",
         },
         {
             title: "Miscellaneous",

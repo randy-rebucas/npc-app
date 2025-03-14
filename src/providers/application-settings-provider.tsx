@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 type ApplicationSettings = {
   siteName: string;
@@ -14,6 +14,8 @@ type ApplicationSettings = {
 type ApplicationSettingsContextType = {
   settings: ApplicationSettings;
   isLoading: boolean;
+  error: Error | null;
+  refreshSettings: () => Promise<void>;
 };
 
 const ApplicationSettingsContext = createContext<ApplicationSettingsContextType | undefined>(undefined);
@@ -28,20 +30,49 @@ export function ApplicationSettingsProvider({ children }: { children: React.Reac
     appVersion: "",
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    fetch("/api/config")
-      .then((res) => res.json())
-      .then((data) => {
+  // Type guard function
+  const isValidApplicationSettings = (data: unknown): data is ApplicationSettings => {
+    return (
+      typeof data === "object" &&
+      data !== null &&
+      typeof (data as Record<string, unknown>).siteName === "string" &&
+      typeof (data as Record<string, unknown>).siteDescription === "string" &&
+      typeof (data as Record<string, unknown>).siteUrl === "string" &&
+      typeof (data as Record<string, unknown>).siteLogo === "string" &&
+      typeof (data as Record<string, unknown>).siteFavicon === "string" &&
+      typeof (data as Record<string, unknown>).appVersion === "string"
+    );
+  };
+
+  const fetchSettings = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const res = await fetch("/api/config");
+      if (!res.ok) {
+        throw new Error(`Failed to fetch settings: ${res.statusText}`);
+      }
+      const data = await res.json();
+      if (isValidApplicationSettings(data)) {
         setSettings(data);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      } else {
+        throw new Error("Invalid settings data received from API");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error("Unknown error occurred"));
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
+  useEffect(() => {
+    fetchSettings();
+  }, [fetchSettings]);
+
   return (
-    <ApplicationSettingsContext.Provider value={{ settings, isLoading }}>
+    <ApplicationSettingsContext.Provider value={{ settings, isLoading, error, refreshSettings: fetchSettings }}>
       {children}
     </ApplicationSettingsContext.Provider>
   );

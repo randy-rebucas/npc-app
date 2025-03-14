@@ -1,31 +1,35 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { INotification } from "@/app/models/Notification"; 
+import { INotification } from "@/app/models/Notification";
 
-type NotificationsContextType = {
+interface NotificationsContextType {
   notifications: INotification[];
   unreadCount: number;
-  markAsRead: (id: string) => void;
-  markAllAsRead: () => void;
+  markAsRead: (id: string) => Promise<void>;
+  markAllAsRead: () => Promise<void>;
   fetchNotifications: () => Promise<void>;
-};
+}
 
 const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
 
 export function NotificationsProvider({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();
   const [notifications, setNotifications] = useState<INotification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const fetchNotifications = useCallback(async () => {
-    console.log("fetching notifications");
     if (!session?.user) return;
     
     try {
       const response = await fetch('/api/notifications');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch notifications: ${response.statusText}`);
+      }
       const data = await response.json();
       setNotifications(data);
+      setUnreadCount(data.filter((n: INotification) => !n.read).length);
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
     }
@@ -34,40 +38,60 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
   useEffect(() => {
     if (session?.user) {
       fetchNotifications();
-      const interval = setInterval(fetchNotifications, 30000);
+      const interval = setInterval(fetchNotifications, 30000); // Poll every 30 seconds
       return () => clearInterval(interval);
     }
   }, [session, fetchNotifications]);
 
-  const markAsRead = async (id: string) => {
+  const markAsRead = useCallback(async (id: string) => {
     try {
-      await fetch(`/api/notifications/${id}`, {
+      const response = await fetch(`/api/notifications/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ read: true }),
       });
-      
-      setNotifications(notifications.map(notification =>
-        notification._id === id ? { ...notification, read: true } : notification
-      ));
+
+      if (!response.ok) {
+        throw new Error(`Failed to mark notification as read: ${response.statusText}`);
+      }
+
+      setNotifications(prev =>
+        prev.map(notification =>
+          notification._id === id ? { ...notification, read: true } : notification
+        )
+      );
+      setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (error) {
       console.error('Failed to mark notification as read:', error);
+      throw error;
     }
-  };
+  }, []);
 
-  const markAllAsRead = async () => {
+  const markAllAsRead = useCallback(async () => {
     try {
-      await fetch('/api/notifications/mark-all-read', { method: 'POST' });
-      setNotifications(notifications.map(notification => ({ ...notification, read: true })));
+      const response = await fetch('/api/notifications/mark-all-read', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to mark all notifications as read: ${response.statusText}`);
+      }
+
+      setNotifications(prev =>
+        prev.map(notification => ({ ...notification, read: true }))
+      );
+      setUnreadCount(0);
     } catch (error) {
       console.error('Failed to mark all notifications as read:', error);
+      throw error;
     }
-  };
+  }, []);
 
   return (
     <NotificationsContext.Provider value={{
       notifications,
-      unreadCount: notifications.filter(n => !n.read).length,
+      unreadCount,
       markAsRead,
       markAllAsRead,
       fetchNotifications,

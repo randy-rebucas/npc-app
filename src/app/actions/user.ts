@@ -145,8 +145,13 @@ export async function getUserByEmail(email: string) {
 }
 
 export async function getUserById(id: string): Promise<UserDocument> {
+  if (!id) {
+    throw new ValidationError('User ID is required');
+  }
+
   await connect();
-  const user = await User.aggregate([
+  
+  const [user, error] = await handleAsync(User.aggregate([
     {
       $match: {
         _id: new mongoose.Types.ObjectId(id),
@@ -169,7 +174,15 @@ export async function getUserById(id: string): Promise<UserDocument> {
     {
       $sort: { createdAt: -1 },
     },
-  ]);
+  ]));
+
+  if (error) {
+    throw new DatabaseError(`Failed to fetch user: ${error.message}`);
+  }
+
+  if (!user || user.length === 0) {
+    throw new NotFoundError(`User with ID ${id} not found`);
+  }
 
   const transformedUser = {
     _id: user[0]._id.toString(),
@@ -215,6 +228,8 @@ export async function getUserById(id: string): Promise<UserDocument> {
       "clinicalDegree",
       "education",
       "npiNumber",
+      "title",
+      "publications",
     ]) as UserDocument["profile"],
   };
   return transformedUser;
@@ -227,41 +242,73 @@ export async function getOnboardingStatus(id: string) {
 }
 
 export async function createUser(userData: Partial<IUser>) {
-  try {
-    await connect();
-    const user = new User(userData);
-    await user.save();
-    return user;
-  } catch (error) {
-    console.error("Error creating user:", error);
-    throw new Error("Failed to create user");
+  if (!userData) {
+    throw new ValidationError('User data is required');
   }
+
+  const [user, error] = await handleAsync(
+    (async () => {
+      await connect();
+      const newUser = new User(userData);
+      return await newUser.save();
+    })()
+  );
+
+  if (error) {
+    throw new DatabaseError(`Failed to create user: ${error.message}`);
+  }
+
+  return user;
 }
 
 export async function updateUser(userId: string, userData: Partial<IUser>) {
-  try {
-    await connect();
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { $set: userData },
-      { new: true }
-    );
-    return user;
-  } catch (error) {
-    console.error("Error updating user:", error);
-    throw new Error("Failed to update user");
+  if (!userId || !userData) {
+    throw new ValidationError('User ID and update data are required');
   }
+
+  const [user, error] = await handleAsync(
+    (async () => {
+      await connect();
+      return await User.findByIdAndUpdate(
+        userId,
+        { $set: userData },
+        { new: true }
+      );
+    })()
+  );
+
+  if (error) {
+    throw new DatabaseError(`Failed to update user: ${error.message}`);
+  }
+
+  if (!user) {
+    throw new NotFoundError(`User with ID ${userId} not found`);
+  }
+
+  return user;
 }
 
 export async function deleteUser(userId: string) {
-  try {
-    await connect();
-    await User.findByIdAndDelete(userId);
-    return true;
-  } catch (error) {
-    console.error("Error deleting user:", error);
-    throw new Error("Failed to delete user");
+  if (!userId) {
+    throw new ValidationError('User ID is required');
   }
+
+  const [result, error] = await handleAsync(
+    (async () => {
+      await connect();
+      const user = await User.findByIdAndDelete(userId);
+      if (!user) {
+        throw new NotFoundError(`User with ID ${userId} not found`);
+      }
+      return true;
+    })()
+  );
+
+  if (error) {
+    throw new DatabaseError(`Failed to delete user: ${error.message}`);
+  }
+
+  return result;
 }
 
 export async function resetPassword(id: string) {

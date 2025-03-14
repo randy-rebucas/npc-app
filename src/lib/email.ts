@@ -10,6 +10,12 @@ interface EmailSender {
   email: string;
 }
 
+interface EmailAttachment {
+  name: string;
+  content: string;
+  contentType?: string;
+}
+
 interface EmailParams {
   to: EmailRecipient | EmailRecipient[];
   subject: string;
@@ -17,29 +23,25 @@ interface EmailParams {
   textContent?: string;
   sender?: EmailSender;
   replyTo?: EmailSender;
-  attachments?: Array<{
-    name: string;
-    content: string;
-    contentType?: string;
-  }>;
+  attachments?: EmailAttachment[];
 }
 
 export class EmailService {
-  private apiInstance: Brevo.TransactionalEmailsApi;
-  private defaultSender: EmailSender;
+  private readonly apiInstance: Brevo.TransactionalEmailsApi;
+  private readonly defaultSender: EmailSender;
 
   constructor(defaultSender?: EmailSender) {
-    if (!process.env.BREVO_API_KEY) {
+    const apiKey = process.env.BREVO_API_KEY;
+    if (!apiKey) {
       throw new Error('BREVO_API_KEY environment variable is not set');
     }
 
-    // const config = new Brevo.Configuration();
     this.apiInstance = new Brevo.TransactionalEmailsApi();
-    this.apiInstance.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
+    this.apiInstance.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, apiKey);
 
     this.defaultSender = defaultSender || {
-      name: process.env.BREVO_SENDER_NAME || 'Your Name',
-      email: process.env.BREVO_SENDER_EMAIL || 'your-verified-sender@domain.com'
+      name: process.env.BREVO_SENDER_NAME || 'Default Sender',
+      email: process.env.BREVO_SENDER_EMAIL || 'noreply@example.com'
     };
   }
 
@@ -47,23 +49,24 @@ export class EmailService {
     try {
       const sendSmtpEmail = new Brevo.SendSmtpEmail();
       
+      // Required fields
       sendSmtpEmail.subject = params.subject;
       sendSmtpEmail.htmlContent = params.htmlContent;
-      sendSmtpEmail.textContent = params.textContent;
       sendSmtpEmail.sender = params.sender || this.defaultSender;
-      sendSmtpEmail.replyTo = params.replyTo;
       
-      // Handle single recipient or array of recipients
-      sendSmtpEmail.to = Array.isArray(params.to) 
-        ? params.to 
-        : [params.to];
+      // Optional fields
+      if (params.textContent) sendSmtpEmail.textContent = params.textContent;
+      if (params.replyTo) sendSmtpEmail.replyTo = params.replyTo;
+      
+      // Handle recipients
+      sendSmtpEmail.to = Array.isArray(params.to) ? params.to : [params.to];
 
-      // Handle attachments if present
+      // Handle attachments
       if (params.attachments?.length) {
-        sendSmtpEmail.attachment = params.attachments.map(attachment => ({
-          name: attachment.name,
-          content: attachment.content,
-          contentType: attachment.contentType
+        sendSmtpEmail.attachment = params.attachments.map(({ name, content, contentType }) => ({
+          name,
+          content,
+          contentType: contentType || this.getContentType(name)
         }));
       }
 
@@ -72,10 +75,24 @@ export class EmailService {
     } catch (error) {
       const errorMessage = error instanceof Error 
         ? error.message 
-        : 'Failed to send email';
+        : 'Unknown error occurred while sending email';
       
-      console.error('Error sending email:', error);
+      console.error('Email sending failed:', error);
       throw new Error(`Email sending failed: ${errorMessage}`);
     }
+  }
+
+  private getContentType(fileName: string): string {
+    const extension = fileName.split('.').pop()?.toLowerCase();
+    const mimeTypes: Record<string, string> = {
+      pdf: 'application/pdf',
+      doc: 'application/msword',
+      docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      jpg: 'image/jpeg',
+      jpeg: 'image/jpeg',
+      png: 'image/png'
+    };
+    
+    return mimeTypes[extension || ''] || 'application/octet-stream';
   }
 } 

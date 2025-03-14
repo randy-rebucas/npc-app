@@ -281,25 +281,46 @@ export interface ICharges {
 }
 
 export class StripeService {
-  static async createStripeAccount() {
-    const account = await stripe.accounts.create({
-      type: "express",
-      capabilities: {
-        card_payments: { requested: true },
-        transfers: { requested: true },
-      },
-    });
-    return account.id;
+  /**
+   * Creates a new Stripe account with basic capabilities
+   * @returns Promise<string> The created account ID
+   * @throws {Stripe.errors.StripeError}
+   */
+  static async createStripeAccount(): Promise<string> {
+    try {
+      const account = await stripe.accounts.create({
+        type: "express",
+        capabilities: {
+          card_payments: { requested: true },
+          transfers: { requested: true },
+        },
+      });
+      return account.id;
+    } catch (error) {
+      if (error instanceof Stripe.errors.StripeError) {
+        throw error;
+      }
+      throw new Error('Failed to create Stripe account');
+    }
   }
 
-  static async getStripeAccount(accountId: string) {
-    const account = await stripe.accounts.retrieve(accountId);
-    return account;
-  }
-
-  static async getStripeAccountStatus(accountId: string) {
-    const account = await stripe.accounts.retrieve(accountId);
-    return account;
+  /**
+   * Retrieves a Stripe account by ID
+   * @param accountId The Stripe account ID
+   * @returns Promise<Stripe.Account>
+   * @throws {Stripe.errors.StripeError}
+   */
+  static async getStripeAccount(accountId: string): Promise<Stripe.Account> {
+    if (!accountId) throw new Error('Account ID is required');
+    
+    try {
+      return await stripe.accounts.retrieve(accountId);
+    } catch (error) {
+      if (error instanceof Stripe.errors.StripeError) {
+        throw error;
+      }
+      throw new Error(`Failed to retrieve Stripe account: ${accountId}`);
+    }
   }
 
   static async getStripeAccountLink(accountId: string) {
@@ -337,17 +358,34 @@ export class StripeService {
     return earnings;
   }
 
-  // Payment Methods
-  static async createPaymentIntent(amount: number, accountId: string) {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount,
-      currency: "usd",
-      payment_method_types: ["card"],
-      transfer_data: {
-        destination: accountId,
-      },
-    });
-    return paymentIntent;
+  /**
+   * Creates a payment intent
+   * @param amount Amount in cents
+   * @param accountId Connected account ID
+   * @returns Promise<Stripe.PaymentIntent>
+   */
+  static async createPaymentIntent(
+    amount: number, 
+    accountId: string
+  ): Promise<Stripe.PaymentIntent> {
+    if (amount <= 0) throw new Error('Amount must be greater than 0');
+    if (!accountId) throw new Error('Account ID is required');
+
+    try {
+      return await stripe.paymentIntents.create({
+        amount,
+        currency: "usd",
+        payment_method_types: ["card"],
+        transfer_data: {
+          destination: accountId,
+        },
+      });
+    } catch (error) {
+      if (error instanceof Stripe.errors.StripeError) {
+        throw error;
+      }
+      throw new Error('Failed to create payment intent');
+    }
   }
 
   static async confirmPaymentIntent(paymentIntentId: string) {

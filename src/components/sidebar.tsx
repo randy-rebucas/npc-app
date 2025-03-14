@@ -9,7 +9,7 @@ import Nav from "./nav"
 export async function AppSidebar() {
     const session = await getServerSession(authOptions)
     const user = session?.user?.email ? await getUserByEmail(session.user.email) : null
-
+   
     return (
         <aside className="flex h-screen w-72 flex-col bg-card/50 backdrop-blur-xl border-r border-border">
             {/* Header */}

@@ -13,49 +13,29 @@ type Breadcrumb = {
     active?: boolean;  // Add optional active property
 };
 
+const helpTabs = [
+    { value: "help", label: "Overview", href: "/admin/dashboard/help" },
+    { value: "features", label: "Features", href: "/admin/dashboard/help/features" },
+    { value: "issues", label: "Issues", href: "/admin/dashboard/help/issues" },
+    { value: "enquiries", label: "Enquiries", href: "/admin/dashboard/help/enquiries" }
+];
+
 export default function HelpLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const currentTab = pathname.split('/').pop();
-  
-    const isFeatures = pathname.split('/').pop() === 'features';
-    const isEnquiries = pathname.split('/').pop() === 'enquiries';
-    const isIssues = pathname.split('/').pop() === 'issues';
-
-    const title = isFeatures ? 'Features' : isEnquiries ? 'Enquiries' : isIssues ? 'Issues' : 'Help';
+    
+    const currentTabData = helpTabs.find(tab => tab.value === currentTab);
+    const title = currentTabData?.label || 'Help';
 
     const breadcrumbs: Breadcrumb[] = [
         { label: 'Admin', href: '/admin' },
-        { label: 'Help', href: '/admin/dashboard/help' },
+        { label: 'Help', href: '/admin/dashboard/help', active: currentTab === 'help' },
+        ...(currentTabData && currentTab !== 'help' ? [{ label: currentTabData.label, href: currentTabData.href, active: true }] : [])
     ];
-
-    if (isFeatures) {
-        breadcrumbs.push({
-            label: 'Features',
-            href: '/admin/dashboard/help/features',
-            active: isFeatures,
-        });
-    }
-
-    if (isIssues) {
-        breadcrumbs.push({
-            label: 'Issues',
-            href: '/admin/dashboard/help/issues',
-            active: isIssues,
-        });
-    }
-
-    if (isEnquiries) {
-        breadcrumbs.push({
-            label: 'Enquiries',
-            href: '/admin/dashboard/help/enquiries',
-            active: isEnquiries,
-        });
-    }
 
     return (
         <SidebarInset>
             <AdminHeader breadcrumbs={breadcrumbs} />
-            
             <div className="flex flex-1 flex-col space-y-8 p-8">
                 <div className="flex items-center justify-between space-y-2">
                     <div>
@@ -68,34 +48,16 @@ export default function HelpLayout({ children }: { children: React.ReactNode }) 
 
                 <Tabs defaultValue={currentTab} className="space-y-4">
                     <TabsList>
-                        <TabsTrigger
-                            value="help"
-                            className={cn("w-[120px]")}
-                            asChild
-                        >
-                            <Link href="/admin/dashboard/help">Overview</Link>
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="features"
-                            className={cn("w-[120px]")}
-                            asChild
-                        >
-                            <Link href="/admin/dashboard/help/features">Features</Link>
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="webhook"
-                            className={cn("w-[120px]")}
-                            asChild
-                        >
-                            <Link href="/admin/dashboard/help/issues">Issues</Link>
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="enquiries"
-                            className={cn("w-[120px]")}
-                            asChild
-                        >
-                            <Link href="/admin/dashboard/help/enquiries">Enquiries</Link>
-                        </TabsTrigger>
+                        {helpTabs.map(tab => (
+                            <TabsTrigger
+                                key={tab.value}
+                                value={tab.value}
+                                className={cn("w-[120px]")}
+                                asChild
+                            >
+                                <Link href={tab.href}>{tab.label}</Link>
+                            </TabsTrigger>
+                        ))}
                     </TabsList>
                 </Tabs>
 

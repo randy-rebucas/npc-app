@@ -5,11 +5,16 @@ interface Message {
   content: string;
 }
 
+interface ChatResponse {
+  message: string;
+  // Add any other response fields you expect from the API
+}
+
 export function useOpenAIChat() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const sendMessage = async (messages: Message[]) => {
+  const sendMessage = async (messages: Message[]): Promise<ChatResponse | null> => {
     setIsLoading(true);
     setError(null);
 
@@ -23,13 +28,13 @@ export function useOpenAIChat() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to get response from OpenAI');
+        throw new Error(`API error: ${response.status}`);
       }
 
-      const data = await response.json();
-      return data;
+      return await response.json();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      setError(errorMessage);
       return null;
     } finally {
       setIsLoading(false);

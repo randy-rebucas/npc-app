@@ -48,7 +48,7 @@ export default async function TemplatesPage(props: {
                     <div className="flex items-center justify-between">
                         <h1 className="text-2xl font-bold text-foreground">Templates</h1>
                         <Button asChild>
-                            <Link href="/admin/dashboard/templates/new">
+                            <Link href="/admin/dashboard/templates/new" className="flex items-center gap-2">
                                 <PlusIcon className="w-4 h-4" />
                                 Add Template
                             </Link>

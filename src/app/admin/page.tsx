@@ -16,7 +16,7 @@ export default async function AdminPage() {
     const user = await getUserByEmail(session.user.email);
 
     if (user.role !== UserRole.ADMIN) {
-        redirect("/np")
+        redirect("/")
     }
 
     redirect("/admin/dashboard");

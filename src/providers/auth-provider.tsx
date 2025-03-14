@@ -2,25 +2,28 @@
 
 import { SessionProvider, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect } from "react";
+
+interface User {
+  role: "PHYSICIAN" | "NURSE_PRACTITIONER" | null;
+  onBoardingStatus: "COMPLETE" | "INCOMPLETE";
+}
 
 function OnboardingCheck({ children }: { children: React.ReactNode }) {
     const { data: session } = useSession();
     const router = useRouter();
 
-    const fetchUser = useMemo(() => {
-        return async (userId: string) => {
-            const response = await fetch(`/api/user/${userId}`);
-            const user = await response.json();
+    const fetchUser = useCallback(async (userId: string) => {
+        const response = await fetch(`/api/user/${userId}`);
+        const user: User = await response.json();
 
-            if (user.role === null || user.role === undefined) {
-                router.push("/onboarding");
-            } else if (user.role === "PHYSICIAN" && user.onBoardingStatus === "INCOMPLETE") {
-                router.push("/onboarding/physician");
-            } else if (user.role === "NURSE_PRACTITIONER" && user.onBoardingStatus === "INCOMPLETE") {
-                router.push("/onboarding/nurse-practitioner");
-            }
-        };
+        if (user.role === null || user.role === undefined) {
+            router.push("/onboarding");
+        } else if (user.role === "PHYSICIAN" && user.onBoardingStatus === "INCOMPLETE") {
+            router.push("/onboarding/physician");
+        } else if (user.role === "NURSE_PRACTITIONER" && user.onBoardingStatus === "INCOMPLETE") {
+            router.push("/onboarding/nurse-practitioner");
+        }
     }, [router]);
 
     useEffect(() => {

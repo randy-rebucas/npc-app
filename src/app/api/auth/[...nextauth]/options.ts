@@ -121,6 +121,7 @@ export const authOptions: NextAuthOptions = {
           user.id = existingUser._id.toString();
           user.role = existingUser.role;
           user.username = existingUser.username;
+          user.email = existingUser.email;
         }
       } catch (error) {
         console.error("Error during social sign in:", error);
@@ -140,6 +141,8 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.username = user.username;
+        token.email = user.email;
       }
       return token;
     },
@@ -147,6 +150,8 @@ export const authOptions: NextAuthOptions = {
       if (token) {
         session.user.id = token.id;
         session.user.role = token.role;
+        session.user.username = token.username;
+        session.user.email = token.email;
       }
       return session;
     },

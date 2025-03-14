@@ -3,16 +3,16 @@ import { Table, TableHead, TableHeader, TableBody, TableRow, TableCell } from "@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { getUsers } from "@/app/actions/user";
 import Link from "next/link";
+import { subDays, isAfter } from 'date-fns';
 
 export default async function AdminUserPage() {
     const { users } = await getUsers({ page: 1, limit: 10 })
     
-    // Filter for new users (last 7 days) with "user" role
-    const filteredUsers = users.filter((user) => {
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        return user.role === "CUSTOMER" && user.createdAt > sevenDaysAgo;
-    });
+    const sevenDaysAgo = subDays(new Date(), 7);
+    const filteredUsers = users.filter((user) => 
+        user.role === "CUSTOMER" && 
+        isAfter(new Date(user.createdAt), sevenDaysAgo)
+    );
 
     return (
         <Card>

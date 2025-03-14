@@ -6,11 +6,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-// ... existing code ...
+
+const settingsTabs = [
+  { value: "application", label: "Application", href: "/admin/dashboard/settings/application" },
+  { value: "profile", label: "Profile", href: "/admin/dashboard/settings/profile" },
+  { value: "password", label: "Password", href: "/admin/dashboard/settings/password" },
+  { value: "notification", label: "Notifications", href: "/admin/dashboard/settings/notification" }
+];
+
 type Breadcrumb = {
   label: string;
   href: string;
-  active?: boolean;  // Add optional active property
+  active?: boolean;
 };
 
 export default function SettingsLayout({
@@ -18,71 +25,22 @@ export default function SettingsLayout({
 }: {
   children: React.ReactNode;
 }) {
-
   const pathname = usePathname();
   const currentTab = pathname.split('/').pop();
   
-  const isSettings = pathname.split('/').pop() === 'settings';
-  const isApplication = pathname.split('/').pop() === 'application';
-  const isProfile = pathname.split('/').pop() === 'profile';
-  const isPassword = pathname.split('/').pop() === 'password';
-  const isNotification = pathname.split('/').pop() === 'notification';
-
-
-  const title = isApplication ? 'Application' : isProfile ? 'Profile' : isPassword ? 'Password' : isNotification ? 'Notification' : 'Settings';
-
+  const currentTabData = settingsTabs.find(tab => tab.value === currentTab);
+  const title = currentTabData?.label || 'Settings';
 
   const breadcrumbs: Breadcrumb[] = [
     { label: 'Admin', href: '/admin' },
     { label: 'Dashboard', href: '/admin/dashboard' },
-    { label: 'Settings', href: '/admin/dashboard/settings', active: isSettings },
+    { label: 'Settings', href: '/admin/dashboard/settings', active: currentTab === 'settings' },
+    ...(currentTabData ? [{ label: currentTabData.label, href: currentTabData.href, active: true }] : [])
   ];
-
-
-  if (isApplication) {
-    breadcrumbs.push({
-      label: 'Application',
-
-      href: '/admin/dashboard/settings/application',
-      active: isApplication,
-    });
-  }
-
-
-  if (isProfile) {
-    breadcrumbs.push({
-      label: 'Profile',
-
-      href: '/admin/dashboard/settings/profile',
-      active: isProfile,
-
-    });
-  }
-
-  if (isPassword) {
-    breadcrumbs.push({
-      label: 'Password',
-
-      href: '/admin/dashboard/settings/password',
-      active: isPassword,
-    });
-  }
-
-  if (isNotification) {
-    breadcrumbs.push({
-      label: 'Notification',
-
-      href: '/admin/dashboard/settings/notification',
-      active: isNotification,
-    });
-  }
 
   return (
     <SidebarInset>
-
-      <AdminHeader
-        breadcrumbs={breadcrumbs}
-      />
+      <AdminHeader breadcrumbs={breadcrumbs} />
       <div className="flex flex-1 flex-col space-y-8 p-8">
         <div className="flex items-center justify-between space-y-2">
           <div>
@@ -95,40 +53,21 @@ export default function SettingsLayout({
 
         <Tabs defaultValue={currentTab} className="space-y-4">
           <TabsList>
-            <TabsTrigger
-              value="application"
-              className={cn("w-[120px]")}
-              asChild
-            >
-              <Link href="/admin/dashboard/settings/application">Application</Link>
-            </TabsTrigger>
-            <TabsTrigger
-              value="profile"
-              className={cn("w-[120px]")}
-              asChild
-            >
-              <Link href="/admin/dashboard/settings/profile">Profile</Link>
-            </TabsTrigger>
-            <TabsTrigger
-              value="password"
-              className={cn("w-[120px]")}
-              asChild
-            >
-              <Link href="/admin/dashboard/settings/password">Password</Link>
-            </TabsTrigger>
-            <TabsTrigger
-              value="notification"
-              className={cn("w-[120px]")}
-              asChild
-            >
-              <Link href="/admin/dashboard/settings/notification">Notifications</Link>
-            </TabsTrigger>
+            {settingsTabs.map(tab => (
+              <TabsTrigger
+                key={tab.value}
+                value={tab.value}
+                className={cn("w-[120px]")}
+                asChild
+              >
+                <Link href={tab.href}>{tab.label}</Link>
+              </TabsTrigger>
+            ))}
           </TabsList>
         </Tabs>
 
         {children}
-
       </div>
-    </SidebarInset >
+    </SidebarInset>
   );
 }

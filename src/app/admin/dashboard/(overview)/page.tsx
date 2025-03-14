@@ -24,8 +24,8 @@ export default async function AdminDashboard() {
     const lastMonthMembers = await countMembers(lastMonthStart);
 
     // Calculate percentage changes
-    const userChange = calculatePercentageChange(lastMonthUsers, currentUsers);
-    const memberChange = calculatePercentageChange(lastMonthMembers, currentMembers);
+    const userChange = calculatePercentageChange(lastMonthUsers ?? 0, currentUsers ?? 0);
+    const memberChange = calculatePercentageChange(lastMonthMembers ?? 0, currentMembers ?? 0);
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -37,7 +37,7 @@ export default async function AdminDashboard() {
             />
             <StatsCard
                 title="Webhook Events"
-                value={currentMembers.toString()}
+                value={(currentMembers ?? 0).toString()}
                 description={`${memberChange.toFixed(2)}% vs last month`}
                 icon={Webhook}
             />
@@ -48,7 +48,7 @@ export default async function AdminDashboard() {
             />
             <StatsCard
                 title="Synced Members"
-                value={currentSyncedMembers.toString()}
+                value={(currentSyncedMembers ?? 0).toString()}
                 icon={RefreshCcw}
             />
         </div>
