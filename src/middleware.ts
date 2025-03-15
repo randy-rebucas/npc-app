@@ -9,7 +9,7 @@ export default withAuth(
     const isPhysician = token?.role === "PHYSICIAN";
     
     // Handle role-based redirections after login
-    if (token && req.nextUrl.pathname === "/") {
+    if (token && req.nextUrl.pathname === "/auth") {
       if (isAdmin) {
         return NextResponse.redirect(new URL("/admin", req.url));
       } else if (isNP) {

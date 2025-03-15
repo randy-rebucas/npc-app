@@ -14,7 +14,7 @@ export async function GET() {
     }
 
     await connect();
-
+    console.log(session.user);
     const notifications = await Notification.find({
       user: session.user.id,
     }).sort({ createdAt: -1 });

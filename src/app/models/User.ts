@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Types } from "mongoose";
 
 export enum UserRole {
   ADMIN = 'ADMIN',
@@ -32,6 +32,8 @@ export interface IUser extends Document {
   stripeAccountId: string;
   role?: string | undefined;
   canCreateListings: boolean;
+  sharetribeToken?: string;
+  sharetribeUserId?: string;
 }
 
 
@@ -40,7 +42,7 @@ const userSchema = new Schema<IUser>(
     email: { type: String, required: true, unique: true },
     username: { type: String, required: true, unique: true },
     provider: { type: String, required: true },
-    role: { type: String },
+    role: { type: Types.ObjectId, ref: "Role" },
     onBoardingStatus: {
       type: String,
       enum: Object.values(UserOnBoardingStatus),
@@ -57,6 +59,8 @@ const userSchema = new Schema<IUser>(
       type: Map,
       of: String,
     },
+    sharetribeToken: { type: String, default: "" },
+    sharetribeUserId: { type: String, default: "" },
   },
   { timestamps: true }
 );

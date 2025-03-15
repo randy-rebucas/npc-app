@@ -14,15 +14,23 @@ function OnboardingCheck({ children }: { children: React.ReactNode }) {
     const router = useRouter();
 
     const fetchUser = useCallback(async (userId: string) => {
-        const response = await fetch(`/api/user/${userId}`);
-        const user: User = await response.json();
-
-        if (user.role === null || user.role === undefined) {
-            router.push("/onboarding");
-        } else if (user.role === "PHYSICIAN" && user.onBoardingStatus === "INCOMPLETE") {
-            router.push("/onboarding/physician");
-        } else if (user.role === "NURSE_PRACTITIONER" && user.onBoardingStatus === "INCOMPLETE") {
-            router.push("/onboarding/nurse-practitioner");
+        try {
+            const response = await fetch(`/api/user/${userId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch user data');
+            }
+            const user: User = await response.json();
+            
+            if (!user.role) {
+                router.push("/onboarding");
+            } else if (user.onBoardingStatus === "INCOMPLETE") {
+                const route = user.role === "PHYSICIAN" 
+                    ? "/onboarding/physician"
+                    : "/onboarding/nurse-practitioner";
+                router.push(route);
+            }
+        } catch (error) {
+            console.error('Error fetching user data:', error);
         }
     }, [router]);
 

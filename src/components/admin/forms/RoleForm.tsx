@@ -188,8 +188,8 @@ export default function RoleForm({ id }: { id: string | null }) {
                                         <div key={resource} className="border rounded-lg p-4">
                                             <h3 className="font-medium mb-3 capitalize">{resource}</h3>
                                             <div className="grid grid-cols-2 gap-4">
-                                                {resourcePermissions.map((permission) => (
-                                                    <div key={permission.id} className="flex items-center space-x-2">
+                                                {resourcePermissions.map((permission) => {
+                                                    return (<div key={permission.id} className="flex items-center space-x-2">
                                                         <Checkbox
                                                             checked={field.value?.includes(permission.name)}
                                                             onCheckedChange={(checked) => {
@@ -202,7 +202,6 @@ export default function RoleForm({ id }: { id: string | null }) {
                                                         />
                                                         <div className="space-y-1">
                                                             <label
-                                                                key={`label-${permission.id}`}
                                                                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                                                 title={permission.description}
                                                             >
@@ -211,7 +210,8 @@ export default function RoleForm({ id }: { id: string | null }) {
                                                             <p className="text-xs text-muted-foreground">{permission.description}</p>
                                                         </div>
                                                     </div>
-                                                ))}
+                                                    )
+                                                })}
                                             </div>
                                         </div>
                                     ))}
