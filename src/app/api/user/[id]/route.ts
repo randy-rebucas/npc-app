@@ -3,6 +3,7 @@ import User from "@/app/models/User";
 import connect from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/options";
+import mongoose from "mongoose";
 
 export async function GET(
   request: Request,
@@ -11,7 +12,7 @@ export async function GET(
   const { id } = await params;
   try {
     await connect();
-    const user = await User.findById(id);
+    const user = await User.findById(new mongoose.Types.ObjectId(id));
     return NextResponse.json(user);
   } catch (error) {
     console.error("Error in user:", error);

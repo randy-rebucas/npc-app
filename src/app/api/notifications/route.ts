@@ -5,7 +5,7 @@ import Notification from "@/app/models/Notification";
 import connect from "@/lib/db";
 import NotificationSetting from "@/app/models/NotificationSetting";
 import { EmailService } from "@/lib/email";
-
+import mongoose from "mongoose";
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -15,8 +15,13 @@ export async function GET() {
 
     await connect();
 
+    // Validate if the ID is a valid MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(session.user.id)) {
+      return new NextResponse("Invalid user ID", { status: 400 });
+    }
+
     const notifications = await Notification.find({
-      user: session.user.id,
+      user: new mongoose.Types.ObjectId(session.user.id),
     }).sort({ createdAt: -1 });
 
     return NextResponse.json(notifications);
