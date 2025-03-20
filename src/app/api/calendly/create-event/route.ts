@@ -1,11 +1,11 @@
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-import { authOptions } from "../../auth/[...nextauth]/options";
+import { getLogtoContext } from "@logto/next/server-actions";
+import { logtoConfig } from "@/app/logto";
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions); 
-    if (!session) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
         { status: 401 }
@@ -22,9 +22,9 @@ export async function POST(req: Request) {
       },
       body: JSON.stringify({
         max_event_count: 1,
-        owner: `${process.env.CALENDLY_OWNER_URL}/${session?.user?.id}`,
+        owner: `${process.env.CALENDLY_OWNER_URL}/${claims?.id}`,
         owner_type: "users",
-        event_type: `${process.env.CALENDLY_EVENT_TYPE_URL}/${session?.user?.id}`,
+        event_type: `${process.env.CALENDLY_EVENT_TYPE_URL}/${claims?.id}`,
         invitee_email: email,
         invitee_name: name,
       }),

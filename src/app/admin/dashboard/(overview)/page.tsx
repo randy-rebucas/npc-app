@@ -6,6 +6,7 @@ import { Metadata } from "next";
 import { countUsers } from "@/app/actions/user";
 import { startOfMonth, subMonths } from "date-fns";
 import { calculatePercentageChange } from "@/lib/utils";
+import { getTotalUserCount } from "@/app/actions/dashboard";
 
 export const metadata: Metadata = {
     title: 'Admin Dashboard',
@@ -15,7 +16,7 @@ export default async function AdminDashboard() {
 
     const { totalCount: currentMemberstackCount } = await MemberstackAdminService.listMembers();
     const currentMembers = await countMembers();
-    const currentUsers = await countUsers();
+    const currentUsers = await getTotalUserCount();
     const currentSyncedMembers = await countMembers(undefined, "true");
 
     // Get last month's counts
@@ -24,14 +25,14 @@ export default async function AdminDashboard() {
     const lastMonthMembers = await countMembers(lastMonthStart);
 
     // Calculate percentage changes
-    const userChange = calculatePercentageChange(lastMonthUsers ?? 0, currentUsers ?? 0);
+    const userChange = calculatePercentageChange(lastMonthUsers ?? 0, currentUsers.count);
     const memberChange = calculatePercentageChange(lastMonthMembers ?? 0, currentMembers ?? 0);
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <StatsCard
                 title="Total Users"
-                value={currentUsers.toString()}
+                value={currentUsers.count.toString()}
                 description={`${userChange.toFixed(2)}% vs last month`}
                 icon={Users}
             />

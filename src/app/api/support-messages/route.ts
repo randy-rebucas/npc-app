@@ -2,20 +2,19 @@ import { NextResponse } from "next/server";
 import Message from "@/app/models/Message";
 import mongoose from "mongoose";
 import connect from "@/lib/db";
-import { authOptions } from "../auth/[...nextauth]/options";
-import { getServerSession } from "next-auth";
+import { getLogtoContext } from "@logto/next/server-actions";
+import { logtoConfig } from "@/app/logto";
 
 // GET - Fetch messages
 export async function GET() {
   try {
     await connect();
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
     
-    const senderId = session.user.id;
+    const senderId = claims?.id;
     const receiverId = "666666666666666666666666";
     
     const messages = await Message.find({

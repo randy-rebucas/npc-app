@@ -2,7 +2,7 @@ import Footer from "@/components/root/Footer";
 import Header from "@/components/root/Header";
 import { ThemeProvider } from "next-themes";
 
-export default function Layout({
+export default async function Layout({
     children,
 }: Readonly<{
     children: React.ReactNode;

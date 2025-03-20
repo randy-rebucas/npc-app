@@ -1,20 +1,20 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import Notification from "@/app/models/Notification";
 import connect from "@/lib/db";
+import { getLogtoContext } from "@logto/next/server-actions";
+import { logtoConfig } from "@/app/logto";
 
 export async function POST() {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     await connect();
     
     await Notification.updateMany(
-      { user: session.user.id, read: false },
+      { user: claims?.id, read: false },
       { read: true }
     );
 

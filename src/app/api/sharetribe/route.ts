@@ -4,7 +4,7 @@ import { generatePassword } from "@/lib/utils";
 import { createEvent } from "@/app/actions/events";
 import User from "@/app/models/User";
 import { EventType } from "@/app/models/Event";
-import { getUserById } from "@/app/actions/user";
+import { getUser } from "@/app/actions/user";
 import { EmailService } from "@/lib/email";
 import Template from "@/app/models/Template";
 
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     await connect();
     const { id } = await request.json();
 
-    const user = await getUserById(id);
+    const user = await getUser(id);
 
     if (!user) {
       return Response.json({ error: "User not found" }, { status: 404 });

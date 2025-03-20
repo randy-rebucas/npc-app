@@ -1,12 +1,7 @@
-import { getUserByEmail } from "@/app/actions/user";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import { UserSubmissionStatus } from "@/app/models/User";
 import Header from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { Calendar, CheckCircle } from "lucide-react";
-import { getServerSession } from "next-auth";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 interface TimelineItem {
     title: string;
@@ -50,14 +45,6 @@ const timeline: TimelineItem[] = [
 ]
 
 export default async function MainPage() {
-    const session = await getServerSession(authOptions);
-
-    const user = await getUserByEmail(session?.user.email);
-
-    if (user.submissionStatus === UserSubmissionStatus.APPROVED) {
-        redirect("/np");
-    }
-
     return (
         <div className="bg-background min-h-screen w-full">
             <Header />
@@ -81,9 +68,9 @@ export default async function MainPage() {
                                     <Calendar className="h-4 w-4" />
                                     <h3 className="font-medium">Current Status</h3>
                                 </div>
-                                <p className="text-primary font-medium">
+                                {/* <p className="text-primary font-medium">
                                     {user.submissionStatus}
-                                </p>
+                                </p> */}
                             </div>
                             <div className="mt-2 text-sm">
                                 Last updated: {new Date().toLocaleDateString()}

@@ -1,16 +1,15 @@
 import { Table, TableHead, TableHeader, TableBody, TableRow, TableCell } from "@/components/ui/table";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { getUsers } from "@/app/actions/user";
+import { getUsers, GetUsersResponse } from "@/app/actions/user";
 import Link from "next/link";
 import { subDays, isAfter } from 'date-fns';
 
 export default async function AdminUserPage() {
-    const { users } = await getUsers({ page: 1, limit: 10 })
+    const users = await getUsers({ page: 1, page_size: 10 })
     
     const sevenDaysAgo = subDays(new Date(), 7);
-    const filteredUsers = users.filter((user) => 
-        user.role === "CUSTOMER" && 
+    const filteredUsers = users.filter((user: GetUsersResponse) => 
         isAfter(new Date(user.createdAt), sevenDaysAgo)
     );
 
@@ -31,15 +30,15 @@ export default async function AdminUserPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {filteredUsers.map((user) => (
+                        {filteredUsers.map((user: GetUsersResponse) => (
                             <TableRow key={user.id}>
-                                <TableCell>{user.email}</TableCell>
+                                <TableCell>{user.primaryEmail}</TableCell>
                                 <TableCell>
                                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
-                                        {user.role}
+                                        {user.customData.role}
                                     </span>
                                 </TableCell>
-                                <TableCell>{user.createdAt.toLocaleDateString()}</TableCell>
+                                <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
                                 <TableCell>{user.username}</TableCell>
                             </TableRow>
                         ))}

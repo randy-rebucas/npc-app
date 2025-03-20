@@ -8,6 +8,7 @@ import { Chat } from "@/components/chat";
 import { Notifications } from "@/components/notifications";
 import { useTheme } from "next-themes";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useSession } from "@/providers/logto-session-provider";
 
 interface Breadcrumb {
   label: string;
@@ -17,6 +18,7 @@ interface Breadcrumb {
 
 export default function AdminHeader({ breadcrumbs }: { breadcrumbs: Breadcrumb[] }) {
   const { theme, setTheme } = useTheme(); 
+  const { signOut } = useSession();
   return (
     <header className="flex sticky top-0 bg-background h-16 shrink-0 items-center gap-2 border-b px-4">
       <SidebarTrigger className="-ml-1" />
@@ -27,7 +29,7 @@ export default function AdminHeader({ breadcrumbs }: { breadcrumbs: Breadcrumb[]
         <ThemeToggle theme={theme as "light" | "dark"} setTheme={setTheme} />
         <Chat />
         <Notifications /> 
-        <SignOut />
+        <SignOut onSignOut={signOut} />
       </div>
     </header>
   );

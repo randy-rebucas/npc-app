@@ -1,25 +1,21 @@
 import { redirect } from "next/navigation";
-import { authOptions } from "../api/auth/[...nextauth]/options";
-import { getServerSession } from "next-auth";
-import { UserRole } from "../models/User";
-import { getUserByEmail } from "../actions/user";
+// import { UserRole } from "../models/User";
+// import { getUserByEmail } from "../actions/user";
+// import { getLogtoContext } from "@logto/next/server-actions";
+// import { logtoConfig } from "../logto";
 
 
 export default async function AdminPage() {
     
-    const session = await getServerSession(authOptions);
+    // const { claims } = await getLogtoContext(logtoConfig);
 
-    if (!session) {
-        redirect("/auth/signin");
-    }
+    // const user = await getUserByEmail(claims?.email || "");
 
-    const user = await getUserByEmail(session.user.email);
-
-    if (user.role !== UserRole.ADMIN) {
-        redirect("/")
-    }
+    // if (user.role !== UserRole.ADMIN) {
+    //     redirect("/")
+    // }
 
     redirect("/admin/dashboard");
 
-    return (<></>);
+    // return (<></>);
 }

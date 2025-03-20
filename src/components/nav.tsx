@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from 'lucide-react'
 import { Key, User, HelpCircle, CreditCardIcon, FileCheck, Settings, MessageCircle, Users, Search, Heart, File } from "lucide-react"
-import { useSession } from "next-auth/react";
+import { useSession } from "@/providers/logto-session-provider";
 import { useState, useEffect } from "react";
 
 // Move this to src/types/navigation.ts
@@ -16,28 +16,28 @@ type NavItem = {
 }
 
 function useNavigationItems() {
-    const { data: session } = useSession();
+    const { user } = useSession();
     const [items, setItems] = useState<NavItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchUser = async () => {
-            if (!session?.user?.id) {
+            if (!user?.id) {
                 setIsLoading(false);
                 return;
             }
 
             try {
-                const response = await fetch(`/api/user/${session.user.id}`);
+                const response = await fetch(`/api/user/${user.id}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch user data');
                 }
-                const user = await response.json();
+                const userData = await response.json();
                 
                 const newItems: NavItem[] = [];
 
-                if (user?.role === "PHYSICIAN") {
+                if (userData?.role === "PHYSICIAN") {
                     newItems.push(
                         {
                             title: "Profile",
@@ -62,7 +62,7 @@ function useNavigationItems() {
                     );
                 }
 
-                if (user?.role === "PHYSICIAN" && user?.submissionStatus === "APPROVED") {
+                if (userData?.role === "PHYSICIAN" && userData?.submissionStatus === "APPROVED") {
                     newItems.push(
                         {
                             title: "Collaborators",
@@ -87,7 +87,7 @@ function useNavigationItems() {
                     );
                 }
 
-                if (user?.role === "NURSE_PRACTITIONER") {
+                if (userData?.role === "NURSE_PRACTITIONER") {
                     newItems.push(
                         {
                             title: "Find Match",
@@ -117,7 +117,7 @@ function useNavigationItems() {
                     );
                 }
 
-                if (user?.canCreateListings) {
+                if (userData?.canCreateListings) {
                     newItems.push({
                         title: "Listings",
                         url: "/np/listings",  
@@ -134,7 +134,7 @@ function useNavigationItems() {
         };
 
         fetchUser();
-    }, [session]);
+        }, [user]);
 
     return { items, isLoading, error };
 }

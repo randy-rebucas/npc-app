@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/providers/logto-session-provider";
 import { useToast } from "@/hooks/use-toast";
 import { ProfileSkeleton } from "@/components/skeletons";
 
@@ -23,7 +23,7 @@ const formSchema = z.object({
 
 
 export default function ProfilePage() {
-    const { data: session } = useSession();
+    const { user } = useSession();
     const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -48,7 +48,7 @@ export default function ProfilePage() {
         const fetchUserProfile = async () => {
             try {
                 setIsLoading(true);
-                const userProfile = await fetch(`/api/profile`);
+                const userProfile = await fetch(`/api/user/${user.id}/profile`);
 
                 if (!userProfile.ok) {
                     throw new Error(`Failed to fetch profile: ${userProfile.statusText}`);
@@ -214,7 +214,7 @@ export default function ProfilePage() {
                     <label className="block text-sm font-medium text-foreground mb-1">Email</label>
                     <div className="flex items-center gap-4">
                         <input
-                            defaultValue={session?.user?.email}
+                            defaultValue={user?.email}
                             readOnly
                             className="flex-1 px-3 py-2 bg-muted border border-border rounded-md"
                         />

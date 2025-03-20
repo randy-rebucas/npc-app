@@ -2,36 +2,29 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { useSession } from "next-auth/react";
-import { useEffect } from "react";
 import { useTheme } from "next-themes";
 import SignIn from "@/components/sign-in";
+import { handleSignIn, handleSignOut } from '@/app/actions/auth';
+import { SignOut } from "../signout";
+import { ThemeSwitcher } from "../theme";
+import { useSession } from "@/providers/logto-session-provider";
 
 export default function Header() {
-    const { data: session } = useSession();
-    const { theme, setTheme } = useTheme();
-    const router = useRouter();
-
-    useEffect(() => {
-        if (session) {
-            router.push("/np");
-        }
-    }, [session, router]);
+    const { isAuthenticated } = useSession();
+    const { theme } = useTheme();
 
     return (
         <header className="px-6 py-4">
             <div className="container mx-auto max-w-7xl px-4 flex justify-between items-center">
                 {/* Logo */}
                 <div className="logo">
-                    <Image 
-                        src={theme === 'dark' ? '/logo-white.png' : '/logo-black.png'} 
-                        alt="NP Collaborator Logo" 
-                        width={0} 
-                        height={0} 
-                        sizes="100vw" 
-                        className="w-auto h-auto" 
+                    <Image
+                        src={theme === 'dark' ? '/logo-white.png' : '/logo-black.png'}
+                        alt="NP Collaborator Logo"
+                        width={0}
+                        height={0}
+                        sizes="100vw"
+                        className="w-auto h-auto"
                     />
                 </div>
 
@@ -40,8 +33,16 @@ export default function Header() {
                     <Link href="/" className="text-foreground hover:text-muted-foreground">Home</Link>
                     <Link href="/nurse" className="text-foreground hover:text-muted-foreground">Nurse Practitioners</Link>
                     <Link href="/physician" className="text-foreground hover:text-muted-foreground">Physician Collaborators</Link>
-                    <SignIn />
-                    <ThemeToggle theme={theme as "light" | "dark"} setTheme={setTheme} />
+                    {isAuthenticated && (
+                        <>
+                            <Link href="/np" className="text-foreground hover:text-muted-foreground">Dashboard</Link>
+                            <SignOut onSignOut={handleSignOut} />
+                        </>
+                    )}
+                    {!isAuthenticated && (
+                        <SignIn onSignIn={handleSignIn} />
+                    )}
+                    <ThemeSwitcher />
                 </nav>
             </div>
         </header>

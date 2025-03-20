@@ -3,14 +3,14 @@
 import Script from "next/script";
 import Header from '@/components/header';
 import { useCallback, useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
-import { getUserById } from "@/app/actions/user";
+import { useSession } from "@/providers/logto-session-provider";
+import { getUser } from "@/app/actions/user";
 
 export default function AgreementPage() {
     const jotformId = process.env.NEXT_PUBLIC_JOTFORM_ID;
     const [jotformUrl, setJotformUrl] = useState(`https://form.jotform.com/${jotformId}`);
     const [formFilled, setFormFilled] = useState(false);
-    const { data: session } = useSession();
+    const { user } = useSession();
 
     // Improve iframe handling
     useEffect(() => {
@@ -45,48 +45,48 @@ export default function AgreementPage() {
     }, [jotformId, formFilled]);
 
     const checkMemberstackAlternative = useCallback(async () => {
-        if (!session) {
+        if (!user) {
             console.warn('User is not logged in');
             return;
         }
 
         try {
-            const user = await getUserById(session.user.id);
-            console.log(user);
-            if (!user) {
+            const userInfo = await getUser(user.id);
+            console.log(userInfo);
+            if (!userInfo) {
                 console.warn('User is not logged in or data is missing.');
                 return;
             }
-            console.log(user.profile); 
+            console.log(userInfo.profile); 
             const userData = {
-                'first-name': user.profile.firstName || '',
-                'last-name': user.profile.lastName || '',
-                'email': user.email || '',
-                'member_id': user._id || '',
-                'npi': user.profile.npiNumber || '', 
-                'base-rate': user.profile.monthlyCollaborationRate || '',
-                'state-fee': user.profile.additionalStateFee || '',
-                'background': user.profile.description || '',
-                'control-fee': user.profile.controlledSubstancesMonthlyFee || '',
-                'degree-type': user.profile.clinicalDegree || '',
-                'linkedin-url': user.profile.linkedinProfile || '',
-                'multi-np-fee': user.profile.additionalNPFee || '',
-                'practice-types': user.profile.practiceTypes || '',
-                'id-document-url': user.profile.governmentIdPath || '',
-                'board-certification': user.profile.boardCertification || '',
-                'active-license-states': user.profile.medicalLicenseStates?.map(l => l.state) || [],
-                'additional-certification': user.profile.additionalCertifications?.map(c => c.certification) || [],
-                'address': user.profile.address || '',
-                'city': user.profile.city || '',
-                'state': user.profile.state || '',
-                'zip': user.profile.zip || '',
+                'first-name': userInfo.profile.firstName || '',
+                'last-name': userInfo.profile.lastName || '',
+                'email': userInfo.email || '',
+                'member_id': userInfo._id || '',
+                'npi': userInfo.profile.npiNumber || '', 
+                'base-rate': userInfo.profile.monthlyCollaborationRate || '',
+                'state-fee': userInfo.profile.additionalStateFee || '',
+                'background': userInfo.profile.description || '',
+                'control-fee': userInfo.profile.controlledSubstancesMonthlyFee || '',
+                'degree-type': userInfo.profile.clinicalDegree || '',
+                'linkedin-url': userInfo.profile.linkedinProfile || '',
+                'multi-np-fee': userInfo.profile.additionalNPFee || '',
+                'practice-types': userInfo.profile.practiceTypes || '',
+                'id-document-url': userInfo.profile.governmentIdPath || '',
+                'board-certification': userInfo.profile.boardCertification || '',
+                'active-license-states': userInfo.profile.medicalLicenseStates?.map((l: any) => l.state) || [],
+                'additional-certification': userInfo.profile.additionalCertifications?.map((c: any) => c.certification) || [],
+                'address': userInfo.profile.address || '',
+                'city': userInfo.profile.city || '',
+                'state': userInfo.profile.state || '',
+                'zip': userInfo.profile.zip || '',
             };
             
             fillJotformFields(userData);
         } catch (error) {
             console.error('Error getting current member:', error);
         }
-    }, [fillJotformFields, session]);
+    }, [fillJotformFields, user]);
 
     // Initial check
     useEffect(() => {

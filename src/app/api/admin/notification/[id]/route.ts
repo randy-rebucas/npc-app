@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import connect from "@/lib/db";
 import EmailNotification from "@/app/models/EmailNotification";
-import { EmailService } from "@/lib/email";
+// import { EmailService } from "@/lib/email";
 import NotificationSetting from "@/app/models/NotificationSetting";
 import Notification from "@/app/models/Notification";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
+import { getLogtoContext } from "@logto/next/server-actions";
+import { logtoConfig } from "@/app/logto";
 
 export async function GET(
   request: Request,
@@ -32,8 +32,8 @@ export async function PUT(
   try {
     const { id } = await params;
 
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -52,7 +52,7 @@ export async function PUT(
     if (data.autoSend) {
       // Check if the user has email notifications enabled
       const targetUser = await NotificationSetting.find({
-        user: { $ne: session.user.id },
+        user: { $ne: claims?.id },
       })
         .populate("user")
         .lean();
@@ -64,37 +64,37 @@ export async function PUT(
         });
       }
 
-      const emailService = new EmailService();
+      // const emailService = new EmailService();
 
-      for (const target of targetUser) {
-        // Create in-app notification
-        const notification = await Notification.create({
-          ...data,
-          user: target.user._id,
-          type: "in-app",
-        });
+      // for (const target of targetUser) {
+      //   // Create in-app notification
+      //   const notification = await Notification.create({
+      //     ...data,
+      //     user: target.user._id,
+      //     type: "in-app",
+      //   });
 
-        // Check if the user has email notifications enabled
-        if (target.emailNotifications) {
-          await emailService.sendEmail({
-            to: { email: target.user.email! },
-            subject: notification.title,
-            htmlContent: notification.message,
-            sender: {
-              name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
-              email:
-                process.env.NEXT_PUBLIC_APP_EMAIL ||
-                "noreply@npcollaborator.com",
-            },
-            replyTo: {
-              name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
-              email:
-                process.env.NEXT_PUBLIC_APP_EMAIL ||
-                "noreply@npcollaborator.com",
-            },
-          });
-        }
-      }
+      //   // Check if the user has email notifications enabled
+      //   if (target.emailNotifications) {
+      //     await emailService.sendEmail({
+      //       to: { email: target.user.email! },
+      //       subject: notification.title,
+      //       htmlContent: notification.message,
+      //       sender: {
+      //         name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+      //         email:
+      //           process.env.NEXT_PUBLIC_APP_EMAIL ||
+      //           "noreply@npcollaborator.com",
+      //       },
+      //       replyTo: {
+      //         name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+      //         email:
+      //           process.env.NEXT_PUBLIC_APP_EMAIL ||
+      //           "noreply@npcollaborator.com",
+      //       },
+      //     });
+      //   }
+      // }
     }
 
     return NextResponse.json(notification);

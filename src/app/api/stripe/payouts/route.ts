@@ -1,19 +1,19 @@
 import Stripe from 'stripe';
 import StripeAccount from '@/app/models/StripeAccount';
 import { stripe } from '@/utils/stripe';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '../../auth/[...nextauth]/options';
 import { NextResponse } from 'next/server';
 import connect from '@/lib/db';
+import { getLogtoContext } from '@logto/next/server-actions';
+import { logtoConfig } from '@/app/logto';
 
 export async function GET() {
     try {
-        const session = await getServerSession(authOptions);
-        if (!session) {
+        const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+        if (!isAuthenticated) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const userId = session.user.id;
+        const userId = claims?.id;
 
         await connect();
 

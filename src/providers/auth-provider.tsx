@@ -1,8 +1,8 @@
 "use client";
 
-import { SessionProvider, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
+import { SessionProvider, useSession } from "@/providers/logto-session-provider";
 
 interface User {
   role: "PHYSICIAN" | "NURSE_PRACTITIONER" | null;
@@ -10,7 +10,7 @@ interface User {
 }
 
 function OnboardingCheck({ children }: { children: React.ReactNode }) {
-    const { data: session } = useSession();
+    const { user } = useSession();
     const router = useRouter();
 
     const fetchUser = useCallback(async (userId: string) => {
@@ -35,10 +35,10 @@ function OnboardingCheck({ children }: { children: React.ReactNode }) {
     }, [router]);
 
     useEffect(() => {
-        if (session?.user?.id) {
-            fetchUser(session.user.id);
+        if (user?.id) {
+            fetchUser(user.id);
         }
-    }, [session, fetchUser]);
+    }, [user, fetchUser]);
 
     return <>{children}</>;
 }

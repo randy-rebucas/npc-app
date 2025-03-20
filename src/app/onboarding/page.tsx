@@ -1,23 +1,23 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useSession } from "@/providers/logto-session-provider";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Stethoscope, Syringe } from "lucide-react";
 
 export default function OnboardingPage() {
-    const { data: session, update } = useSession();
+    const { user, } = useSession();
     const router = useRouter();
     const [selectedRole, setSelectedRole] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!selectedRole || !session?.user?.id) return;
+        if (!selectedRole || !user?.id) return;
 
         setIsSubmitting(true);
         try {
-            const response = await fetch(`/api/user/${session.user.id}/onboarding`, {
+            const response = await fetch(`/api/user/${user.id}/onboarding`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -27,7 +27,7 @@ export default function OnboardingPage() {
 
             if (!response.ok) throw new Error('Failed to update user role');
 
-            await update();
+            // await update();
             if (selectedRole === 'PHYSICIAN') {
                 router.push('/onboarding/physician');
             } else if (selectedRole === 'NURSE_PRACTITIONER') {

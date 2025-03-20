@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/providers/logto-session-provider";
 import { INotification } from "@/app/models/Notification";
 
 interface NotificationsContextType {
@@ -15,12 +15,12 @@ interface NotificationsContextType {
 const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
 
 export function NotificationsProvider({ children }: { children: React.ReactNode }) {
-  const { data: session } = useSession();
+  const { user } = useSession();
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
   const fetchNotifications = useCallback(async () => {
-    if (!session?.user) return;
+    if (!user) return;
     
     try {
       const response = await fetch('/api/notifications');
@@ -33,15 +33,15 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
     }
-  }, [session?.user]);
+  }, [user]);
 
   useEffect(() => {
-    if (session?.user) {
+    if (user) {
       fetchNotifications();
       const interval = setInterval(fetchNotifications, 30000); // Poll every 30 seconds
       return () => clearInterval(interval);
     }
-  }, [session, fetchNotifications]);
+  }, [user, fetchNotifications]);
 
   const markAsRead = useCallback(async (id: string) => {
     try {

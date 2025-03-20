@@ -1,15 +1,15 @@
 import connect from "@/lib/db";
 import Favorite from "../models/Favorite";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/options";
 import mongoose from "mongoose";
 import { handleAsync } from '@/lib/errorHandler';
 import { DatabaseError, ValidationError } from '@/lib/errors';
+import { getLogtoContext } from "@logto/next/server-actions";
+import { logtoConfig } from "@/app/logto";
 
 export async function getFavorites() {
-  const [session, sessionError] = await handleAsync(getServerSession(authOptions));
+  const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
 
-  if (sessionError || !session?.user?.id) {
+  if (!isAuthenticated) {
     throw new ValidationError("User not authenticated");
   }
 
@@ -20,7 +20,7 @@ export async function getFavorites() {
       const favorites = await Favorite.aggregate([
         {
           $match: {
-            npUser: new mongoose.Types.ObjectId(String(session.user.id)),
+            npUser: new mongoose.Types.ObjectId(String(claims?.id)),
           },
         },
         {

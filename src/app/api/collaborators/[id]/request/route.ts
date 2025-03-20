@@ -6,9 +6,8 @@ import {
 } from "@/app/models/Collaboration";
 import Notification from "@/app/models/Notification";
 import User, { UserSubmissionStatus } from "@/app/models/User";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import { getServerSession } from "next-auth";
-import { EmailService } from "@/lib/email";
+import { logtoConfig } from "@/app/logto";
+import { getLogtoContext } from "@logto/next/server-actions";
 import Template from "@/app/models/Template";
 
 export async function POST(
@@ -16,8 +15,8 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
         { status: 401 }
@@ -41,7 +40,7 @@ export async function POST(
     // Check if the collaboration request already exists
     const collaborationRequest = await CollaborationRequest.findOne({
       physicianUser: id,
-      npUser: session.user.id,
+      npUser: claims?.id,
     });
     if (collaborationRequest) {
       return NextResponse.json(
@@ -52,7 +51,7 @@ export async function POST(
 
     // Create a new collaboration request
     const newCollaborationRequest = new CollaborationRequest({
-      npUser: session.user.id,
+      npUser: claims?.id,
       physicianUser: id,
       status: CollaborationRequestStatus.PENDING,
       responseMessage: "Collaboration request received",
@@ -87,20 +86,20 @@ export async function POST(
     }
 
     // Send email to NP
-    const emailService = new EmailService();
-    await emailService.sendEmail({
-      to: { email: physicianUser.email },
-      subject: template?.name || "Collaboration Request from NP",
-      htmlContent: template?.content || "<p>NP has requested collaboration</p>",
-      sender: {
-        name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
-        email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
-      },
-      replyTo: {
-        name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
-        email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
-      },
-    });
+    // const emailService = new EmailService();
+    // await emailService.sendEmail({
+    //   to: { email: physicianUser.email },
+    //   subject: template?.name || "Collaboration Request from NP",
+    //   htmlContent: template?.content || "<p>NP has requested collaboration</p>",
+    //   sender: {
+    //     name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+    //     email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
+    //   },
+    //   replyTo: {
+    //     name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+    //     email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
+    //   },
+    // });
 
     return NextResponse.json({
       success: true,

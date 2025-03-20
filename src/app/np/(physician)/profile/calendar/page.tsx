@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Script from "next/script";
-import { useSession } from "next-auth/react";
-import { getUserById } from "@/app/actions/user";
+import { useSession } from "@/providers/logto-session-provider";
+import { getUser } from "@/app/actions/user";
 import { cn } from "@/lib/utils";
 import { BadgeInfo } from "lucide-react";
 
@@ -39,7 +39,7 @@ declare global {
 }
 
 export default function Calendar() {
-    const { data: session } = useSession();
+    const { user } = useSession();      
     const [isConnected, setIsConnected] = useState(false);
     const [isApproved, setIsApproved] = useState(false);
     const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -78,22 +78,22 @@ export default function Calendar() {
                 setIsLoading(false);
             }
         };
-        if (session) {
-            fetchAccessToken(session.user.id);
+        if (user) {
+            fetchAccessToken(user.id);
         }
-    }, [session, isScriptLoaded]);
+    }, [user, isScriptLoaded]);
 
     useEffect(() => {
         const fetchUser = async () => {
-            const user = await getUserById(session?.user?.id);
-            if (user.submissionStatus === 'APPROVED') {
+            const userInfo = await getUser(user?.id);
+            if (userInfo?.submissionStatus === 'APPROVED') {
                 setIsApproved(true);
             }
         };
-        if (session) {
+        if (user) {
             fetchUser();
         }
-    }, [session]);
+    }, [user]);
 
     const fetchCalendarEvents = async (token: string) => {
         try {
@@ -162,7 +162,7 @@ export default function Calendar() {
                         console.log("Access token received:", response.access_token);
                         const tokenInfo = await fetch("/api/calendar", {
                             method: "POST",
-                            body: JSON.stringify({ access_token: response.access_token, user_id: session?.user?.id }),
+                            body: JSON.stringify({ access_token: response.access_token, user_id: user?.id }),
                         });
                         const tokenInfoData = await tokenInfo.json();
                         console.log("Token info:", tokenInfoData);
@@ -189,7 +189,7 @@ export default function Calendar() {
     const handleDisconnect = async () => {
         try {
             setIsLoading(true);
-            await fetch(`/api/calendar/${session?.user?.id}`, {
+            await fetch(`/api/calendar/${user?.id}`, {
                 method: 'DELETE'
             });
             setIsConnected(false);

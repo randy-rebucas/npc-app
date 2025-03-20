@@ -3,17 +3,17 @@
 import { ICollaborationRequest } from "@/app/models/Collaboration";
 import { IUserProfile } from "@/app/models/UserProfile";
 import { IUser } from "@/app/models/User";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/providers/logto-session-provider";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
 
 export default function CollaboratorRequestsPage() {
-    const { data: session } = useSession();
+    const { user } = useSession();     
     const [collaborationRequests, setCollaborationRequests] = useState([]);
 
     useEffect(() => {
-        if (session) {
+        if (user) {
             const fetchCollaborationRequests = async () => {
                 const response = await fetch(`/api/collaboration-request`);
                 const data = await response.json();
@@ -21,7 +21,7 @@ export default function CollaboratorRequestsPage() {
             };
             fetchCollaborationRequests();
         }
-    }, [session]);
+    }, [user]);
 
     return (
         <div className="bg-card rounded-lg p-6 shadow-sm">

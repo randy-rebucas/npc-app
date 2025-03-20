@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { pusherClient } from '@/lib/pusher';
 import { IMessage } from '@/app/models/Message';
-import { useSession } from 'next-auth/react';
+import { useSession } from "@/providers/logto-session-provider";
 
 interface MessagingContextType {
   messages: IMessage[];
@@ -16,7 +16,7 @@ interface MessagingContextType {
 const MessagingContext = createContext<MessagingContextType | undefined>(undefined);
 
 export function MessagingProvider({ children }: { children: React.ReactNode }) {
-  const { data: session } = useSession();
+  const { user } = useSession();
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -29,31 +29,31 @@ export function MessagingProvider({ children }: { children: React.ReactNode }) {
       const data = await response.json();
       setMessages(data);
       setUnreadCount(data.filter((m: IMessage) =>
-        m.receiverId.toString() === session?.user?.id && !m.read
+        m.receiverId.toString() === user?.id && !m.read
       ).length);
     } catch (error) {
       console.error('Error fetching messages:', error);
     }
-  }, [session?.user?.id]);
+  }, [user?.id]);
 
   useEffect(() => {
-    if (session?.user?.id) {
+    if (user?.id) {
       fetchMessages();
-      const channel = pusherClient.subscribe(`user-${session.user.id}`);
+      const channel = pusherClient.subscribe(`user-${user.id}`);
 
       channel.bind('new-message', (message: IMessage) => {
         setMessages(prev => [...prev, message]);
-        if (message.receiverId.toString() === session.user.id && !message.read) {
+        if (message.receiverId.toString() === user?.id && !message.read) {
           setUnreadCount(prev => prev + 1);
         }
       });
 
       return () => {
         channel.unbind_all();
-        pusherClient.unsubscribe(`user-${session.user.id}`);
+        pusherClient.unsubscribe(`user-${user.id}`);
       };
     }
-  }, [session?.user?.id, fetchMessages]);
+  }, [user?.id, fetchMessages]); 
 
   const sendMessage = useCallback(async (receiverId: string, content: string) => {
     try {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession } from "@/providers/logto-session-provider";
 
 interface Message {
     id: string;
@@ -18,7 +18,7 @@ const INITIAL_BOT_MESSAGE: Message = {
 };
 
 export default function ChatBot() {
-    const { data: session } = useSession();
+    const { user } = useSession();
     const [messages, setMessages] = useState<Message[]>([INITIAL_BOT_MESSAGE]);
     const [inputText, setInputText] = useState('');
     const [isOpen, setIsOpen] = useState(false);
@@ -47,7 +47,7 @@ export default function ChatBot() {
                 },
                 body: JSON.stringify({
                     message: inputText,
-                    customerId: session?.user?.id,
+                    customerId: user?.id,
                 }),
             });
 

@@ -1,20 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import connect from "@/lib/db";
 import Listing from "@/app/models/Listing";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/options";
 import Notification from "@/app/models/Notification";
-import { EmailService } from "@/lib/email";
+// import { EmailService } from "@/lib/email";
 import Template from "@/app/models/Template";
+import { logtoConfig } from "@/app/logto";
+import { getLogtoContext } from "@logto/next/server-actions";
 
 export async function GET() {
   try {
     await connect();
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-    const listings = await Listing.find({ user: session.user.id }).populate(
+    const listings = await Listing.find({ user: claims?.id }).populate(
       "user"
     );
 
@@ -36,8 +36,8 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -45,10 +45,10 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
-    const listing = await Listing.create({ ...body, user: session.user.id });
+    const listing = await Listing.create({ ...body, user: claims?.id });
 
     await Notification.create({
-      user: session.user.id,
+      user: claims?.id,
       title: "New Listing Created",
       message: "A new listing has been created",
       link: `/np/listings/${listing._id}`,
@@ -60,20 +60,20 @@ export async function POST(request: NextRequest) {
       template = await Template.findOne({ type: "email", code: "new-listing-created" });
     }
 
-    const emailService = new EmailService();
-    await emailService.sendEmail({
-      to: { email: session.user.email },
-      subject: template?.name || "New Listing Created",
-      htmlContent: template?.content || "<p>A new listing has been created</p>",
-      sender: {
-        name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
-        email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
-      },
-      replyTo: {
-        name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
-        email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
-      },
-    });
+    // const emailService = new EmailService();
+    // await emailService.sendEmail({
+    //   to: { email: session.user.email },
+    //   subject: template?.name || "New Listing Created",
+    //   htmlContent: template?.content || "<p>A new listing has been created</p>",
+    //   sender: {
+      //   name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+      //   email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
+      // },
+      // replyTo: {
+      //   name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+    //     email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
+    //   },
+    // });
 
     return NextResponse.json({
       success: true,

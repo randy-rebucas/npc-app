@@ -1,20 +1,20 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../auth/[...nextauth]/options";
 import connect from "@/lib/db";
 import Chat from "@/app/models/Chat";
+import { logtoConfig } from "@/app/logto";
+import { getLogtoContext } from "@logto/next/server-actions";
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     await connect();
 
     const chats = await Chat.find({
-      $or: [{ customerId: session.user.id }, { agentId: session.user.id }]
+      $or: [{ customerId: claims?.id }, { agentId: claims?.id }]
     })
       .populate('customerId', 'username')
       .populate('agentId', 'username')

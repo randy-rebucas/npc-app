@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useSession } from "@/providers/logto-session-provider";
 import { redirect } from "next/navigation";
 import { useEffect } from "react";
 
@@ -11,7 +11,7 @@ export default function AttestationsLayout({
   children: React.ReactNode;
   modal: React.ReactNode;
 }) {
-  const { data: session } = useSession();
+  const { user } = useSession();
 
   useEffect(() => {
     const getUserSubmissionStatus = async (id: string) => {
@@ -21,10 +21,10 @@ export default function AttestationsLayout({
         redirect("/not-authorized");
       }
     }
-    if (session) {
-      getUserSubmissionStatus(session.user.id);
+    if (user) {
+      getUserSubmissionStatus(user.id);
     }
-  }, [session]);
+  }, [user]);
 
   return (
     <div className="min-h-screen w-full bg-background">

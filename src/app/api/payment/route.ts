@@ -1,17 +1,16 @@
 import Payment from "@/app/models/Payment";
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-
-import { authOptions } from "../auth/[...nextauth]/options";
+import { logtoConfig } from "@/app/logto";
+import { getLogtoContext } from "@logto/next/server-actions";
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const payment = await Payment.find({ user: session.user.id });
+    const payment = await Payment.find({ user: claims?.id });
 
     const totalEarnings = payment.reduce((acc, curr) => acc + curr.amount, 0);
     console.log(totalEarnings);

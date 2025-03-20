@@ -8,35 +8,14 @@ import {
 } from "@/components/ui/table";
 
 import Search from "@/components/ui/member/search";
-import Filter from "@/components/ui/member/filter";
-import Pagination from "@/components/ui/member/pagination";
 import { MembersTableSkeleton } from "@/components/ui/skeletons";
 import { Metadata } from "next";
 import { getUsers } from "@/app/actions/user";
 import { Suspense } from "react";
 import { SearchParams } from "@/lib/types/search-params";
-import { IUserProfile } from "@/app/models/UserProfile";
-import { IStripeAccount } from "@/app/models/StripeAccount";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { EyeIcon } from "lucide-react";
-
-// Define a new type for the response from getUsers
-type SimplifiedUserResponse = {
-    id: string;
-    username: string;
-    email: string;
-    role: string;
-    provider: string;
-    createdAt: Date;
-    onBoardingStatus: string;
-    metaData?: {
-        [key: string]: string;
-    };
-    profile?: IUserProfile;
-    stripeaccount?: IStripeAccount;
-    submissionStatus: string;
-};
 
 export const metadata: Metadata = {
     title: 'Admin Users',
@@ -51,24 +30,16 @@ export default async function AdminUsers(props: {
     const query = String(params?.query || '');
     // page
     const currentPage = Number(params?.page) || 1;
-    // filters
-    const role = String(params?.role || 'all');
-    const onBoardingStatus = String(params?.onBoardingStatus || 'all');
-    const submissionStatus = String(params?.submissionStatus || 'all');
 
     // get users
-    const { users, total }: { users: SimplifiedUserResponse[], total: number } = await getUsers({
+    const users = await getUsers({
         page: currentPage,
-        search: query,
-        role: role,
-        limit: ITEMS_PER_PAGE,
-        onBoardingStatus: onBoardingStatus,
-        submissionStatus: submissionStatus
+        page_size: ITEMS_PER_PAGE,
     });
-
-    const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
-    const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
-    const endItem = Math.min(startItem + ITEMS_PER_PAGE - 1, total);
+ 
+    // const totalPages = Math.ceil(users.length / ITEMS_PER_PAGE);
+    // const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+    // const endItem = Math.min(startItem + ITEMS_PER_PAGE - 1, users.length);
 
     return (
         <>
@@ -78,9 +49,9 @@ export default async function AdminUsers(props: {
 
             <div className="flex items-center gap-4">
                 <Search placeholder='Search users...' />
-                <Filter target="role" options={[{ 'ADMIN': 'Admin' }, { 'PHYSICIAN': 'Physician' }, { 'NURSE_PRACTITIONER': 'Nurse Practitioner' }]} placeholder="Role" defaultValue="all" />
+                {/* <Filter target="role" options={[{ 'ADMIN': 'Admin' }, { 'PHYSICIAN': 'Physician' }, { 'NURSE_PRACTITIONER': 'Nurse Practitioner' }]} placeholder="Role" defaultValue="all" />
                 <Filter target="onBoardingStatus" options={[{ 'COMPLETED': 'Completed' }, { 'INCOMPLETE': 'Incomplete' }]} placeholder="Onboarding Status" defaultValue="all" />
-                <Filter target="submissionStatus" options={[{ 'PENDING': 'Pending' }, { 'APPROVED': 'Approved' }, { 'REJECTED': 'Rejected' }, { 'INCOMPLETE': 'Incomplete' }, { 'INCORRECT': 'Incorrect' }]} placeholder="Submission Status" defaultValue="all" />
+                <Filter target="submissionStatus" options={[{ 'PENDING': 'Pending' }, { 'APPROVED': 'Approved' }, { 'REJECTED': 'Rejected' }, { 'INCOMPLETE': 'Incomplete' }, { 'INCORRECT': 'Incorrect' }]} placeholder="Submission Status" defaultValue="all" /> */}
             </div>
 
             <div className="rounded-md border">
@@ -90,15 +61,15 @@ export default async function AdminUsers(props: {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Full Name</TableHead>
+                                <TableHead>Name</TableHead>
                                 <TableHead>Username</TableHead>
                                 <TableHead>Email</TableHead>
+                                <TableHead>Phone</TableHead>
                                 <TableHead>Role</TableHead>
-                                <TableHead>Provider</TableHead>
-                                <TableHead>Stripe Account</TableHead>
+                                {/* <TableHead>Stripe Account</TableHead>
                                 <TableHead>Onboarding</TableHead>
                                 <TableHead>Submission Status</TableHead>
-                                <TableHead>Synced</TableHead>
+                                <TableHead>Synced</TableHead> */}
                                 <TableHead>Created At</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
@@ -107,33 +78,33 @@ export default async function AdminUsers(props: {
                             {users.map((user) => (
                                 <TableRow key={user.id} className="group">
                                     <TableCell>
-                                        {user.profile ? `${user.profile.firstName} ${user.profile.lastName}` : 'N/A'}
+                                        {user.name ?? 'N/A'}
                                     </TableCell>
                                     <TableCell>{user.username}</TableCell>
-                                    <TableCell>{user.email}</TableCell>
-                                    <TableCell>{user.role}</TableCell>
-                                    <TableCell>{user.provider}</TableCell>
-                                    <TableCell>
-                                        {user.metaData?.stripeAccountId ? user.metaData?.stripeAccountId : 'N/A'}
+                                    <TableCell>{user.primaryEmail}</TableCell>
+                                    <TableCell>{user.primaryPhone}</TableCell>
+                                    <TableCell>{user.customData?.role}</TableCell>
+                                    {/* <TableCell>
+                                        {user.customData?.stripeAccountId ? user.customData?.stripeAccountId : 'N/A'}
                                     </TableCell>
                                     <TableCell>
-                                        {user.onBoardingStatus === 'COMPLETED' && (
+                                        {user.customData?.onBoardingStatus === 'COMPLETED' && (
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800`}>
-                                                {user.onBoardingStatus}
+                                                {user.customData?.onBoardingStatus}
                                             </span>
                                         )}
-                                        {user.onBoardingStatus === 'INCOMPLETE' && (
+                                        {user.customData?.onBoardingStatus === 'INCOMPLETE' && (
                                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                                {user.onBoardingStatus}
+                                                {user.customData?.onBoardingStatus}
                                             </span>
                                         )}
                                     </TableCell>
                                     <TableCell>
-                                        {user.submissionStatus}
+                                        {user.customData?.submissionStatus}
                                     </TableCell>
                                     <TableCell>
-                                        {user.metaData?.accountSynced ? 'Yes' : 'No'}
-                                    </TableCell>
+                                        {user.customData?.accountSynced ? 'Yes' : 'No'}
+                                    </TableCell> */}
                                     <TableCell>
                                         {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}
                                     </TableCell>
@@ -149,14 +120,14 @@ export default async function AdminUsers(props: {
                 </Suspense>
             </div>
 
-            <Pagination
+            {/* <Pagination
                 startItem={startItem}
                 endItem={endItem}
                 totalItems={total}
                 currentPage={currentPage}
                 query={query}
                 totalPages={totalPages}
-            />
+            /> */}
         </>
 
     );
