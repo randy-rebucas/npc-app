@@ -5,9 +5,9 @@ import { redirect } from "next/navigation";
 import { useSession } from "@/providers/logto-session-provider";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-    const { user } = useSession();
+    const { claims } = useSession();
 
-    if (user?.role !== "PHYSICIAN") {
+    if (claims?.role !== "physician") {
         redirect("/np/find-match");
     }
 

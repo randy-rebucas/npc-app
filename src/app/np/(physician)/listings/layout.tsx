@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { useEffect } from "react";
 
 export default function ListingsLayout({ children }: { children: React.ReactNode }) {
-    const { user } = useSession();
+    const { claims } = useSession();
 
     useEffect(() => {
         const getUserCreateListingPermission = async (id: string) => {
@@ -16,10 +16,10 @@ export default function ListingsLayout({ children }: { children: React.ReactNode
                 redirect("/not-authorized");
             }
         }
-        if (user) {
-            getUserCreateListingPermission(user.id);
+        if (claims?.sub) {
+            getUserCreateListingPermission(claims.sub);
         }
-    }, [user]);
+    }, [claims?.sub]);
     
     return (
         <div className="min-h-screen w-full bg-background">

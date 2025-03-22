@@ -20,7 +20,7 @@ export default function NursePractitionerOnboardingPage() {
     const [currentStep, setCurrentStep] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const { user } = useSession();
+    const { claims } = useSession();
     const router = useRouter();
 
     // Get the onboarding state from the store
@@ -29,10 +29,10 @@ export default function NursePractitionerOnboardingPage() {
 
     // Update the onboarding state with the user's email if they are logged in
     useEffect(() => {
-        if (user) {
+        if (claims?.sub) {
             // updateFields({ email: user.email });
         }
-    }, [user, updateFields]);
+    }, [claims?.sub, updateFields]);
 
     // Define the maximum file size for uploads
     const MAX_FILE_SIZE = 5000000;
@@ -231,7 +231,7 @@ export default function NursePractitionerOnboardingPage() {
                 },
                 body: JSON.stringify({
                     ...finalData,
-                    userId: user?.id
+                    userId: claims?.sub
                 }),
             });
 

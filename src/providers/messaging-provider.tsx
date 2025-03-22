@@ -16,7 +16,7 @@ interface MessagingContextType {
 const MessagingContext = createContext<MessagingContextType | undefined>(undefined);
 
 export function MessagingProvider({ children }: { children: React.ReactNode }) {
-  const { user } = useSession();
+  const { claims } = useSession();
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -29,31 +29,31 @@ export function MessagingProvider({ children }: { children: React.ReactNode }) {
       const data = await response.json();
       setMessages(data);
       setUnreadCount(data.filter((m: IMessage) =>
-        m.receiverId.toString() === user?.id && !m.read
+        m.receiverId.toString() === claims?.sub && !m.read
       ).length);
     } catch (error) {
       console.error('Error fetching messages:', error);
     }
-  }, [user?.id]);
+  }, [claims?.sub]);
 
   useEffect(() => {
-    if (user?.id) {
+    if (claims?.sub) {
       fetchMessages();
-      const channel = pusherClient.subscribe(`user-${user.id}`);
+      const channel = pusherClient.subscribe(`user-${claims?.sub}`);
 
       channel.bind('new-message', (message: IMessage) => {
         setMessages(prev => [...prev, message]);
-        if (message.receiverId.toString() === user?.id && !message.read) {
+        if (message.receiverId.toString() === claims?.sub && !message.read) {
           setUnreadCount(prev => prev + 1);
         }
       });
 
       return () => {
         channel.unbind_all();
-        pusherClient.unsubscribe(`user-${user.id}`);
+        pusherClient.unsubscribe(`user-${claims?.sub}`);
       };
     }
-  }, [user?.id, fetchMessages]); 
+  }, [claims?.sub, fetchMessages]); 
 
   const sendMessage = useCallback(async (receiverId: string, content: string) => {
     try {

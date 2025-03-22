@@ -21,8 +21,17 @@ export enum UserSubmissionStatus {
 
 export interface IUserCustomData {
   role: string;
-  onboardingStatus: UserOnBoardingStatus;
-  submissionStatus: UserSubmissionStatus;
+  onboardingStatus?: UserOnBoardingStatus;
+  submissionStatus?: UserSubmissionStatus;
+  canCreateListings?: boolean;
+  medicalLicenseStates?: string[];
+  deaLicenseStates?: string[];
+  npiNumber?: string;
+  boardCertification?: string[];
+  practiceTypes?: string[];
+  additionalCertifications?: string[];
+  governmentIdPath?: string;
+  education?: string[];
 }
 
 export interface IUser {

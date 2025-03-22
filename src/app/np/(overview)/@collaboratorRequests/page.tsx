@@ -9,11 +9,11 @@ import Link from "next/link";
 
 
 export default function CollaboratorRequestsPage() {
-    const { user } = useSession();     
+    const { claims } = useSession();    
     const [collaborationRequests, setCollaborationRequests] = useState([]);
 
     useEffect(() => {
-        if (user) {
+        if (claims?.sub) {
             const fetchCollaborationRequests = async () => {
                 const response = await fetch(`/api/collaboration-request`);
                 const data = await response.json();
@@ -21,7 +21,7 @@ export default function CollaboratorRequestsPage() {
             };
             fetchCollaborationRequests();
         }
-    }, [user]);
+    }, [claims?.sub]);
 
     return (
         <div className="bg-card rounded-lg p-6 shadow-sm">

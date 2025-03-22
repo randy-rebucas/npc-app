@@ -1,115 +1,95 @@
 'use client';
 
 import { logtoConfig } from '@/app/logto';
-import { getLogtoContext, signIn, signOut } from '@logto/next/server-actions';
-import React, { createContext, useCallback, useEffect, useState } from 'react';
+import { signIn, signOut } from '@logto/next/server-actions';
+import React, { createContext, useCallback, useState } from 'react';
 
+/**
+ * Properties representing user claims from authentication
+ * @interface ClaimProps
+ */
+export type ClaimProps = {
+    /** Unique identifier for the user */
+    sub?: string;
+    /** Full name of the user */
+    name?: string;
+    /** Username of the user */
+    username?: string;
+    /** URL to the user's profile picture */
+    picture?: string;
+    /** Timestamp of when the user was created */
+    created_at?: string;
+}
+
+/**
+ * Context type for managing authentication session state
+ * @interface SessionContextType
+ */
 type SessionContextType = {
+    /** Indicates if the user is currently authenticated */
     isAuthenticated: boolean;
-    claims: {
-        sub?: string;
-        name?: string;
-        username?: string;
-        phone?: string;
-        email?: string;
-        [key: string]: unknown;
-    };
+    /** Indicates if an authentication operation is in progress */
+    isLoading: boolean;
+    /** User claims from the authentication provider */
+    claims: ClaimProps;
+    /** Function to initiate the sign-in process */
+    signIn: () => Promise<void>;
+    /** Function to initiate the sign-out process */
+    signOut: () => Promise<void>;
 };
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
-export function LogtoProvider({ 
-    children
-}: { 
-    children: React.ReactNode;
-}) {
-    const [sessionData, setSessionData] = useState<SessionContextType>({
-        isAuthenticated: false,
-        claims: {},
-    });
-
-    // Initialize session on mount
-    useEffect(() => {
-        const initSession = async () => {
-            try {
-                const { isAuthenticated, claims } = await getLogtoContext(logtoConfig, { fetchUserInfo: true });
-                const sanitizedClaims = claims ? Object.fromEntries(
-                    Object.entries(claims).map(([k, v]) => [k, v === null ? undefined : v])
-                ) : {};
-                setSessionData({ isAuthenticated, claims: sanitizedClaims });
-            } catch (error) {
-                console.error('Failed to initialize session:', error);
-            }
-        };
-
-        initSession();
-    }, []);
-
-    return (
-        <SessionContext.Provider value={sessionData}>
-            {children}
-        </SessionContext.Provider>
-    );
+/**
+ * Hook to access the session context
+ * @throws {Error} If used outside of LogtoProvider
+ * @returns {SessionContextType} The session context value
+ */
+export function useSession() {
+    const context = React.useContext(SessionContext);
+    if (context === undefined) {
+        throw new Error('useSession must be used within a LogtoProvider');
+    }
+    return context;
 }
 
-// Custom hook to access Logto session with additional features
-export function useSession() {
+/**
+ * Provider component for managing authentication state
+ * @component
+ * @param {Object} props - Component props
+ * @param {React.ReactNode} props.children - Child components
+ * @param {boolean} props.isAuthenticated - Initial authentication state
+ * @param {Object} props.claims - User claims from authentication
+ * @returns {JSX.Element} Provider component with authentication context
+ */
+export function LogtoProvider({
+    children,
+    isAuthenticated,
+    claims
+}: {
+    children: React.ReactNode;
+    isAuthenticated: boolean;
+    claims: ClaimProps
+}) {
     const [isLoading, setIsLoading] = useState(false);
-    const [sessionData, setSessionData] = useState<{
-        isAuthenticated: boolean;
-        claims: {
-            sub?: string;
-            name?: string;
-            username?: string;
-            phone?: string;
-            email?: string;
-            [key: string]: unknown;
-        };
-    }>({
-        isAuthenticated: false,
-        claims: {},
+    const [sessionData, setSessionData] = useState<Omit<SessionContextType, 'isLoading' | 'signIn' | 'signOut'>>({
+        isAuthenticated,
+        claims,
     });
 
-    // Fetch session data on mount
-    useEffect(() => {
-        const fetchSession = async () => {
-            setIsLoading(true);
-            try {
-                const { isAuthenticated, claims } = await getLogtoContext(logtoConfig, { fetchUserInfo: true });
-                const sanitizedClaims = claims ? Object.fromEntries(
-                    Object.entries(claims).map(([k, v]) => [k, v === null ? undefined : v])
-                ) : {};
-                setSessionData({ isAuthenticated, claims: sanitizedClaims });
-            } catch (error) {
-                console.error('Failed to fetch session:', error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchSession();
-    }, []);
-
-    // Enhanced sign-in with loading state
     const handleSignIn = useCallback(async () => {
         setIsLoading(true);
         try {
             await signIn(logtoConfig);
-            // Refresh session data after sign-in
-            const { isAuthenticated, claims } = await getLogtoContext(logtoConfig, { fetchUserInfo: true });
-            const sanitizedClaims = claims ? Object.fromEntries(
-                Object.entries(claims).map(([k, v]) => [k, v === null ? undefined : v])
-            ) : {};
-            setSessionData({ isAuthenticated, claims: sanitizedClaims });
+            setSessionData({ isAuthenticated, claims });
         } catch (error) {
             console.error('Sign in failed:', error);
-            throw error; // Propagate error to caller
+            throw error;
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [isAuthenticated, claims]);
 
-    // Enhanced sign-out with loading state
     const handleSignOut = useCallback(async () => {
         setIsLoading(true);
         try {
@@ -117,17 +97,23 @@ export function useSession() {
             setSessionData({ isAuthenticated: false, claims: {} });
         } catch (error) {
             console.error('Sign out failed:', error);
-            throw error; // Propagate error to caller
+            throw error;
         } finally {
             setIsLoading(false);
         }
     }, []);
 
-    return {
-        isAuthenticated: sessionData.isAuthenticated,
+    const contextValue = {
+        ...sessionData,
         isLoading,
         signIn: handleSignIn,
         signOut: handleSignOut,
-        user: sessionData.claims,
     };
+
+    return (
+        <SessionContext.Provider value={contextValue}>
+            {children}
+        </SessionContext.Provider>
+    );
 }
+

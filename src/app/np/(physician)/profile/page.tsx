@@ -23,7 +23,7 @@ const formSchema = z.object({
 
 
 export default function ProfilePage() {
-    const { user } = useSession();
+    const { claims } = useSession();
     const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -48,7 +48,7 @@ export default function ProfilePage() {
         const fetchUserProfile = async () => {
             try {
                 setIsLoading(true);
-                const userProfile = await fetch(`/api/user/${user.id}/profile`);
+                const userProfile = await fetch(`/api/user/${claims.sub}/profile`);
 
                 if (!userProfile.ok) {
                     throw new Error(`Failed to fetch profile: ${userProfile.statusText}`);
@@ -81,7 +81,7 @@ export default function ProfilePage() {
 
         fetchUserProfile();
         
-    }, [setValue, toast]);
+    }, [setValue, toast, claims]);
 
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         setIsSubmitting(true);
@@ -214,7 +214,7 @@ export default function ProfilePage() {
                     <label className="block text-sm font-medium text-foreground mb-1">Email</label>
                     <div className="flex items-center gap-4">
                         <input
-                            defaultValue={user?.email}
+                            defaultValue={claims?.primaryEmail}
                             readOnly
                             className="flex-1 px-3 py-2 bg-muted border border-border rounded-md"
                         />

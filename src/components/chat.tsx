@@ -26,7 +26,7 @@ interface Chat {
 }
 
 export function Chat() {
-  const { user } = useSession(); 
+  const { claims } = useSession();
   const [isOpen, setIsOpen] = useState(false);
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -38,7 +38,7 @@ export function Chat() {
   useEffect(() => {
     const loadChat = async () => {
       try {
-        const response = await fetch(`/api/chat/session?chatId=${user?.id}`);
+        const response = await fetch(`/api/chat/session?chatId=${claims?.sub}`);
         const data = await response.json();
         setChat(data.chat);
       } catch (err) {
@@ -46,10 +46,10 @@ export function Chat() {
       }
     };
 
-    if (isOpen && user?.id) {
+    if (isOpen && claims?.sub) {
       loadChat();
     }
-  }, [isOpen, user]);
+  }, [isOpen, claims?.sub]);
 
   // Updated typing indicator logic
   useEffect(() => {

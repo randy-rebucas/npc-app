@@ -3,10 +3,9 @@ import { Users, RefreshCcw, Webhook, Shrub } from "lucide-react";
 import { countMembers } from "@/app/actions/members";
 import { MemberstackAdminService } from "@/utils/memberstack-admin";
 import { Metadata } from "next";
-import { countUsers } from "@/app/actions/user";
 import { startOfMonth, subMonths } from "date-fns";
 import { calculatePercentageChange } from "@/lib/utils";
-import { getTotalUserCount } from "@/app/actions/dashboard";
+import { getNewUserCount, getTotalUserCount } from "@/app/actions/dashboard";
 
 export const metadata: Metadata = {
     title: 'Admin Dashboard',
@@ -21,11 +20,11 @@ export default async function AdminDashboard() {
 
     // Get last month's counts
     const lastMonthStart = startOfMonth(subMonths(new Date(), 1));
-    const lastMonthUsers = await countUsers(lastMonthStart);
+    const { last7Days } = await getNewUserCount();
     const lastMonthMembers = await countMembers(lastMonthStart);
 
     // Calculate percentage changes
-    const userChange = calculatePercentageChange(lastMonthUsers ?? 0, currentUsers.count);
+    const userChange = calculatePercentageChange(last7Days.count, currentUsers.count);
     const memberChange = calculatePercentageChange(lastMonthMembers ?? 0, currentMembers ?? 0);
 
     return (

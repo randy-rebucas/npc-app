@@ -9,7 +9,7 @@ import { useEffect } from "react";
 export default function CollaboratorsLayout({ children, modal }: { children: React.ReactNode, modal: React.ReactNode }) {
     const pathname = usePathname();
     const currentTab = pathname.split('/').pop();
-    const { user } = useSession();
+    const { claims } = useSession();
 
     useEffect(() => {
         const getUserSubmissionStatus = async (id: string) => {
@@ -19,10 +19,10 @@ export default function CollaboratorsLayout({ children, modal }: { children: Rea
                 redirect("/not-authorized");
             }
         }
-        if (user) {
-            getUserSubmissionStatus(user.id);
+        if (claims?.sub) {
+            getUserSubmissionStatus(claims.sub);
         }
-    }, [user]);
+    }, [claims?.sub]);
 
     return (
         <div className="min-h-screen w-full bg-background">

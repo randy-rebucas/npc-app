@@ -5,10 +5,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { getConfig } from "@/app/actions/config"
 import { ThemeProvider } from "next-themes";
 import { FontSizeProvider } from "@/providers/font-provider";
-import { LogtoProvider } from "@/providers/logto-session-provider";
+import { LogtoProvider, ClaimProps } from "@/providers/logto-session-provider";
 import { ApplicationSettingsProvider } from "@/providers/application-settings-provider";
 import { NotificationsProvider } from "@/providers/notifications-provider";
 import { MessagingProvider } from "@/providers/messaging-provider";
+import { logtoConfig } from "./logto";
+import { getLogtoContext } from "@logto/next/server-actions";
 
 // import { OpenAIProvider } from "@/providers/openai-provider";
 // import ChatBot from '@/components/root/ChatBot/ChatBot';
@@ -58,13 +60,18 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { isAuthenticated, claims } = await getLogtoContext(logtoConfig, { fetchUserInfo: true }); 
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`} >
         <ThemeProvider attribute="class">
           <FontSizeProvider>
-            <LogtoProvider>
+            <LogtoProvider 
+              isAuthenticated={isAuthenticated} 
+              claims={claims as ClaimProps}
+            >
               <ApplicationSettingsProvider>
                 {/* <OpenAIProvider> */}
                 <MessagingProvider>

@@ -15,12 +15,12 @@ interface NotificationsContextType {
 const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
 
 export function NotificationsProvider({ children }: { children: React.ReactNode }) {
-  const { user } = useSession();
+  const { claims } = useSession();
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
   const fetchNotifications = useCallback(async () => {
-    if (!user) return;
+    if (!claims?.sub) return;
     
     try {
       const response = await fetch('/api/notifications');
@@ -33,15 +33,15 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
     }
-  }, [user]);
+  }, [claims?.sub]);
 
   useEffect(() => {
-    if (user) {
+    if (claims?.sub) {
       fetchNotifications();
       const interval = setInterval(fetchNotifications, 30000); // Poll every 30 seconds
       return () => clearInterval(interval);
     }
-  }, [user, fetchNotifications]);
+  }, [claims?.sub, fetchNotifications]);
 
   const markAsRead = useCallback(async (id: string) => {
     try {

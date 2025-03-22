@@ -1,7 +1,6 @@
 "use server";
 
-import User, { IUser, IUserCustomData, IUserProfile } from "@/app/models/User";
-import connect from "@/lib/db";
+import { IUser, IUserCustomData, IUserProfile } from "@/app/models/User";
 import { NotFoundError, ValidationError } from "@/lib/errors";
 import { logtoFetch } from "@/utils/logto-fetch";
 
@@ -103,6 +102,13 @@ export async function getUserCustomData(userId: string): Promise<IUserCustomData
   return data;
 }
 
+/**
+ * Updates a user's custom data
+ * @param userId The ID of the user
+ * @param customData Partial custom data to update
+ * @returns Updated custom data
+ * @throws {ValidationError} If userId or customData is not provided
+ */
 export async function updateUserCustomData(userId: string, customData: Partial<IUserCustomData>) {
   if (!userId || !customData) {
     throw new ValidationError("User ID and custom data are required");
@@ -116,6 +122,13 @@ export async function updateUserCustomData(userId: string, customData: Partial<I
   return data;
 }
 
+/**
+ * Updates a user's profile information
+ * @param userId The ID of the user
+ * @param userData Partial profile data to update
+ * @returns Updated profile data
+ * @throws {ValidationError} If userId or userData is not provided
+ */
 export async function updateUserProfile(userId: string, userData: Partial<IUserProfile>) {
   if (!userId || !userData) {
     throw new ValidationError("User ID and update data are required");
@@ -127,13 +140,20 @@ export async function updateUserProfile(userId: string, userData: Partial<IUserP
   });
 }
 
+/**
+ * Retrieves a paginated list of users
+ * @param params Object containing pagination parameters
+ * @param params.page Page number (default: 1)
+ * @param params.page_size Number of items per page (default: 10)
+ * @returns Array of user objects
+ * @throws {Error} If fetching users fails
+ */
 export async function getUsers({
   page = 1,
   page_size = 10,
 }: GetUsersParams): Promise<GetUsersResponse[]> {
   try {
     const data = await logtoFetch(`users?page=${page}&page_size=${page_size}`);
-
     return data;
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -141,6 +161,12 @@ export async function getUsers({
   }
 }
 
+/**
+ * Creates a new user
+ * @param userData User data for creation
+ * @returns Created user data
+ * @throws {ValidationError} If userData is not provided
+ */
 export async function createUser(userData: Partial<IUser>) {
   if (!userData) {
     throw new ValidationError("User data is required");
@@ -229,14 +255,13 @@ export async function updateUserSuspensionStatus(id: string, suspensionStatus: b
   return data;
 }
 
-export async function countUsers(date?: Date) {
-  await connect();
-  const query = date ? { createdAt: { $lte: date } } : {};
-
-  const count = await User.countDocuments(query);
-  return count;
-}
-
+/**
+ * Gets the onboarding status for a user
+ * @param id The ID of the user
+ * @returns User's onboarding status
+ * @throws {ValidationError} If id is not provided
+ * @throws {NotFoundError} If user is not found
+ */
 export async function getOnboardingStatus(id: string) {
   if (!id) {
     throw new ValidationError("User ID is required");
@@ -251,6 +276,13 @@ export async function getOnboardingStatus(id: string) {
   return data?.onboardingStatus;
 }
 
+/**
+ * Gets the submission status for a user
+ * @param id The ID of the user
+ * @returns User's submission status
+ * @throws {ValidationError} If id is not provided
+ * @throws {NotFoundError} If user is not found
+ */
 export async function getSubmissionStatus(id: string) {
   if (!id) {
     throw new ValidationError("User ID is required");
@@ -265,6 +297,13 @@ export async function getSubmissionStatus(id: string) {
   return data?.submissionStatus;
 }
 
+/**
+ * Gets the role for a user
+ * @param id The ID of the user
+ * @returns User's role
+ * @throws {ValidationError} If id is not provided
+ * @throws {NotFoundError} If user is not found
+ */
 export async function getUserRole(id: string) {
   if (!id) {
     throw new ValidationError("User ID is required");

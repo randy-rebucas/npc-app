@@ -1,14 +1,25 @@
-import { NotFoundError, ValidationError } from "@/lib/errors";
+import { ValidationError } from "@/lib/errors";
 import { IUser } from "@/app/models/User";
 import { logtoFetch } from "@/utils/logto-fetch";
+import { cookies } from "next/headers";
 
 export async function myAccount(): Promise<IUser> {
-  const data = await logtoFetch(`my-account`);
+  const cookieStore = await cookies();
+  const logtoToken = cookieStore.get("logtoToken");
 
-  if (!data) {
-    throw new NotFoundError(`User not found`);
+  console.log(logtoToken);
+  if (!logtoToken?.value) {
+    throw new Error("Authentication token not found");
   }
 
+  const response = await fetch(`${process.env.LOGTO_ENDPOINT}api/my-account`, {
+    headers: {
+      Authorization: `Bearer ${logtoToken.value}`,
+      "Content-Type": "application/json",
+    },
+  });
+  const data = await response.json();
+  console.log(data);
   return data;
 }
 
@@ -37,7 +48,9 @@ export async function updateProfile(userData: Partial<IUser>): Promise<IUser> {
  * @returns Success response
  * @throws {ValidationError} If password is not provided
  */
-export async function updatePassword(password: string): Promise<{ success: boolean }> {
+export async function updatePassword(
+  password: string
+): Promise<{ success: boolean }> {
   if (!password?.trim()) {
     throw new ValidationError("Password is required");
   }
@@ -56,7 +69,9 @@ export async function updatePassword(password: string): Promise<{ success: boole
  * @returns Success response
  * @throws {ValidationError} If email is not provided
  */
-export async function updateEmail(email: string): Promise<{ success: boolean }> {
+export async function updateEmail(
+  email: string
+): Promise<{ success: boolean }> {
   if (!email?.trim()) {
     throw new ValidationError("Email address is required");
   }
@@ -87,7 +102,9 @@ export async function deleteEmail(): Promise<{ success: boolean }> {
  * @returns Success response
  * @throws {ValidationError} If phone is not provided
  */
-export async function updatePhone(phone: string): Promise<{ success: boolean }> {
+export async function updatePhone(
+  phone: string
+): Promise<{ success: boolean }> {
   if (!phone?.trim()) {
     throw new ValidationError("Phone number is required");
   }

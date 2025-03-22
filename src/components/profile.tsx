@@ -7,7 +7,7 @@ import { useSession } from "@/providers/logto-session-provider";
 
 
 export default function Profile() {
-    const { user, signOut } = useSession();
+    const { claims, signOut } = useSession();
     const [userData, setUserData] = useState<Partial<UserDocument> | null>(null);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -26,29 +26,29 @@ export default function Profile() {
 
     useEffect(() => {
         const fetchUser = async () => {
-            if (user?.id) {
-                const userData = await getUser(user.id);
+            if (claims?.sub) {
+                const userData = await getUser(claims.sub);
                 setUserData(userData);
             }
         }
-        if (user) {
+        if (claims?.sub) {
             fetchUser();
         }
-    }, [user]);
+    }, [claims?.sub]);
     return (
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex items-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 p-2"
             >
-                {user?.profile?.profilePhotoPath ? (
+                {userData?.profile?.profilePhotoPath ? (
                     <Avatar className="h-8 w-8 rounded-lg">
-                        <AvatarImage src={user?.profile?.profilePhotoPath} alt={user?.username} />
-                        <AvatarFallback className="rounded-lg">{user?.username?.charAt(0)}</AvatarFallback>
+                        <AvatarImage src={userData?.profile?.profilePhotoPath} alt={userData?.username} />
+                        <AvatarFallback className="rounded-lg">{userData?.username?.charAt(0)}</AvatarFallback>
                     </Avatar>
                 ) : (
                     <Avatar className="h-8 w-8 rounded-lg">
-                        <AvatarFallback className="rounded-lg">{user?.username?.charAt(0)}</AvatarFallback>
+                        <AvatarFallback className="rounded-lg">{userData?.username?.charAt(0)}</AvatarFallback>
                     </Avatar>
                 )}
             </button>

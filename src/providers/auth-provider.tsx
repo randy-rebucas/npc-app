@@ -10,7 +10,7 @@ interface User {
 }
 
 function OnboardingCheck({ children }: { children: React.ReactNode }) {
-    const { user } = useSession();
+    const { claims } = useSession();
     const router = useRouter();
 
     const fetchUser = useCallback(async (userId: string) => {
@@ -35,10 +35,10 @@ function OnboardingCheck({ children }: { children: React.ReactNode }) {
     }, [router]);
 
     useEffect(() => {
-        if (user?.id) {
-            fetchUser(user.id);
+        if (claims?.sub) {
+            fetchUser(claims.sub);
         }
-    }, [user, fetchUser]);
+    }, [claims?.sub, fetchUser]);
 
     return <>{children}</>;
 }

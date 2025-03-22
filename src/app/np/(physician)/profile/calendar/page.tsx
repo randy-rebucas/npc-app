@@ -39,7 +39,7 @@ declare global {
 }
 
 export default function Calendar() {
-    const { user } = useSession();      
+    const { claims } = useSession();
     const [isConnected, setIsConnected] = useState(false);
     const [isApproved, setIsApproved] = useState(false);
     const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -78,22 +78,22 @@ export default function Calendar() {
                 setIsLoading(false);
             }
         };
-        if (user) {
-            fetchAccessToken(user.id);
+        if (claims?.sub) {
+            fetchAccessToken(claims.sub);
         }
-    }, [user, isScriptLoaded]);
+    }, [claims, isScriptLoaded]);
 
     useEffect(() => {
         const fetchUser = async () => {
-            const userInfo = await getUser(user?.id);
+            const userInfo = await getUser(claims.sub);
             if (userInfo?.submissionStatus === 'APPROVED') {
                 setIsApproved(true);
             }
         };
-        if (user) {
+        if (claims?.sub) {
             fetchUser();
         }
-    }, [user]);
+    }, [claims]);
 
     const fetchCalendarEvents = async (token: string) => {
         try {
@@ -162,7 +162,7 @@ export default function Calendar() {
                         console.log("Access token received:", response.access_token);
                         const tokenInfo = await fetch("/api/calendar", {
                             method: "POST",
-                            body: JSON.stringify({ access_token: response.access_token, user_id: user?.id }),
+                            body: JSON.stringify({ access_token: response.access_token, user_id: claims.sub }),
                         });
                         const tokenInfoData = await tokenInfo.json();
                         console.log("Token info:", tokenInfoData);
@@ -189,7 +189,7 @@ export default function Calendar() {
     const handleDisconnect = async () => {
         try {
             setIsLoading(true);
-            await fetch(`/api/calendar/${user?.id}`, {
+            await fetch(`/api/calendar/${claims.sub}`, {
                 method: 'DELETE'
             });
             setIsConnected(false);

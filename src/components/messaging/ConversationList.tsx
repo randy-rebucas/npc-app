@@ -11,7 +11,7 @@ export function ConversationList({ receiverId }: { receiverId: string | null }) 
     const searchParams = useSearchParams();
     const { replace } = useRouter();
     const pathname = usePathname();
-    const { user } = useSession();
+    const { claims } = useSession();
     const [users, setUsers] = useState<IUser[]>([]);
     const { messages } = useMessaging();
 
@@ -35,20 +35,20 @@ export function ConversationList({ receiverId }: { receiverId: string | null }) 
                     return;
                 }
 
-                setUsers(data.filter((u: IUser) => u.id !== user?.id));
+                setUsers(data.filter((u: IUser) => u.id !== claims?.sub));
             } catch (error) {
                 console.error('Error fetching users:', error);
                 setUsers([]);
             }
         };
         fetchUsers();
-    }, [user]);
+    }, [claims?.sub]);
 
     const getLastMessage = (userId: string) => {
         return messages
             .filter(m =>
-                (m.senderId.toString() === userId && m.receiverId.toString() === user?.id) ||
-                (m.senderId.toString() === user?.id && m.receiverId.toString() === userId)
+                (m.senderId.toString() === userId && m.receiverId.toString() === claims?.sub) ||
+                (m.senderId.toString() === claims?.sub && m.receiverId.toString() === userId)
             )
             .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
     };

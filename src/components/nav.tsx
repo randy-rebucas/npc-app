@@ -16,20 +16,20 @@ type NavItem = {
 }
 
 function useNavigationItems() {
-    const { user } = useSession();
+    const { claims } = useSession();
     const [items, setItems] = useState<NavItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchUser = async () => {
-            if (!user?.id) {
+            if (!claims?.sub) {
                 setIsLoading(false);
                 return;
             }
 
             try {
-                const response = await fetch(`/api/user/${user.id}`);
+                const response = await fetch(`/api/user/${claims.sub}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch user data');
                 }
@@ -134,7 +134,7 @@ function useNavigationItems() {
         };
 
         fetchUser();
-        }, [user]);
+    }, [claims?.sub]);
 
     return { items, isLoading, error };
 }

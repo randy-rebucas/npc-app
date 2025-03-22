@@ -10,7 +10,7 @@ export default function AgreementPage() {
     const jotformId = process.env.NEXT_PUBLIC_JOTFORM_ID;
     const [jotformUrl, setJotformUrl] = useState(`https://form.jotform.com/${jotformId}`);
     const [formFilled, setFormFilled] = useState(false);
-    const { user } = useSession();
+    const { claims } = useSession();
 
     // Improve iframe handling
     useEffect(() => {
@@ -45,48 +45,48 @@ export default function AgreementPage() {
     }, [jotformId, formFilled]);
 
     const checkMemberstackAlternative = useCallback(async () => {
-        if (!user) {
+        if (!claims?.sub) {
             console.warn('User is not logged in');
             return;
         }
 
         try {
-            const userInfo = await getUser(user.id);
+            const userInfo = await getUser(claims.sub);
             console.log(userInfo);
             if (!userInfo) {
                 console.warn('User is not logged in or data is missing.');
                 return;
             }
             console.log(userInfo.profile); 
-            const userData = {
-                'first-name': userInfo.profile.firstName || '',
-                'last-name': userInfo.profile.lastName || '',
-                'email': userInfo.email || '',
-                'member_id': userInfo._id || '',
-                'npi': userInfo.profile.npiNumber || '', 
-                'base-rate': userInfo.profile.monthlyCollaborationRate || '',
-                'state-fee': userInfo.profile.additionalStateFee || '',
-                'background': userInfo.profile.description || '',
-                'control-fee': userInfo.profile.controlledSubstancesMonthlyFee || '',
-                'degree-type': userInfo.profile.clinicalDegree || '',
-                'linkedin-url': userInfo.profile.linkedinProfile || '',
-                'multi-np-fee': userInfo.profile.additionalNPFee || '',
-                'practice-types': userInfo.profile.practiceTypes || '',
-                'id-document-url': userInfo.profile.governmentIdPath || '',
-                'board-certification': userInfo.profile.boardCertification || '',
-                'active-license-states': userInfo.profile.medicalLicenseStates?.map((l: any) => l.state) || [],
-                'additional-certification': userInfo.profile.additionalCertifications?.map((c: any) => c.certification) || [],
-                'address': userInfo.profile.address || '',
-                'city': userInfo.profile.city || '',
-                'state': userInfo.profile.state || '',
-                'zip': userInfo.profile.zip || '',
-            };
+            // const userData = {
+            //     'first-name': userInfo.profile.firstName || '',
+            //     'last-name': userInfo.profile.lastName || '',
+            //     'email': userInfo.email || '',
+            //     'member_id': userInfo._id || '',
+            //     'npi': userInfo.profile.npiNumber || '', 
+            //     'base-rate': userInfo.profile.monthlyCollaborationRate || '',
+            //     'state-fee': userInfo.profile.additionalStateFee || '',
+            //     'background': userInfo.profile.description || '',
+            //     'control-fee': userInfo.profile.controlledSubstancesMonthlyFee || '',
+            //     'degree-type': userInfo.profile.clinicalDegree || '',
+            //     'linkedin-url': userInfo.profile.linkedinProfile || '',
+            //     'multi-np-fee': userInfo.profile.additionalNPFee || '',
+            //     'practice-types': userInfo.profile.practiceTypes || '',
+            //     'id-document-url': userInfo.profile.governmentIdPath || '',
+            //     'board-certification': userInfo.profile.boardCertification || '',
+            //     'active-license-states': userInfo.profile.medicalLicenseStates?.map((l: any) => l.state) || [],
+            //     'additional-certification': userInfo.profile.additionalCertifications?.map((c: any) => c.certification) || [],
+            //     'address': userInfo.profile.address || '',
+            //     'city': userInfo.profile.city || '',
+            //     'state': userInfo.profile.state || '',
+            //     'zip': userInfo.profile.zip || '',
+            // };
             
             fillJotformFields(userData);
         } catch (error) {
             console.error('Error getting current member:', error);
         }
-    }, [fillJotformFields, user]);
+    }, [fillJotformFields, claims?.sub]);
 
     // Initial check
     useEffect(() => {

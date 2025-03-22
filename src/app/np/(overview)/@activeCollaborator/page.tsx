@@ -9,11 +9,11 @@ import { IUserProfile } from "@/app/models/UserProfile";
 
 export default function ActiveCollaboratorPage() {
 
-    const { user } = useSession();
+    const { claims } = useSession();
     const [activeCollaborations, setActiveCollaborations] = useState([]);
 
     useEffect(() => {
-        if (user) {
+        if (claims?.sub) {
             const fetchActiveCollaborations = async () => {
                 const response = await fetch(`/api/active-collaboration`);
                 const data = await response.json();
@@ -21,7 +21,7 @@ export default function ActiveCollaboratorPage() {
             };
             fetchActiveCollaborations();
         }
-    }, [user]);
+    }, [claims?.sub]);
 
     return (
         <div className="bg-card rounded-lg p-6 shadow-sm">

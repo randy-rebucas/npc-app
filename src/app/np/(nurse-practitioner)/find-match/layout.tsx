@@ -12,7 +12,7 @@ export default function FindMatchLayout({
     children: React.ReactNode
     modal: React.ReactNode
 }) {
-    const { user } = useSession();
+    const { claims } = useSession();
 
     useEffect(() => {
         const getUserSubmissionStatus = async (id: string) => {
@@ -22,10 +22,10 @@ export default function FindMatchLayout({
                 redirect("/not-authorized");
             }
         }
-        if (user) {
-            getUserSubmissionStatus(user.id);
+        if (claims?.sub) {
+            getUserSubmissionStatus(claims.sub);
         }
-    }, [user]);
+    }, [claims]);
 
     return (
         <div className="min-h-screen w-full bg-background">

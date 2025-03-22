@@ -6,18 +6,18 @@ import { useState } from "react";
 import { Stethoscope, Syringe } from "lucide-react";
 
 export default function OnboardingPage() {
-    const { user, } = useSession();
+    const { claims } = useSession();
     const router = useRouter();
     const [selectedRole, setSelectedRole] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!selectedRole || !user?.id) return;
+        if (!selectedRole || !claims?.sub) return;
 
         setIsSubmitting(true);
         try {
-            const response = await fetch(`/api/user/${user.id}/onboarding`, {
+            const response = await fetch(`/api/user/${claims.sub}/onboarding`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

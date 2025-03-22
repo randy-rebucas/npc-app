@@ -18,7 +18,7 @@ const INITIAL_BOT_MESSAGE: Message = {
 };
 
 export default function ChatBot() {
-    const { user } = useSession();
+    const { claims } = useSession();
     const [messages, setMessages] = useState<Message[]>([INITIAL_BOT_MESSAGE]);
     const [inputText, setInputText] = useState('');
     const [isOpen, setIsOpen] = useState(false);
@@ -47,7 +47,7 @@ export default function ChatBot() {
                 },
                 body: JSON.stringify({
                     message: inputText,
-                    customerId: user?.id,
+                    customerId: claims?.sub,
                 }),
             });
 
