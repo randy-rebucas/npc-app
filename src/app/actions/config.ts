@@ -1,19 +1,26 @@
 import Config from "../models/Config"
 import connect from "@/lib/db"
+import { handleAsync } from '@/lib/errorHandler';
+import { DatabaseError, ValidationError } from '@/lib/errors';
 
 /**
  * Retrieves the entire configuration object from the database
  * @returns The configuration object or null if not found
  */
 export async function getConfig() {
-    try {
-        await connect()
-        const config = await Config.findOne({})
-        return config || null
-    } catch (error) {
-        console.error('Error fetching config:', error)
-        throw new Error('Failed to fetch configuration')
+    const [result, error] = await handleAsync(
+        (async () => {
+            await connect()
+            const config = await Config.findOne({})
+            return config || null
+        })()
+    )
+
+    if (error) {
+        throw new DatabaseError('Failed to fetch configuration')
     }
+
+    return result
 }
 
 /**
@@ -22,12 +29,21 @@ export async function getConfig() {
  * @returns The configuration value or null if not found
  */
 export async function getConfigValue<T>(key: string): Promise<T | null> {
-    try {
-        await connect()
-        const config = await Config.findOne({})
-        return config ? (config[key] as T) : null
-    } catch (error) {
-        console.error(`Error fetching config value for key "${key}":`, error)
-        throw new Error(`Failed to fetch configuration value for ${key}`)
+    if (!key) {
+        throw new ValidationError('Configuration key is required')
     }
+
+    const [result, error] = await handleAsync(
+        (async () => {
+            await connect()
+            const config = await Config.findOne({})
+            return config ? (config[key] as T) : null
+        })()
+    )
+
+    if (error) {
+        throw new DatabaseError(`Failed to fetch configuration value for ${key}`)
+    }
+
+    return result
 }

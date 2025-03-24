@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
+import { getLogtoContext } from "@logto/next/server-actions";
+import { logtoConfig } from "@/app/logto";
 import Payment from "@/app/models/Payment";
 import connect from "@/lib/db";
 
@@ -8,13 +8,13 @@ export async function GET() {
   console.log("GET request received");
   try {
     await connect();
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const nextPayout = await Payment.findOne({
-      user: session.user.id,
+      user: claims?.id,
       status: "succeeded",
     })
       .sort({ createdAt: -1 })

@@ -14,7 +14,7 @@ export default async function AdminMembersPage() {
     const webhookCount = await countMembers();
     
     // Calculate sync status
-    const syncDifference = Math.abs(nodeApiCount - webhookCount);
+    const syncDifference = Math.abs(nodeApiCount - (webhookCount ?? 0));
     const isSynced = syncDifference === 0;
 
     return (

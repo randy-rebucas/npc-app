@@ -1,15 +1,14 @@
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-
-import { authOptions } from "../auth/[...nextauth]/options";
 import { NextRequest } from "next/server";
 import Transaction from "@/app/models/Transaction";
+import { getLogtoContext } from "@logto/next/server-actions";
+import { logtoConfig } from "@/app/logto";
 
 export async function POST(req: NextRequest) {
 
     try {
-        const session = await getServerSession(authOptions); 
-        if (!session) {
+        const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+        if (!isAuthenticated) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
          
@@ -22,7 +21,7 @@ export async function POST(req: NextRequest) {
             paymentIntentId: paymentIntent,
             clientSecret: paymentIntentClientSecret,
             status: redirectStatus,
-            user: session.user.id
+            user: claims?.id
         });
 
         return NextResponse.json(transaction);

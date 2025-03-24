@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from './ui/button';
 import { Bell } from 'lucide-react';
 import Link from 'next/link';
+import { NotificationsProvider } from '@/providers/notifications-provider';
 
 export function Notifications() {
   const [isOpen, setIsOpen] = useState(false);
@@ -86,5 +87,13 @@ export function Notifications() {
         </div>
       )}
     </div>
+  );
+}
+
+export function NotificationsWithProvider() {
+  return (
+    <NotificationsProvider>
+      <Notifications />
+    </NotificationsProvider>
   );
 } 

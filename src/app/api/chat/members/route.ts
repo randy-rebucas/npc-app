@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../auth/[...nextauth]/options";
 import connect from "@/lib/db";
 import Chat from "@/app/models/Chat";
 import User from "@/app/models/User";
+import { getLogtoContext } from "@logto/next/server-actions";
+import { logtoConfig } from "@/app/logto";
 
 export async function GET(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -45,8 +45,8 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

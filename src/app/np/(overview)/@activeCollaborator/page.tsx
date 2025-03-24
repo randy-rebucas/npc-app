@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/providers/logto-session-provider";
 import Link from "next/link";
 import { IActiveCollaboration } from "@/app/models/Collaboration";
 import { IUser } from "@/app/models/User";
@@ -9,11 +9,11 @@ import { IUserProfile } from "@/app/models/UserProfile";
 
 export default function ActiveCollaboratorPage() {
 
-    const { data: session } = useSession();
+    const { claims } = useSession();
     const [activeCollaborations, setActiveCollaborations] = useState([]);
 
     useEffect(() => {
-        if (session) {
+        if (claims?.sub) {
             const fetchActiveCollaborations = async () => {
                 const response = await fetch(`/api/active-collaboration`);
                 const data = await response.json();
@@ -21,7 +21,7 @@ export default function ActiveCollaboratorPage() {
             };
             fetchActiveCollaborations();
         }
-    }, [session]);
+    }, [claims?.sub]);
 
     return (
         <div className="bg-card rounded-lg p-6 shadow-sm">

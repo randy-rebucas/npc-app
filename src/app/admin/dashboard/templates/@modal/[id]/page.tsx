@@ -1,19 +1,25 @@
 import Modal from "@/components/modal";
 import { Card } from "@/components/ui/card";
 import TemplateForm from "@/components/admin/forms/TemplateForm";
+import { Suspense } from "react";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
-export default async function TemplateDetailModal({
+interface TemplateDetailModalProps {
+    params: {
+        id: string;
+    };
+}
+
+export default function TemplateDetailModal({
     params,
-}: {
-    params: Promise<{ id: string }>
-}) {
-    const id = (await params).id;
-
+}: TemplateDetailModalProps) {
     return (
         <Modal>
             <Card className="p-6">
-                <TemplateForm id={id} />
+                <Suspense fallback={<LoadingSpinner />}>
+                    <TemplateForm id={params.id} />
+                </Suspense>
             </Card>
         </Modal>
-    )
+    );
 }

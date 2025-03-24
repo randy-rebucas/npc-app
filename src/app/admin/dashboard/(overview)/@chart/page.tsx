@@ -5,12 +5,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { useEffect, useState, useCallback } from 'react';
 import { useTheme } from 'next-themes'
+import { LoadingSpinner } from "@/components/LoadingSpinner"
 
 export default function AdminChartPage() {
     const [period, setPeriod] = useState('7days');
     const [view, setView] = useState('daily');
     const [data, setData] = useState<DataPoint[]>([]);
     const { theme } = useTheme();
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     interface DataPoint {
         date: string;
@@ -46,13 +49,25 @@ export default function AdminChartPage() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const response = await fetch(`/api/users?period=${period}`);
-            const { users } = await response.json() as { users: DataPoint[] };
-            const processedData = processDataByView(users, view);
-            setData(processedData as DataPoint[]);
+            try {
+                setIsLoading(true);
+                setError(null);
+                const response = await fetch(`/api/users?period=${period}`);
+                if (!response.ok) throw new Error('Failed to fetch data');
+                const { users } = await response.json() as { users: DataPoint[] };
+                const processedData = processDataByView(users, view);
+                setData(processedData as DataPoint[]);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'An error occurred');
+            } finally {
+                setIsLoading(false);
+            }
         };
         fetchData();
-    }, [period, view, processDataByView]); // Add view as dependency
+    }, [period, view, processDataByView]);
+
+    if (isLoading) return <LoadingSpinner />;
+    if (error) return <div className="text-destructive">{error}</div>;
 
     // Update the chart colors based on theme
     const chartColors = {

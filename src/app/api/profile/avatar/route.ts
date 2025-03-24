@@ -1,18 +1,21 @@
 import UserProfile from "@/app/models/UserProfile";
 import connect from "@/lib/db";
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-import { authOptions } from "../../auth/[...nextauth]/options";
+import { logtoConfig } from "@/app/logto";
+import { getLogtoContext } from "@logto/next/server-actions";
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     await connect();
 
     const { profilePhotoPath } = await request.json();
 
-    const userProfile = await UserProfile.findOne({ user: session?.user?.id });
+    const userProfile = await UserProfile.findOne({ user: claims?.id });
     userProfile.profilePhotoPath = profilePhotoPath;
     await userProfile.save();
 

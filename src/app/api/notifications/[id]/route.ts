@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
+import { getLogtoContext } from "@logto/next/server-actions";
+import { logtoConfig } from "@/app/logto";
 import connect from "@/lib/db";
 import Notification from "@/app/models/Notification";
 
@@ -11,15 +11,15 @@ export async function PATCH(
   try {
     const { id } = await params;
 
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     await connect();
 
     const notification = await Notification.findOneAndUpdate(
-      { _id: id, user: session.user.id },
+      { _id: id, user: claims?.id },
       { read: true },
       { new: true }
     );

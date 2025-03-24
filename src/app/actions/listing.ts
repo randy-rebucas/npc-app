@@ -4,6 +4,8 @@ import { selectedItem } from "@/lib/utils";
 import { Certification, License } from "@/lib/types/onboarding";
 import mongoose from "mongoose";
 import { revalidateTag } from "next/cache";
+import { handleAsync } from '@/lib/errorHandler';
+import { DatabaseError, NotFoundError, ValidationError } from '@/lib/errors';
 
 
 export interface ListingDocument {
@@ -122,87 +124,142 @@ export async function getListings({
   practiceType?: string;
   priceRange?: string;
 }): Promise<GetListingResponse> {
-  try {
-    await connect();
+  if (page < 1 || limit < 1) {
+    throw new ValidationError('Invalid pagination parameters');
+  }
 
-    const query: ListingQuery = {};
+  const [result, error] = await handleAsync(
+    (async () => {
+      await connect();
+      const query: ListingQuery = {};
 
-    if (search) {
-      query.$or = [
-        { username: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
-        { "profile.firstName": { $regex: search, $options: "i" } },
-        { "profile.lastName": { $regex: search, $options: "i" } },
-      ];
-    }
+      if (search) {
+        query.$or = [
+          { username: { $regex: search, $options: "i" } },
+          { email: { $regex: search, $options: "i" } },
+          { "profile.firstName": { $regex: search, $options: "i" } },
+          { "profile.lastName": { $regex: search, $options: "i" } },
+        ];
+      }
 
-    if (status !== "all") {
-      query.status = status;
-    }
+      if (status !== "all") {
+        query.status = status;
+      }
 
-    if (stateLicense) {
-      const states = stateLicense.split(",").map((state) => state.trim());
-      query.stateLicenses = {
-        $in: states,
-      };
-    }
+      if (stateLicense) {
+        const states = stateLicense.split(",").map((state) => state.trim());
+        query.stateLicenses = { $in: states };
+      }
 
-    if (practiceType) {
-      const practiceTypes = practiceType.split(",").map((type) => type.trim());
-      query.practiceTypes = {
-        $in: practiceTypes,
-      };
-    }
+      if (practiceType) {
+        const practiceTypes = practiceType.split(",").map((type) => type.trim());
+        query.practiceTypes = { $in: practiceTypes };
+      }
 
-    if (priceRange) {
-      const [min, max] = priceRange.split(",").map(Number);
-      query.monthlyBaseRate = { $gte: min, $lte: max };
-    }
+      if (priceRange) {
+        const [min, max] = priceRange.split(",").map(Number);
+        query.monthlyBaseRate = { $gte: min, $lte: max };
+      }
 
-    const skip = (page - 1) * limit;
+      const skip = (page - 1) * limit;
+      const sortConfig = {
+        lowest_price: { monthlyBaseRate: 1 },
+        highest_price: { monthlyBaseRate: -1 },
+        most_recent: { createdAt: -1 },
+      } as const;
 
-    const sortConfig = {
-      lowest_price: { monthlyBaseRate: 1 },
-      highest_price: { monthlyBaseRate: -1 },
-      most_recent: { createdAt: -1 },
-    } as const;
-
-    const [aggregatedListings, total] = await Promise.all([
-      Listing.aggregate([
-        {
-          $lookup: {
-            from: "users",
-            localField: "user",
-            foreignField: "_id",
-            as: "user",
+      const [aggregatedListings, total] = await Promise.all([
+        Listing.aggregate([
+          { $lookup: { from: "users", localField: "user", foreignField: "_id", as: "user" } },
+          { $unwind: "$user" },
+          { $lookup: { from: "userprofiles", localField: "user._id", foreignField: "user", as: "profile" } },
+          { $unwind: "$profile" },
+          { $match: query },
+          { $sort: sortConfig[sort] || { monthlyBaseRate: 1 } },
+          { $skip: skip },
+          { $limit: limit },
+          {
+            $project: {
+              userId: "$user._id",
+              username: "$user.username",
+              email: "$user.email",
+              metaData: "$user.metaData",
+              profile: 1,
+              _id: "$_id",
+              title: "$title",
+              description: "$description",
+              boardCertification: "$boardCertification",
+              practiceTypes: "$practiceTypes",
+              stateLicenses: "$stateLicenses",
+              specialties: "$specialties",
+              monthlyBaseRate: "$monthlyBaseRate",
+              multipleNPFee: "$multipleNPFee",
+              additionalFeePerState: "$additionalFeePerState",
+              controlledSubstanceFee: "$controlledSubstanceFee",
+              status: "$status",
+              createdAt: "$createdAt",
+            },
           },
-        },
-        {
-          $unwind: "$user",
-        },
-        {
-          $lookup: {
-            from: "userprofiles",
-            localField: "user._id",
-            foreignField: "user",
-            as: "profile",
-          },
-        },
-        {
-          $unwind: "$profile",
-        },
-        {
-          $match: query,
-        },
-        {
-          $sort: sortConfig[sort] || { monthlyBaseRate: 1 },
-        },
-        {
-          $skip: skip,
-        },
-        {
-          $limit: limit,
-        },
+        ]),
+        Listing.countDocuments(),
+      ]);
+
+      return {
+        listings: aggregatedListings.map((listing) => ({
+          id: listing._id.toString(),
+          userId: listing.userId,
+          username: listing.username,
+          email: listing.email,
+          metaData: listing.metaData,
+          createdAt: listing.createdAt,
+          title: listing.title,
+          description: listing.description,
+          boardCertification: listing.boardCertification,
+          practiceTypes: listing.practiceTypes,
+          stateLicenses: listing.stateLicenses,
+          specialties: listing.specialties,
+          monthlyBaseRate: listing.monthlyBaseRate,
+          multipleNPFee: listing.multipleNPFee,
+          additionalFeePerState: listing.additionalFeePerState,
+          controlledSubstanceFee: listing.controlledSubstanceFee,
+          status: listing.status,
+          profile: selectedItem(listing.profile, [
+            "firstName",
+            "lastName",
+            "profilePhotoPath",
+          ]),
+        })),
+        total: total || 0,
+      };
+    })()
+  );
+
+  if (error) {
+    throw new DatabaseError(`Failed to fetch listings: ${error.message}`);
+  }
+
+  if (!result) {
+    throw new NotFoundError('No listings found');
+  }
+
+  return result;
+}
+
+export async function getListingById(id: string): Promise<ListingDocument> {
+  if (!id) {
+    throw new ValidationError('Listing ID is required');
+  }
+
+  const [result, error] = await handleAsync(
+    (async () => {
+      await connect();
+      const listing = await Listing.aggregate([
+        { $match: { _id: new mongoose.Types.ObjectId(id) } },
+        { $lookup: { from: "users", localField: "user", foreignField: "_id", as: "user" } },
+        { $unwind: "$user" },
+        { $lookup: { from: "userprofiles", localField: "user._id", foreignField: "user", as: "profile" } },
+        { $unwind: "$profile" },
+        { $limit: 1 },
         {
           $project: {
             userId: "$user._id",
@@ -225,134 +282,66 @@ export async function getListings({
             createdAt: "$createdAt",
           },
         },
-      ]),
-      Listing.countDocuments(),
-    ]);
+      ]);
 
-    return {
-      listings: (aggregatedListings as ListingDocument[]).map((listing) => ({
-        id: listing._id.toString(),
-        userId: listing.userId,
-        username: listing.username,
-        email: listing.email,
-        metaData: listing.metaData,
-        createdAt: listing.createdAt,
-        title: listing.title,
-        description: listing.description,
-        boardCertification: listing.boardCertification,
-        practiceTypes: listing.practiceTypes,
-        stateLicenses: listing.stateLicenses,
-        specialties: listing.specialties,
-        monthlyBaseRate: listing.monthlyBaseRate,
-        multipleNPFee: listing.multipleNPFee,
-        additionalFeePerState: listing.additionalFeePerState,
-        controlledSubstanceFee: listing.controlledSubstanceFee,
-        status: listing.status,
-        profile: selectedItem(listing.profile, [
-          "firstName",
-          "lastName",
-          "profilePhotoPath",
-        ]),
-      })),
-      total: total || 0,
-    };
-  } catch (error) {
-    console.error("Error fetching listings:", error);
-    throw new Error("Failed to fetch listings");
+      if (!listing || listing.length === 0) {
+        throw new ValidationError(`Listing with ID ${id} not found`);
+      }
+
+      return {
+        _id: listing[0]._id.toString(),
+        userId: listing[0].userId.toString(),
+        email: listing[0].email,
+        metaData: listing[0].metaData,
+        username: listing[0].username,
+        createdAt: listing[0].createdAt,
+        title: listing[0].title,
+        description: listing[0].description,
+        boardCertification: listing[0].boardCertification,
+        practiceTypes: listing[0].practiceTypes,
+        stateLicenses: listing[0].stateLicenses,
+        specialties: listing[0].specialties,
+        monthlyBaseRate: listing[0].monthlyBaseRate,
+        multipleNPFee: listing[0].multipleNPFee,
+        additionalFeePerState: listing[0].additionalFeePerState,
+        controlledSubstanceFee: listing[0].controlledSubstanceFee,
+        status: listing[0].status,
+        profile: listing[0].profile,
+      };
+    })()
+  );
+
+  if (error) {
+    throw new DatabaseError(`Failed to fetch listing: ${error.message}`);
   }
-}
 
-export async function getListingById(id: string): Promise<ListingDocument> {
-  await connect();
-  const listing = await Listing.aggregate([
-    {
-      $lookup: {
-        from: "users",
-        localField: "user",
-        foreignField: "_id",
-        as: "user",
-      },
-    },
-    {
-      $unwind: "$user",
-    },
-    {
-      $lookup: {
-        from: "userprofiles",
-        localField: "user._id",
-        foreignField: "user",
-        as: "profile",
-      },
-    },
-    {
-      $unwind: "$profile",
-    },
-    {
-      $match: {
-        _id: new mongoose.Types.ObjectId(id),
-      },
-    },
-    {
-      $limit: 1,
-    },
-    {
-      $sort: { createdAt: -1 },
-    },
-    {
-      $project: {
-        userId: "$user._id",
-        username: "$user.username",
-        email: "$user.email",
-        metaData: "$user.metaData",
-        profile: 1,
-        _id: "$_id",
-        title: "$title",
-        description: "$description",
-        boardCertification: "$boardCertification",
-        practiceTypes: "$practiceTypes",
-        stateLicenses: "$stateLicenses",
-        specialties: "$specialties",
-        monthlyBaseRate: "$monthlyBaseRate",
-        multipleNPFee: "$multipleNPFee",
-        additionalFeePerState: "$additionalFeePerState",
-        controlledSubstanceFee: "$controlledSubstanceFee",
-        status: "$status",
-        createdAt: "$createdAt",
-      },
-    },
-  ]);
+  if (!result) {
+    throw new NotFoundError('No listing found');
+  }
 
-  const transformedListing: ListingDocument = {
-    _id: listing[0]._id.toString(),
-    userId: listing[0].userId.toString(),
-    email: listing[0].email,
-    metaData: listing[0].metaData,
-    username: listing[0].username,
-    createdAt: listing[0].createdAt,
-    title: listing[0].title,
-    description: listing[0].description,
-    boardCertification: listing[0].boardCertification,
-    practiceTypes: listing[0].practiceTypes,
-    stateLicenses: listing[0].stateLicenses,
-    specialties: listing[0].specialties,
-    monthlyBaseRate: listing[0].monthlyBaseRate,
-    multipleNPFee: listing[0].multipleNPFee,
-    additionalFeePerState: listing[0].additionalFeePerState,
-    controlledSubstanceFee: listing[0].controlledSubstanceFee,
-    status: listing[0].status,
-    profile: listing[0].profile,
-  };
-  return transformedListing;
+  return result;
 }
 
 export async function deleteListing(id: string) {
-  try {
-    await connect();
-    await Listing.findByIdAndDelete(id);
-    revalidateTag("listings"); // Update cached listings
-    return { success: true };
-  } catch (error) {
-    console.error(error);
-    return { error: "Failed to delete listing" };
+  if (!id) {
+    throw new ValidationError('Listing ID is required');
   }
+
+  const [result, error] = await handleAsync(
+    (async () => {
+      await connect();
+      const listing = await Listing.findByIdAndDelete(id);
+      if (!listing) {
+        throw new ValidationError(`Listing with ID ${id} not found`);
+      }
+      revalidateTag("listings");
+      return { success: true };
+    })()
+  );
+
+  if (error) {
+    throw new DatabaseError(`Failed to delete listing: ${error.message}`);
+  }
+
+  return result;
 }

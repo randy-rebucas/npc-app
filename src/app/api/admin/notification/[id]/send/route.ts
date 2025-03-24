@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import { getServerSession } from "next-auth";
+import { getLogtoContext } from "@logto/next/server-actions";
+import { logtoConfig } from "@/app/logto";
 import NotificationSetting from "@/app/models/NotificationSetting";
-import { EmailService } from "@/lib/email";
+// import { EmailService } from "@/lib/email";
 import { FlattenMaps } from "mongoose";
-import EmailNotification from "@/app/models/EmailNotification";
+// import EmailNotification from "@/app/models/EmailNotification";
 
 interface NotificationUser {
   _id: unknown;
@@ -29,8 +29,8 @@ export async function POST(
   const id = (await params).id;
   try {
     const { emailOption, selectedEmails } = await request.json();
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -38,7 +38,7 @@ export async function POST(
 
     if (emailOption === "all") {
       const users = await NotificationSetting.find({
-        user: { $ne: session.user.id },
+        user: { $ne: claims?.id },
       })
         .populate("user")
         .lean();
@@ -83,34 +83,34 @@ export async function POST(
 }
 
 const sendEmail = async (targetUsers: EmailTarget[], id: string) => {
-  const emailService = new EmailService();
-  const notification = await EmailNotification.findById(id);
+  // const emailService = new EmailService();
+  // const notification = await EmailNotification.findById(id);
 
-  if (!notification) {
-    throw new Error("Notification template not found");
-  }
+  // if (!notification) {
+  //   throw new Error("Notification template not found");
+  // }
 
-  for (const target of targetUsers) {
-    try {
-      if (target.emailNotifications) {
-        await emailService.sendEmail({
-          to: { email: target.user.email },
-          subject: notification.title,
-          htmlContent: notification.message,
-          sender: {
-            name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
-            email:
-              process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
-          },
-          replyTo: {
-            name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
-            email:
-              process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
-          },
-        });
-      }
-    } catch (error) {
-      console.error(`Failed to send email to ${target.user.email}:`, error);
-    }
-  }
+  // for (const target of targetUsers) {
+  //   try {
+  //     if (target.emailNotifications) {
+  //       await emailService.sendEmail({
+  //         to: { email: target.user.email },
+  //         subject: notification.title,
+  //         htmlContent: notification.message,
+  //         sender: {
+  //           name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+  //           email:
+  //             process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
+  //         },
+  //         replyTo: {
+  //           name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+  //           email:
+  //             process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
+  //         },
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error(`Failed to send email to ${target.user.email}:`, error);
+  //   }
+  // }
 };

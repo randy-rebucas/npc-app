@@ -1,6 +1,6 @@
 import RequestedFeature from "@/app/models/RequesedtFeature";
-import { authOptions } from "../../auth/[...nextauth]/options";
-import { getServerSession } from "next-auth";
+import { logtoConfig } from "@/app/logto";
+import { getLogtoContext } from "@logto/next/server-actions";
 import { NextResponse } from "next/server";
 import connect from "@/lib/db";
 
@@ -8,14 +8,14 @@ export async function POST(req: Request) {
   try {
     await connect();
 
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const data = await req.json();
 
     const requestedFeature = new RequestedFeature({
-      email: session?.user?.email,
+      email: claims?.email,
       ...data,
     });
     await requestedFeature.save();

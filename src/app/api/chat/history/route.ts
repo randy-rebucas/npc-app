@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
 import connect from "@/lib/db";
 import Chat from "@/app/models/Chat";
-import { authOptions } from "../../auth/[...nextauth]/options";
 import mongoose from "mongoose";
+import { getLogtoContext } from "@logto/next/server-actions";
+import { logtoConfig } from "@/app/logto";
 
 export async function GET(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -26,7 +26,7 @@ export async function GET(request: Request) {
 
     const chat = await Chat.findOne({
       _id: new mongoose.Types.ObjectId(chatId),
-      $or: [{ customerId: session.user.id }, { agentId: session.user.id }],
+      $or: [{ customerId: claims?.id }, { agentId: claims?.id }],
     })
       .select("messages")
       .populate("messages.sender", "name email")

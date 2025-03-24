@@ -1,21 +1,21 @@
 import ReportedIssue from "@/app/models/ReportedIssue";
 import connect from "@/lib/db";
-import { getServerSession } from "next-auth";
+import { getLogtoContext } from "@logto/next/server-actions";
+import { logtoConfig } from "@/app/logto";
 import { NextResponse } from "next/server";
-import { authOptions } from "../../auth/[...nextauth]/options";
 
 export async function POST(req: Request) {
   try {
     await connect();
 
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const data = await req.json();
 
     const reportedIssue = new ReportedIssue({
-      email: session?.user?.email,
+      email: claims?.email,
       ...data,
     });
     await reportedIssue.save();

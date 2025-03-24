@@ -1,7 +1,7 @@
 'use client';
 
 import Header from "@/components/header";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/providers/logto-session-provider";
 import { redirect } from "next/navigation";
 import { useEffect } from "react";
 
@@ -12,7 +12,7 @@ export default function FindMatchLayout({
     children: React.ReactNode
     modal: React.ReactNode
 }) {
-    const { data: session } = useSession();
+    const { claims } = useSession();
 
     useEffect(() => {
         const getUserSubmissionStatus = async (id: string) => {
@@ -22,10 +22,10 @@ export default function FindMatchLayout({
                 redirect("/not-authorized");
             }
         }
-        if (session) {
-            getUserSubmissionStatus(session.user.id);
+        if (claims?.sub) {
+            getUserSubmissionStatus(claims.sub);
         }
-    }, [session]);
+    }, [claims]);
 
     return (
         <div className="min-h-screen w-full bg-background">

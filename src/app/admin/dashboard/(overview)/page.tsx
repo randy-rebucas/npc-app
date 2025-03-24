@@ -3,9 +3,9 @@ import { Users, RefreshCcw, Webhook, Shrub } from "lucide-react";
 import { countMembers } from "@/app/actions/members";
 import { MemberstackAdminService } from "@/utils/memberstack-admin";
 import { Metadata } from "next";
-import { countUsers } from "@/app/actions/user";
 import { startOfMonth, subMonths } from "date-fns";
 import { calculatePercentageChange } from "@/lib/utils";
+import { getNewUserCount, getTotalUserCount } from "@/app/actions/dashboard";
 
 export const metadata: Metadata = {
     title: 'Admin Dashboard',
@@ -15,29 +15,29 @@ export default async function AdminDashboard() {
 
     const { totalCount: currentMemberstackCount } = await MemberstackAdminService.listMembers();
     const currentMembers = await countMembers();
-    const currentUsers = await countUsers();
+    const currentUsers = await getTotalUserCount();
     const currentSyncedMembers = await countMembers(undefined, "true");
 
     // Get last month's counts
     const lastMonthStart = startOfMonth(subMonths(new Date(), 1));
-    const lastMonthUsers = await countUsers(lastMonthStart);
+    const { last7Days } = await getNewUserCount();
     const lastMonthMembers = await countMembers(lastMonthStart);
 
     // Calculate percentage changes
-    const userChange = calculatePercentageChange(lastMonthUsers, currentUsers);
-    const memberChange = calculatePercentageChange(lastMonthMembers, currentMembers);
+    const userChange = calculatePercentageChange(last7Days.count, currentUsers.count);
+    const memberChange = calculatePercentageChange(lastMonthMembers ?? 0, currentMembers ?? 0);
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <StatsCard
                 title="Total Users"
-                value={currentUsers.toString()}
+                value={currentUsers.count.toString()}
                 description={`${userChange.toFixed(2)}% vs last month`}
                 icon={Users}
             />
             <StatsCard
                 title="Webhook Events"
-                value={currentMembers.toString()}
+                value={(currentMembers ?? 0).toString()}
                 description={`${memberChange.toFixed(2)}% vs last month`}
                 icon={Webhook}
             />
@@ -48,7 +48,7 @@ export default async function AdminDashboard() {
             />
             <StatsCard
                 title="Synced Members"
-                value={currentSyncedMembers.toString()}
+                value={(currentSyncedMembers ?? 0).toString()}
                 icon={RefreshCcw}
             />
         </div>

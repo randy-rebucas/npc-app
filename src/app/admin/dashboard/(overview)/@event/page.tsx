@@ -3,22 +3,27 @@ import { LogIn, RefreshCcw, UserCog, UserPlus, UserMinus } from "lucide-react";
 import { getEvents } from "@/app/actions/events";
 import Link from "next/link";
 
+type EventType = 'logged-in' | 'member-updated' | 'member-created' | 'member-deleted' | 'member-synced';
+
+const EVENT_ICONS: Record<EventType, React.ElementType> = {
+    'logged-in': LogIn,
+    'member-updated': UserCog,
+    'member-created': UserPlus,
+    'member-deleted': UserMinus,
+    'member-synced': RefreshCcw
+};
+
+const EVENT_LABELS: Record<EventType, string> = {
+    'logged-in': 'Logged in',
+    'member-updated': 'Member Updated',
+    'member-created': 'Member Created',
+    'member-deleted': 'Member Deleted',
+    'member-synced': 'Member Synced'
+};
+
 export default async function AdminEventPage() {
-    const getEventIcon = (type: string) => {
-        switch (type) {
-            case 'logged-in':
-                return LogIn;
-            case 'member-updated':
-                return UserCog;
-            case 'member-created':
-                return UserPlus;
-            case 'member-deleted':
-                return UserMinus;
-            case 'member-synced':
-                return RefreshCcw;
-            default:
-                return LogIn;
-        }
+    const getEventIcon = (type: string): React.ElementType => {
+        return EVENT_ICONS[type as EventType] || LogIn;
     };
 
     const { events } = await getEvents({ page: 1, limit: 6 });
@@ -63,7 +68,7 @@ function EventLogItem({ email, type, icon: Icon }: EventLogItemProps) {
             <div>
                 <p className="text-sm font-medium text-foreground">{email}</p>
                 <p className="text-xs text-muted-foreground">
-                    {type === 'logged-in' ? 'Logged in' : 'Member Updated'}
+                    {EVENT_LABELS[type as EventType] || 'Unknown Event'}
                 </p>
             </div>
         </div>

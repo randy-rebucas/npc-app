@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import User from "@/app/models/User";
 import connect from "@/lib/db";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/options";
+import { getLogtoContext } from "@logto/next/server-actions";
+import { logtoConfig } from "@/app/logto";
 
 export async function GET(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+
+    if (!isAuthenticated) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -20,7 +21,7 @@ export async function GET(request: Request) {
     // Check if username/email exists for any user except the current user
     const existingUser = await User.findOne({
       $or: [{ username }, { email }],
-      email: { $ne: session.user?.email } // Exclude current user
+      email: { $ne: claims?.email } // Exclude current user
     });
 
     return NextResponse.json({

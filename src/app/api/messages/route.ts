@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/options";
+import { getLogtoContext } from "@logto/next/server-actions";
+import { logtoConfig } from "@/app/logto";
 import connect from "@/lib/db";
 import Message from '@/app/models/Message';
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -15,8 +15,8 @@ export async function GET() {
 
     const messages = await Message.find({ 
       $or: [
-        { senderId: session.user.id },
-        { receiverId: session.user.id }
+        { senderId: claims?.id },
+        { receiverId: claims?.id }
       ]
     }).sort({ timestamp: -1 });
 
@@ -29,15 +29,15 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     const { receiverId, content } = await req.json();
     
     const message = await Message.create({
-      senderId: session.user.id,
+      senderId: claims?.id,
       receiverId,
       content,
       timestamp: new Date(),

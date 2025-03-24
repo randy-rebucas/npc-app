@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
 import NotificationSetting from "@/app/models/NotificationSetting";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import connect from "@/lib/db";
+import { getLogtoContext } from "@logto/next/server-actions";
+import { logtoConfig } from "@/app/logto";
 
 export async function PATCH(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -16,7 +16,7 @@ export async function PATCH(request: Request) {
     await connect();
 
     const settings = await NotificationSetting.updateOne(
-      { user: session.user.id },
+      { user: claims?.id },
       {
         $set: {
           [`notificationTypes.${type}`]: value,

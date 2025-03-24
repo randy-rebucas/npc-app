@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-
-import { getServerSession } from "next-auth";
-
-import { authOptions } from "../../../auth/[...nextauth]/options";
+import { logtoConfig } from "@/app/logto";
+import { getLogtoContext } from "@logto/next/server-actions";
 import { NextRequest } from "next/server";
 import Favorite from "@/app/models/Favorite";
 
@@ -13,13 +11,13 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return NextResponse.json({ isFavorite: false }, { status: 401 });
     }
 
     const existingFavorite = await Favorite.findOne({
-      npUser: session?.user?.id,
+      npUser: claims?.id,
       physicianUser: id,
     });
 

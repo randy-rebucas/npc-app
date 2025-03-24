@@ -3,7 +3,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import Header from '@/components/header';
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/providers/logto-session-provider";
 import { redirect } from "next/navigation";
 
 export default function PaymentLayout({
@@ -22,7 +22,7 @@ export default function PaymentLayout({
     const [activeTab, setActiveTab] = useState('payments');
     const [stripeConnected, setStripeConnected] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const { data: session } = useSession();
+    const { claims } = useSession();
 
     useEffect(() => {
         const getUserSubmissionStatus = async (id: string) => {
@@ -32,10 +32,10 @@ export default function PaymentLayout({
                 redirect("/not-authorized");
             }
         }
-        if (session) {
-            getUserSubmissionStatus(session.user.id);
+        if (claims?.sub) {
+            getUserSubmissionStatus(claims.sub);
         }
-    }, [session]);
+    }, [claims?.sub]);
 
     useEffect(() => {
         const fetchAccount = async () => {

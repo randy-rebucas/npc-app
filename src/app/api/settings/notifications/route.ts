@@ -1,26 +1,26 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
 import NotificationSetting from '@/app/models/NotificationSetting';
 import connect from '@/lib/db';
-import { authOptions } from '../../auth/[...nextauth]/options';
+import { getLogtoContext } from '@logto/next/server-actions';
+import { logtoConfig } from '@/app/logto';
 
 export async function GET() {
     try {
         await connect();
 
-        const session = await getServerSession(authOptions);
+        const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
 
-        if (!session?.user) {
+        if (!isAuthenticated) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         let settings = await NotificationSetting.findOne({
-            user: session.user.id,
+            user: claims?.id,
         });
 
         if (!settings) {
             const newSettings = new NotificationSetting({
-                user: session.user.id,
+                user: claims?.id,
                 emailNotifications: false,
                 pushNotifications: false,
                 notificationTypes: {
@@ -48,8 +48,8 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
     try {
-        const session = await getServerSession(authOptions);
-        if (!session?.user) {
+        const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+        if (!isAuthenticated) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -57,7 +57,7 @@ export async function PATCH(request: Request) {
         await connect();
         
         const settings = await NotificationSetting.findOneAndUpdate(
-            { user: session.user.id },
+            { user: claims?.id },
             {
                 $set: {
                     [type]: value,

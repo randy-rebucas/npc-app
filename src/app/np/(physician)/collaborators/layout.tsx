@@ -1,7 +1,7 @@
 'use client';
 
 import Header from "@/components/header";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/providers/logto-session-provider";
 import Link from "next/link";
 import { redirect, usePathname } from "next/navigation";
 import { useEffect } from "react";
@@ -9,7 +9,7 @@ import { useEffect } from "react";
 export default function CollaboratorsLayout({ children, modal }: { children: React.ReactNode, modal: React.ReactNode }) {
     const pathname = usePathname();
     const currentTab = pathname.split('/').pop();
-    const { data: session } = useSession();
+    const { claims } = useSession();
 
     useEffect(() => {
         const getUserSubmissionStatus = async (id: string) => {
@@ -19,10 +19,10 @@ export default function CollaboratorsLayout({ children, modal }: { children: Rea
                 redirect("/not-authorized");
             }
         }
-        if (session) {
-            getUserSubmissionStatus(session.user.id);
+        if (claims?.sub) {
+            getUserSubmissionStatus(claims.sub);
         }
-    }, [session]);
+    }, [claims?.sub]);
 
     return (
         <div className="min-h-screen w-full bg-background">

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Favorite from "@/app/models/Favorite";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/options";
+import { getLogtoContext } from "@logto/next/server-actions";
+import { logtoConfig } from "@/app/logto";
 import connect from "@/lib/db";
 
 // Add this export to mark the route as dynamic
@@ -11,8 +11,8 @@ export async function POST(req: NextRequest) {
   try {
     await connect();
 
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
         { status: 401 }
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
 
     // Check if favorite already exists
     const existingFavorite = await Favorite.findOne({
-      npUser: session?.user?.id,
+      npUser: claims?.id,
       physicianUser: id,
     });
 
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       // }
     } else {
       const favorite = new Favorite({
-        npUser: session?.user?.id,
+        npUser: claims?.id,
         physicianUser: id,
       });
       const savedFavorite = await favorite.save();

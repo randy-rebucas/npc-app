@@ -1,12 +1,12 @@
 'use client';
 
 import Header from "@/components/header";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/providers/logto-session-provider";
 import { redirect } from "next/navigation";
 import { useEffect } from "react";
 
 export default function ListingsLayout({ children }: { children: React.ReactNode }) {
-    const { data: session } = useSession();
+    const { claims } = useSession();
 
     useEffect(() => {
         const getUserCreateListingPermission = async (id: string) => {
@@ -16,10 +16,10 @@ export default function ListingsLayout({ children }: { children: React.ReactNode
                 redirect("/not-authorized");
             }
         }
-        if (session) {
-            getUserCreateListingPermission(session.user.id);
+        if (claims?.sub) {
+            getUserCreateListingPermission(claims.sub);
         }
-    }, [session]);
+    }, [claims?.sub]);
     
     return (
         <div className="min-h-screen w-full bg-background">

@@ -7,78 +7,57 @@ import { usePathname } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
-export default function AdminMembersLayout({ children }: { children: React.ReactNode }) {
+const memberTabs = [
+    { value: "members", label: "Overview", href: "/admin/dashboard/members" },
+    { value: "node-api", label: "Node API", href: "/admin/dashboard/members/node-api" },
+    { value: "webhook", label: "Webhook", href: "/admin/dashboard/members/webhook" }
+];
+
+type Breadcrumb = {
+    label: string;
+    href: string;
+    active?: boolean;
+};
+
+export default function MembersLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const currentTab = pathname.split('/').pop();
     
-    const isNodeApi = pathname.split('/').pop() === 'node-api';
-    const isWebhook = pathname.split('/').pop() === 'webhook';
-    const isMembers = pathname.split('/').pop() === 'members';
+    const currentTabData = memberTabs.find(tab => tab.value === currentTab);
+    const title = currentTabData?.label || 'Members';
 
-    const title = isMembers ? 'Members' : isNodeApi ? 'Node API' : 'Webhook';
-
-    const breadcrumbs = [
+    const breadcrumbs: Breadcrumb[] = [
         { label: 'Admin', href: '/admin' },
-        {
-            label: 'Members',
-            href: '/admin/dashboard/members',
-            active: isMembers,
-        },
+        { label: 'Dashboard', href: '/admin/dashboard' },
+        { label: 'Members', href: '/admin/dashboard/members', active: currentTab === 'members' },
+        ...(currentTabData && currentTab !== 'members' ? [{ label: currentTabData.label, href: currentTabData.href, active: true }] : [])
     ];
-
-    if (isNodeApi) {
-        breadcrumbs.push({
-            label: 'Node API',
-            href: '/admin/dashboard/members/node-api',
-            active: isNodeApi,
-        });
-    }
-
-    if (isWebhook) {
-        breadcrumbs.push({
-            label: 'Webhook',
-            href: '/admin/dashboard/members/webhook',
-            active: isWebhook,
-        });
-    }
 
     return (
         <SidebarInset>
             <AdminHeader breadcrumbs={breadcrumbs} />
-            
             <div className="flex flex-1 flex-col space-y-8 p-8">
                 <div className="flex items-center justify-between space-y-2">
                     <div>
                         <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
                         <p className="text-muted-foreground">
-                            Manage your member settings and preferences
+                            Manage your members and their settings
                         </p>
                     </div>
                 </div>
 
                 <Tabs defaultValue={currentTab} className="space-y-4">
                     <TabsList>
-                        <TabsTrigger
-                            value="members"
-                            className={cn("w-[120px]")}
-                            asChild
-                        >
-                            <Link href="/admin/dashboard/members">Overview</Link>
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="node-api"
-                            className={cn("w-[120px]")}
-                            asChild
-                        >
-                            <Link href="/admin/dashboard/members/node-api">Node API</Link>
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="webhook"
-                            className={cn("w-[120px]")}
-                            asChild
-                        >
-                            <Link href="/admin/dashboard/members/webhook">Webhook</Link>
-                        </TabsTrigger>
+                        {memberTabs.map(tab => (
+                            <TabsTrigger
+                                key={tab.value}
+                                value={tab.value}
+                                className={cn("w-[120px]")}
+                                asChild
+                            >
+                                <Link href={tab.href}>{tab.label}</Link>
+                            </TabsTrigger>
+                        ))}
                     </TabsList>
                 </Tabs>
 

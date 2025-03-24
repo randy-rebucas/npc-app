@@ -1,13 +1,16 @@
-import NotificationSendForm from "@/components/admin/forms/NotificationSendForm";
 import Modal from "@/components/modal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import NotificationSendForm from "@/components/admin/forms/NotificationSendForm";
+import { Suspense } from "react";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
-export default async function NotificationSendModal({
-    params,
-}: {
-    params: Promise<{ id: string }>
-}) {
-    const id = (await params).id;
+interface NotificationSendModalProps {
+    params: {
+        id: string;
+    };
+}
+
+export default function NotificationSendModal({ params }: NotificationSendModalProps) {
     return (
         <Modal>
             <Card className="p-6">
@@ -15,9 +18,11 @@ export default async function NotificationSendModal({
                     <CardTitle>Send Notification</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <NotificationSendForm id={id} />
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <NotificationSendForm id={params.id} />
+                    </Suspense>
                 </CardContent>
             </Card>
         </Modal>
-    )
+    );
 }

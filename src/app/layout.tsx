@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { AuthProvider } from "@/providers/auth-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { getConfig } from "@/app/actions/config"
-import { NotificationsProvider } from "@/providers/notifications-provider";
-import { MessagingProvider } from "@/providers/messaging-provider";
-import { ApplicationSettingsProvider } from "@/providers/application-settings-provider";
-import ChatBot from '@/components/root/ChatBot/ChatBot';
-import { OpenAIProvider } from "@/providers/openai-provider";
 import { ThemeProvider } from "next-themes";
 import { FontSizeProvider } from "@/providers/font-provider";
-import { getServerSession } from "next-auth";
-import { authOptions } from "./api/auth/[...nextauth]/options";
-// import ChatComponent from "@/components/example/ChatComponent";
+import { LogtoProvider, ClaimProps } from "@/providers/logto-session-provider";
+import { ApplicationSettingsProvider } from "@/providers/application-settings-provider";
+import { NotificationsProvider } from "@/providers/notifications-provider";
+import { MessagingProvider } from "@/providers/messaging-provider";
+import { logtoConfig } from "./logto";
+import { getLogtoContext } from "@logto/next/server-actions";
 
+// import { OpenAIProvider } from "@/providers/openai-provider";
+// import ChatBot from '@/components/root/ChatBot/ChatBot';
+// import ChatComponent from "@/components/example/ChatComponent";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -60,26 +60,30 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession(authOptions);
+  const { isAuthenticated, claims } = await getLogtoContext(logtoConfig, { fetchUserInfo: true }); 
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`} >
         <ThemeProvider attribute="class">
           <FontSizeProvider>
-            <ApplicationSettingsProvider>
-              <AuthProvider>
-                <OpenAIProvider>
-                  <MessagingProvider>
-                    <NotificationsProvider>
-                      {children}
-                    </NotificationsProvider>
-                  </MessagingProvider>
-                  {session && <ChatBot />}  
-                  {/* <ChatComponent />  */}
-                </OpenAIProvider>
-              </AuthProvider>
-            </ApplicationSettingsProvider>
+            <LogtoProvider 
+              isAuthenticated={isAuthenticated} 
+              claims={claims as ClaimProps}
+            >
+              <ApplicationSettingsProvider>
+                {/* <OpenAIProvider> */}
+                <MessagingProvider>
+                  <NotificationsProvider>
+                    {children}
+                  </NotificationsProvider>
+                </MessagingProvider>
+                {/* {session && <ChatBot />}   */}
+                {/* <ChatComponent />  */}
+                {/* </OpenAIProvider> */}
+              </ApplicationSettingsProvider>
+            </LogtoProvider>
           </FontSizeProvider>
         </ThemeProvider>
         <Toaster />

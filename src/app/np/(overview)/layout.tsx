@@ -1,30 +1,7 @@
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-
-import { getServerSession } from "next-auth";
-
-import { redirect } from "next/navigation";
-
-import { getUserByEmail } from "@/app/actions/user";
-import { UserSubmissionStatus } from "@/app/models/User";
 import Header from "@/components/header";
 import { ThemeProvider } from "next-themes";
 
 export default async function DashboardLayout({ children, stats, collaboratorRequests, activeCollaborator, modal }: { children: React.ReactNode, stats: React.ReactNode, collaboratorRequests: React.ReactNode, activeCollaborator: React.ReactNode, modal: React.ReactNode; }) {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-        redirect("/auth/signin");
-    }
-
-    const user = await getUserByEmail(session.user.email);
-
-    if (user.role === "PHYSICIAN" && (user.submissionStatus === UserSubmissionStatus.INCOMPLETE || user.submissionStatus === UserSubmissionStatus.INCORRECT || user.submissionStatus === UserSubmissionStatus.PENDING)) {
-        redirect("/np/main");
-    }
-
-    if (user.role === "NURSE_PRACTITIONER" && (user.submissionStatus === UserSubmissionStatus.INCOMPLETE || user.submissionStatus === UserSubmissionStatus.INCORRECT || user.submissionStatus === UserSubmissionStatus.PENDING)) {
-        redirect("/np/find-match");
-    }
 
     return (
         <ThemeProvider

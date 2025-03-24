@@ -1,68 +1,98 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 export enum UserRole {
-  ADMIN = 'ADMIN',
-  PHYSICIAN = 'PHYSICIAN',
-  NURSE_PRACTITIONER = 'NURSE_PRACTITIONER'
+  ADMIN = "ADMIN",
+  PHYSICIAN = "PHYSICIAN",
+  NURSE_PRACTITIONER = "NURSE_PRACTITIONER",
 }
 
 export enum UserOnBoardingStatus {
-  COMPLETED = 'COMPLETED',
-  INCOMPLETE = 'INCOMPLETE'
+  COMPLETED = "COMPLETED",
+  INCOMPLETE = "INCOMPLETE",
 }
 
 export enum UserSubmissionStatus {
-  PENDING = 'PENDING',
-  APPROVED = 'APPROVED',
-  REJECTED = 'REJECTED',
-  INCOMPLETE = 'INCOMPLETE',
-  INCORRECT = 'INCORRECT'
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+  INCOMPLETE = "INCOMPLETE",
+  INCORRECT = "INCORRECT",
 }
 
-export interface IUser extends Document {
+export interface IUserCustomData {
+  role: string;
+  onboardingStatus?: UserOnBoardingStatus;
+  submissionStatus?: UserSubmissionStatus;
+  canCreateListings?: boolean;
+  medicalLicenseStates?: string[];
+  deaLicenseStates?: string[];
+  npiNumber?: string;
+  boardCertification?: string[];
+  practiceTypes?: string[];
+  additionalCertifications?: string[];
+  governmentIdPath?: string;
+  education?: string[];
+}
+
+export interface IUser {
   id: string;
-  email: string;
   username: string;
-  provider: string;
-  createdAt: Date;
-  updatedAt: Date;
-  onBoardingStatus: UserOnBoardingStatus;
-  submissionStatus: UserSubmissionStatus;
-  metaData: Map<string, string>;
-  stripeAccountId: string;
-  role?: string | undefined;
-  canCreateListings: boolean;
+  primaryEmail: string;
+  primaryPhone: string;
+  name: string;
+  avatar: string | null;
+  customData: IUserCustomData;
+  identities: object;
+  lastSignInAt: number;
+  createdAt: number;
+  updatedAt: number;
+  profile: IUserProfile;
+  applicationId: string;
+  isSuspended: boolean;
+  hasPassword: boolean;
 }
 
+export interface IUserProfile {
+  familyName: string;
+  givenName: string;
+  middleName: string;
+  nickname: string;
+  preferredUsername: string;
+  profile: string;
+  website: string;
+  gender: string;
+  birthdate: string;
+  zoneinfo: string;
+  locale: string;
+  address: {
+    formatted: string;
+    streetAddress: string;
+    locality: string;
+    region: string;
+    postalCode: string;
+    country: string;
+  };
+}
 
 const userSchema = new Schema<IUser>(
   {
-    email: { type: String, required: true, unique: true },
-    username: { type: String, required: true, unique: true },
-    provider: { type: String, required: true },
-    role: { type: String },
-    onBoardingStatus: {
-      type: String,
-      enum: Object.values(UserOnBoardingStatus),
-      default: UserOnBoardingStatus.INCOMPLETE,
-    },
-    submissionStatus: {
-      type: String,
-      enum: Object.values(UserSubmissionStatus),
-      default: UserSubmissionStatus.PENDING,
-    },
-    stripeAccountId: { type: String, default: "" },
-    canCreateListings: { type: Boolean, default: false },
-    metaData: {
-      type: Map,
-      of: String,
-    },
+    primaryEmail: { type: String, required: true, unique: true },
+    primaryPhone: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
+    avatar: { type: String, required: true },
+    customData: { type: Object, required: true },
+    identities: { type: Object, required: true },
+    lastSignInAt: { type: Number, required: true },
+    createdAt: { type: Number, required: true },
+    updatedAt: { type: Number, required: true },
+    profile: { type: Object, required: true },
+    applicationId: { type: String, required: true },
+    isSuspended: { type: Boolean, required: true },
+    hasPassword: { type: Boolean, required: true },
   },
   { timestamps: true }
 );
 
-const User =
-  mongoose.models.User ??
-  mongoose.model<IUser>("User", userSchema);
+const User = mongoose.models.User ?? mongoose.model<IUser>("User", userSchema);
 
 export default User;

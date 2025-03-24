@@ -1,19 +1,13 @@
-import { getUserByEmail } from "@/app/actions/user";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
+'use client'
+
 import { ThemeProvider } from "next-themes";
-import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import { useSession } from "@/providers/logto-session-provider";
 
-export default async function Layout({ children }: { children: React.ReactNode }) {
-    const session = await getServerSession(authOptions);
+export default function Layout({ children }: { children: React.ReactNode }) {
+    const { claims } = useSession();
 
-    if (!session) {
-        redirect("/auth/signin");
-    }
-
-    const user = await getUserByEmail(session.user.email);
-
-    if (user.role !== "NURSE_PRACTITIONER") {
+    if (claims?.role !== "NURSE_PRACTITIONER") {
         redirect("/np/main");
     }
 

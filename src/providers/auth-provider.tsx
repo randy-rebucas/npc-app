@@ -1,33 +1,44 @@
 "use client";
 
-import { SessionProvider, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect } from "react";
+import { SessionProvider, useSession } from "@/providers/logto-session-provider";
+
+interface User {
+  role: "PHYSICIAN" | "NURSE_PRACTITIONER" | null;
+  onBoardingStatus: "COMPLETE" | "INCOMPLETE";
+}
 
 function OnboardingCheck({ children }: { children: React.ReactNode }) {
-    const { data: session } = useSession();
+    const { claims } = useSession();
     const router = useRouter();
 
-    const fetchUser = useMemo(() => {
-        return async (userId: string) => {
+    const fetchUser = useCallback(async (userId: string) => {
+        try {
             const response = await fetch(`/api/user/${userId}`);
-            const user = await response.json();
-
-            if (user.role === null || user.role === undefined) {
-                router.push("/onboarding");
-            } else if (user.role === "PHYSICIAN" && user.onBoardingStatus === "INCOMPLETE") {
-                router.push("/onboarding/physician");
-            } else if (user.role === "NURSE_PRACTITIONER" && user.onBoardingStatus === "INCOMPLETE") {
-                router.push("/onboarding/nurse-practitioner");
+            if (!response.ok) {
+                throw new Error('Failed to fetch user data');
             }
-        };
+            const user: User = await response.json();
+            
+            if (!user.role) {
+                router.push("/onboarding");
+            } else if (user.onBoardingStatus === "INCOMPLETE") {
+                const route = user.role === "PHYSICIAN" 
+                    ? "/onboarding/physician"
+                    : "/onboarding/nurse-practitioner";
+                router.push(route);
+            }
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+        }
     }, [router]);
 
     useEffect(() => {
-        if (session?.user?.id) {
-            fetchUser(session.user.id);
+        if (claims?.sub) {
+            fetchUser(claims.sub);
         }
-    }, [session, fetchUser]);
+    }, [claims?.sub, fetchUser]);
 
     return <>{children}</>;
 }

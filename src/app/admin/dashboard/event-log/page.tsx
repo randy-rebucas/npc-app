@@ -19,33 +19,39 @@ export default async function EventLog(props: {
     searchParams: SearchParams
 }) {
     const ITEMS_PER_PAGE = 10;
-
     const searchParams = await props.searchParams
     const currentPage = Number(searchParams?.page) || 1;
     const query = String(searchParams?.query || '');
     const type = String(searchParams?.type || 'all');
-
-    const { events, total } = await getEvents({ page: currentPage, search: query, type: type, limit: ITEMS_PER_PAGE });
+    const { events, total } = await getEvents({ 
+        page: currentPage, 
+        search: query, 
+        type: type, 
+        limit: ITEMS_PER_PAGE 
+    });
 
     const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
     const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
     const endItem = Math.min(currentPage * ITEMS_PER_PAGE, total);
 
+    const eventTypes = [
+        { key: 'logged-in', value: 'Logged In' },
+        { key: 'member-updated', value: 'Member Updated' },
+        { key: 'member-created', value: 'Member Created' },
+        { key: 'member-deleted', value: 'Member Deleted' },
+        { key: 'member-synced', value: 'Member Synced' }
+    ].map(({ key, value }) => ({ [key]: value }));
+
     const getEventIcon = (type: string) => {
-        switch (type) {
-            case 'logged-in':
-                return LogIn;
-            case 'member-updated':
-                return UserCog;
-            case 'member-created':
-                return UserPlus;
-            case 'member-deleted':
-                return UserMinus;
-            case 'member-synced':
-                return RefreshCcw;
-            default:
-                return LogIn;
-        }
+        const icons = {
+            'logged-in': LogIn,
+            'member-updated': UserCog,
+            'member-created': UserPlus,
+            'member-deleted': UserMinus,
+            'member-synced': RefreshCcw
+        } as const;
+        
+        return icons[type as keyof typeof icons] || LogIn;
     };
 
     return (
@@ -58,12 +64,17 @@ export default async function EventLog(props: {
             <div className="flex flex-1 flex-col gap-4 p-4">
                 <div className="mx-auto w-full space-y-4">
                     <div className="flex items-center justify-between">
-                        <h1 className="text-2xl font-bold">Event Log</h1>
+                        <h1 className="text-2xl font-bold text-foreground">Event Log</h1>
                     </div>
 
                     <div className="flex items-center gap-4">
                         <Search placeholder='Search events...' />
-                        <Filter target="type" options={[{ 'logged-in': 'Logged In' }, { 'member-updated': 'Member Updated' }, { 'member-created': 'Member Created' }, { 'member-deleted': 'Member Deleted' }, { 'member-synced': 'Member Synced' }]} placeholder="Type" defaultValue="all" />
+                        <Filter 
+                            target="type" 
+                            options={eventTypes} 
+                            placeholder="Type" 
+                            defaultValue="all" 
+                        />
                     </div>
 
                     <div className="rounded-md border">

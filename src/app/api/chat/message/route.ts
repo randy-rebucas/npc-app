@@ -1,12 +1,12 @@
 import Chat from "@/app/models/Chat";
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-import { authOptions } from "../../auth/[...nextauth]/options";
+import { getLogtoContext } from "@logto/next/server-actions";
+import { logtoConfig } from "@/app/logto";
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
       {
         $push: {
           messages: {
-            sender: session.user.id, // You'll need to get this from the session/auth
+            sender: claims?.id,
             content,
             isAgent: false,
             timestamp: new Date()

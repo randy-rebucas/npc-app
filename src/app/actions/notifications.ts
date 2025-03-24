@@ -1,6 +1,7 @@
 import connect from "@/lib/db";
 import Notification from "@/app/models/Notification";
-
+import { handleAsync } from '@/lib/errorHandler';
+import { DatabaseError, ValidationError } from '@/lib/errors';
 
 export async function createNotification({
   userId,
@@ -13,19 +14,25 @@ export async function createNotification({
   message: string;
   link?: string;
 }) {
-  try {
-    await connect();
-    
-    const notification = await Notification.create({
-      user: userId,
-      title,
-      message,
-      link,
-    });
-
-    return notification;
-  } catch (error) {
-    console.error('Failed to create notification:', error);
-    throw error;
+  if (!userId || !title || !message) {
+    throw new ValidationError('User ID, title, and message are required');
   }
+
+  const [result, error] = await handleAsync(
+    (async () => {
+      await connect();
+      return await Notification.create({
+        user: userId,
+        title,
+        message,
+        link,
+      });
+    })()
+  );
+
+  if (error) {
+    throw new DatabaseError(`Failed to create notification: ${error.message}`);
+  }
+
+  return result;
 } 

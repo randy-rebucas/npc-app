@@ -6,16 +6,12 @@ import Search from "@/components/find-match/Search";
 import Profile from "@/components/profile";
 import Link from "next/link";
 import Image from "next/image";
-import { ExternalLink } from "lucide-react";
-import { useSession } from "next-auth/react";
 
 interface HeaderProps {
   showSearch?: boolean;
 }
 
 export default function Header({ showSearch = false }: HeaderProps) {
-  const { data: session } = useSession(); 
-
   return (
     <header className="w-full top-0 z-50 bg-background/90 border-b border-border shadow-sm backdrop-blur-md">
       <nav className="mx-auto px-4 sm:px-6 lg:px-8">
@@ -29,11 +25,6 @@ export default function Header({ showSearch = false }: HeaderProps) {
             )}
           </div>
           <div className="flex items-center gap-6">
-            {session?.user?.role === "ADMIN" && (
-              <Link href="/admin" target="_blank">
-                  <ExternalLink className="h-6 w-6 text-foreground hover:text-primary transition-colors" />
-              </Link>
-            )}
             <HelpMenu />
             <Notifications />
             <Profile /> 

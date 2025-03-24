@@ -1,4 +1,3 @@
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import {
   CollaborationRequest,
   CollaborationRequestStatus,
@@ -12,18 +11,19 @@ import Offer, {
 import { OfferStatus } from "@/app/models/Offer";
 import User from "@/app/models/User";
 import Notification from "@/app/models/Notification";
-import { EmailService } from "@/lib/email";
-import { getServerSession } from "next-auth/next";
+// import { EmailService } from "@/lib/email";
 import { NextResponse } from "next/server";
 import Template from "@/app/models/Template";
+import { logtoConfig } from "@/app/logto";
+import { getLogtoContext } from "@logto/next/server-actions";
 
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -49,7 +49,7 @@ export async function POST(
     // Create the offer
     const offer = new Offer({
       nursePractitionerUser: collaborationRequest.npUser._id.toString(),
-      physicianUser: session.user.id,
+      physicianUser: claims?.id,
 
       // Compensation details
       baseSalary: 100000,
@@ -127,20 +127,20 @@ export async function POST(
       }
 
       // Send email to NP
-      const emailService = new EmailService(); 
-      await emailService.sendEmail({
-        to: { email: npUser.email },
-        subject: template?.name || "Offer Sent",
-        htmlContent: template?.content || "<p>Your offer has been sent</p>",
-        sender: {
-          name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
-          email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
-        },
-        replyTo: {
-          name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
-          email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
-        },
-      });
+      // const emailService = new EmailService(); 
+      // await emailService.sendEmail({
+      //   to: { email: npUser.email },
+      //   subject: template?.name || "Offer Sent",
+      //   htmlContent: template?.content || "<p>Your offer has been sent</p>",
+      //   sender: {
+      //     name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+      //     email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
+      //   },
+      //   replyTo: {
+      //     name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+      //     email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
+      //   },
+      // });
 
       return NextResponse.json({
         success: true,

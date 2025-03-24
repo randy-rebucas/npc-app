@@ -12,7 +12,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useOnBoardingStore } from '@/lib/store/onBoardingStore';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useSession } from "@/providers/logto-session-provider";
 import { checkFileType } from '@/lib/utils';
 import * as z from 'zod';
 
@@ -20,7 +20,7 @@ export default function PhysicianOnboardingPage() {
     const [currentStep, setCurrentStep] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const { data: session } = useSession();
+    const { claims } = useSession();
     const router = useRouter();
 
     // Get the onboarding state from the store
@@ -29,10 +29,10 @@ export default function PhysicianOnboardingPage() {
 
     // Update the onboarding state with the user's email if they are logged in
     useEffect(() => {
-        if (session?.user) {
-            updateFields({ email: session.user.email });
+        if (claims?.sub) {
+            // updateFields({ email: user.email });
         }
-    }, [session, updateFields]);
+    }, [claims?.sub, updateFields]);
 
     // Define the maximum file size for uploads
     const MAX_FILE_SIZE = 5000000;

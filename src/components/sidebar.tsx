@@ -1,21 +1,23 @@
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar"
 
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/app/api/auth/[...nextauth]/options"
-import { getUserByEmail } from "@/app/actions/user"
-
+import { getLogtoContext } from "@logto/next/server-actions";
+import { logtoConfig } from "@/app/logto";
 import Nav from "./nav"
 
 export async function AppSidebar() {
-    const session = await getServerSession(authOptions)
-    const user = session?.user?.email ? await getUserByEmail(session.user.email) : null
-
+    const { claims } = await getLogtoContext(logtoConfig, { fetchUserInfo: true });
+    // const user = claims?.sub ? await getUserByEmail(claims.sub) : null
+    const user = {
+        username: claims?.name,
+        email: claims?.email,
+        profilePhotoPath: claims?.picture,
+    }
     return (
         <aside className="flex h-screen w-72 flex-col bg-card/50 backdrop-blur-xl border-r border-border">
             {/* Header */}
             <div className="p-6 flex items-center gap-3">
                 <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={user?.profile?.profilePhotoPath} alt={user?.username} />
+                    <AvatarImage src={user?.profilePhotoPath || ""} alt={user?.username || ""} />
                     <AvatarFallback className="rounded-lg">{user?.username?.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="min-w-0">

@@ -72,36 +72,26 @@ export type Certification = {
 export interface OnboardingFormData {
     id?: string;
     // Step 1: User Information
-    firstName: string;
-    lastName: string;
-    phone: string;
-    email: string;
+    userProfile: UserProfile;
+    
     // Step 2: License Information
-    medicalLicenseStates: License[];
-    deaLicenseStates: License[];
+    licenseAndCertification: LicenseAndCertification;
   
     // Step 3: Clinical Practice Types
     practiceTypes: string[];
-    npiNumber: string;
+    npiNumber: NpiNumber['npiNumber'];
 
     // Step 4: Rate Matrix
-    monthlyCollaborationRate: number;
-    additionalStateFee: number;
-    additionalNPFee: number;
-    controlledSubstancesMonthlyFee: number;
-    controlledSubstancesPerPrescriptionFee: number;
+    rateMatrix: RateMatrix;
   
     // Step 5: Background & Certifications
-    description: string;
-    boardCertification: string;
-    additionalCertifications: Certification[];
-    linkedinProfile: string;
+    backgroundCertification: BackgroundCertification;
   
     // Step 6: Profile Photo
     profilePhotoPath: string;
-    profilePhotoUrl: File | null;
+    profilePhoto: ProfilePhotoUrl;
   
     // Step 7: Government ID
     governmentIdPath: string;
-    governmentIdUrl: File | null;
-  }
+    governmentId: GovernmentIdUrl;
+}

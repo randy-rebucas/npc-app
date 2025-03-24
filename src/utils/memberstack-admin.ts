@@ -12,15 +12,33 @@ interface CreateMember {
   }[];
 }
 
+interface UpdateMember {
+  email?: string;
+  customFields?: object;
+  metaData?: object;
+  json?: object;
+  loginRedirect?: string;
+}
+
+interface PlanOperation {
+  planId: string;
+}
+
 export class MemberstackAdminService {
-  // Get member by ID
+  /**
+   * Retrieves a member by their ID
+   * @param memberId - The unique identifier of the member
+   * @throws {Error} If member retrieval fails
+   */
   static async getMemberById(memberId: string) {
+    if (!memberId) throw new Error('Member ID is required');
+    
     try {
       const member = await memberstack.members.retrieve({ id: memberId });
       return member;
     } catch (error) {
       console.error("Error getting member:", error);
-      throw error;
+      throw new Error(`Failed to retrieve member with ID ${memberId}`);
     }
   }
 
@@ -46,18 +64,27 @@ export class MemberstackAdminService {
     }
   }
 
-  // Update member
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  static async updateMember(memberId: string, updateData: any) {
+  /**
+   * Updates a member's information
+   * @param memberId - The unique identifier of the member
+   * @param updateData - The data to update
+   * @throws {Error} If member update fails
+   */
+  static async updateMember(memberId: string, updateData: UpdateMember) {
+    if (!memberId) throw new Error('Member ID is required');
+    if (!updateData || Object.keys(updateData).length === 0) {
+      throw new Error('Update data is required');
+    }
+
     try {
       const updated = await memberstack.members.update({
         id: memberId,
-        ...updateData,
+        data: updateData,
       });
       return updated;
     } catch (error) {
       console.error("Error updating member:", error);
-      throw error;
+      throw new Error(`Failed to update member with ID ${memberId}`);
     }
   }
 
@@ -72,19 +99,25 @@ export class MemberstackAdminService {
     }
   }
 
-  // Add member to plan
+  /**
+   * Adds a member to a plan
+   * @param memberId - The unique identifier of the member
+   * @param planId - The unique identifier of the plan
+   * @throws {Error} If adding plan fails
+   */
   static async addMemberToPlan(memberId: string, planId: string) {
+    if (!memberId) throw new Error('Member ID is required');
+    if (!planId) throw new Error('Plan ID is required');
+
     try {
       const updated = await memberstack.members.addFreePlan({
         id: memberId,
-        data: {
-          planId: planId,
-        },
+        data: { planId } as PlanOperation,
       });
       return updated;
     } catch (error) {
       console.error("Error adding plan to member:", error);
-      throw error;
+      throw new Error(`Failed to add plan ${planId} to member ${memberId}`);
     }
   }
 
@@ -104,8 +137,17 @@ export class MemberstackAdminService {
     }
   }
 
-  // List all members with pagination
+  /**
+   * Lists all members with pagination
+   * @param after - The pagination cursor
+   * @param limit - The number of members to return
+   * @throws {Error} If listing members fails
+   */
   static async listMembers(after = 1, limit = 10) {
+    if (limit < 1 || limit > 100) {
+      throw new Error('Limit must be between 1 and 100');
+    }
+
     try {
       const members = await memberstack.members.list({
         after,
@@ -114,7 +156,7 @@ export class MemberstackAdminService {
       return members;
     } catch (error) {
       console.error("Error listing members:", error);
-      throw error;
+      throw new Error('Failed to list members');
     }
   }
 }

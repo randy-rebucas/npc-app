@@ -1,12 +1,17 @@
 "use client";
 
-import { signOut } from "next-auth/react";
 import { LogOut } from "lucide-react";
 
-export function SignOut() {
+type Props = {
+    onSignOut: () => Promise<void>;
+};
+
+export function SignOut({ onSignOut }: Props) {
     return (
-        <button 
-            onClick={() => signOut({ callbackUrl: "/" })}
+        <button
+            onClick={() => {
+                onSignOut();
+            }}
             aria-label="Sign out"
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full relative"
         >

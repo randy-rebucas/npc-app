@@ -1,20 +1,20 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { NextResponse } from "next/server";
 import { CollaborationRequest } from "@/app/models/Collaboration";
 import connect from "@/lib/db";
+import { logtoConfig } from "@/app/logto";
+import { getLogtoContext } from "@logto/next/server-actions";
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     await connect();
 
     const collaborationRequests = await CollaborationRequest.find({
-      physicianUser: session.user.id,
+      physicianUser: claims?.id,
     //   status: 'pending',
     }).populate({
       path: "npUser",
