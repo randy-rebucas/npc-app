@@ -113,12 +113,16 @@ export async function updateUserCustomData(userId: string, customData: Partial<I
   if (!userId || !customData) {
     throw new ValidationError("User ID and custom data are required");
   }
-
+  
   const data = await logtoFetch(`users/${userId}/custom-data`, {
     method: 'PATCH',
-    body: JSON.stringify(customData),
+    body: JSON.stringify({
+      customData: {
+        role: customData.role,
+      },
+    }),
   });
-
+  
   return data;
 }
 

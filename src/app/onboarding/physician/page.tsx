@@ -45,19 +45,23 @@ export default function PhysicianOnboardingPage() {
             description: 'Please provide your basic information',
             component: UserInformationForm,
             formSchema: z.object({
-                firstName: z.string().min(2, 'First name must be at least 2 characters'),
-                lastName: z.string().min(2, 'Last name must be at least 2 characters'),
-                phone: z.string().regex(
-                    /^\+?[1-9]\d{1,14}$/,
-                    "Please enter a valid international phone number (e.g. +12125551234)"
-                ),
-                email: z.string().email('Invalid email address'),
+                profile: z.object({
+                    firstName: z.string().min(2, 'First name must be at least 2 characters'),
+                    lastName: z.string().min(2, 'Last name must be at least 2 characters'),
+                    phone: z.string().regex(
+                        /^\+?[1-9]\d{1,14}$/,
+                        "Please enter a valid international phone number (e.g. +12125551234)"
+                    ),
+                    email: z.string().email('Invalid email address'),
+                }),
             }),
             defaultValues: {
-                firstName: onBoarding.firstName ?? '',
-                lastName: onBoarding.lastName ?? '',
-                phone: onBoarding.phone ?? '',
-                email: onBoarding.email ?? '',
+                profile: {
+                    firstName: onBoarding.profile.firstName ?? '',
+                    lastName: onBoarding.profile.lastName ?? '',
+                    phone: onBoarding.profile.phone ?? '',
+                    email: onBoarding.profile.email ?? '',
+                },
             },
         },
         {
@@ -66,20 +70,24 @@ export default function PhysicianOnboardingPage() {
             description: 'Please provide your license details',
             component: LicenseInformationForm,
             formSchema: z.object({
-                medicalLicenseStates: z.array(z.object({
-                    state: z.string().min(1, "State is required"),
-                    licenseNumber: z.string().nullable(),
-                    expirationDate: z.date().nullable(),
-                })).min(1, "At least one medical license state is required"),
-                deaLicenseStates: z.array(z.object({
-                    state: z.string().min(1, "State is required"),
-                    licenseNumber: z.string().nullable(),
-                    expirationDate: z.date().nullable(),
-                })).min(1, "At least one DEA license state is required"),
+                licenseAndCertification: z.object({
+                    medicalLicenseStates: z.array(z.object({
+                        state: z.string().min(1, "State is required"),
+                        licenseNumber: z.string().nullable(),
+                        expirationDate: z.date().nullable(),
+                    })).min(1, "At least one medical license state is required"),
+                    deaLicenseStates: z.array(z.object({
+                        state: z.string().min(1, "State is required"),
+                        licenseNumber: z.string().nullable(),
+                        expirationDate: z.date().nullable(),
+                    })).min(1, "At least one DEA license state is required"),
+                }),
             }),
             defaultValues: {
-                medicalLicenseStates: onBoarding.medicalLicenseStates ?? [],
-                deaLicenseStates: onBoarding.deaLicenseStates ?? [],
+                licenseAndCertification: {
+                    medicalLicenseStates: onBoarding.licenseAndCertification.medicalLicenseStates ?? [],
+                    deaLicenseStates: onBoarding.licenseAndCertification.deaLicenseStates ?? [],
+                },
             },
         },
         {
@@ -102,16 +110,22 @@ export default function PhysicianOnboardingPage() {
             description: 'Set your rates and availability',
             component: RateMatrixForm,
             formSchema: z.object({
-                monthlyCollaborationRate: z.number().min(0, "Monthly collaboration rate must be greater than 0"),
-                additionalStateFee: z.number().min(0, "Additional state fee must be greater than 0"),
-                additionalNPFee: z.number().min(0, "Additional NP fee must be greater than 0"),
-                controlledSubstancesMonthlyFee: z.number().min(0, "Controlled substances monthly fee must be greater than 0")
+                rateMatrix: z.object({
+                    monthlyCollaborationRate: z.number().min(0, "Monthly collaboration rate must be greater than 0"),
+                    additionalStateFee: z.number().min(0, "Additional state fee must be greater than 0"),
+                    additionalNPFee: z.number().min(0, "Additional NP fee must be greater than 0"),
+                    controlledSubstancesMonthlyFee: z.number().min(0, "Controlled substances monthly fee must be greater than 0"),
+                    controlledSubstancesPerPrescriptionFee: z.number().min(0, "Controlled substances per prescription fee must be greater than 0"),
+                }),
             }),
             defaultValues: {
-                monthlyCollaborationRate: onBoarding.monthlyCollaborationRate ?? 0,
-                additionalStateFee: onBoarding.additionalStateFee ?? 0,
-                additionalNPFee: onBoarding.additionalNPFee ?? 0,
-                controlledSubstancesMonthlyFee: onBoarding.controlledSubstancesMonthlyFee ?? 0
+                rateMatrix: {
+                    monthlyCollaborationRate: onBoarding.rateMatrix.monthlyCollaborationRate ?? 0,
+                    additionalStateFee: onBoarding.rateMatrix.additionalStateFee ?? 0,
+                    additionalNPFee: onBoarding.rateMatrix.additionalNPFee ?? 0,
+                    controlledSubstancesMonthlyFee: onBoarding.rateMatrix.controlledSubstancesMonthlyFee ?? 0,
+                    controlledSubstancesPerPrescriptionFee: onBoarding.rateMatrix.controlledSubstancesPerPrescriptionFee ?? 0,
+                },
             },
         },
         {
@@ -120,22 +134,26 @@ export default function PhysicianOnboardingPage() {
             description: 'Upload your certifications and background information',
             component: BackgroundCertificationsForm,
             formSchema: z.object({
-                description: z.string().min(10, "Description must be at least 10 characters"),
-                boardCertification: z.string().min(1, "Board certification is required"),
-                additionalCertifications: z.array(z.object({
-                    certification: z.string().min(1, "Certification is required"),
-                    issueDate: z.date().nullable(),
-                    expirationDate: z.date().nullable(),
-                    certificateUrl: z.any().nullable(),
-                    certificateNumber: z.string().nullable(),
-                })).min(1, "At least one additional certification is required"),
-                linkedinProfile: z.string().url("Invalid LinkedIn profile URL"),
+                backgroundCertification: z.object({
+                    description: z.string().min(10, "Description must be at least 10 characters"),
+                    boardCertification: z.string().min(1, "Board certification is required"),
+                    additionalCertifications: z.array(z.object({
+                        certification: z.string().min(1, "Certification is required"),
+                        issueDate: z.date().nullable(),
+                        expirationDate: z.date().nullable(),
+                        certificateUrl: z.any().nullable(),
+                        certificateNumber: z.string().nullable(),
+                    })).min(1, "At least one additional certification is required"),
+                    linkedinProfile: z.string().url("Invalid LinkedIn profile URL"),
+                }),
             }),
             defaultValues: {
-                description: onBoarding.description ?? '',
-                boardCertification: onBoarding.boardCertification ?? '',
-                additionalCertifications: onBoarding.additionalCertifications ?? [],
-                linkedinProfile: onBoarding.linkedinProfile ?? '',
+                backgroundCertification: {
+                    description: onBoarding.backgroundCertification.description ?? '',
+                    boardCertification: onBoarding.backgroundCertification.boardCertification ?? '',
+                    additionalCertifications: onBoarding.backgroundCertification.additionalCertifications ?? [],
+                    linkedinProfile: onBoarding.backgroundCertification.linkedinProfile ?? '',
+                },
             },
         },
         {
@@ -144,7 +162,7 @@ export default function PhysicianOnboardingPage() {
             description: 'Upload your professional photo',
             component: ProfilePhotoForm,
             formSchema: z.object({
-                photo: z.any(),
+                profilePhotoPath: z.string().min(1, "Profile photo path is required"),
                 profilePhotoUrl: z.any()
                     .refine((file: File) => file != null, "Profile Photo is required")
                     .refine((file) => file.size < MAX_FILE_SIZE, "Max size is 5MB.")
@@ -222,7 +240,7 @@ export default function PhysicianOnboardingPage() {
         try {
             setIsSubmitting(true);
             const finalData = useOnBoardingStore.getState().onBoarding;
-
+            console.log(finalData);
             // First submit the JSON data
             const jsonResponse = await fetch('/api/onboarding', {
                 method: 'POST',
@@ -231,7 +249,7 @@ export default function PhysicianOnboardingPage() {
                 },
                 body: JSON.stringify({
                     ...finalData,
-                    userId: session?.user.id
+                    userId: claims?.sub
                 }),
             });
 

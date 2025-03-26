@@ -35,7 +35,7 @@ export default function LicenseInformationForm({ form }: FormStepProps) {
     <div className='flex flex-col gap-2'>
       <FormField
         control={form.control}
-        name="medicalLicenseStates"
+        name="licenseAndCertification.medicalLicenseStates"
         render={({ field }) => (
           <FormItem>
             <FormLabel>States with Medical License</FormLabel>
@@ -46,13 +46,16 @@ export default function LicenseInformationForm({ form }: FormStepProps) {
                   label: state,
                   value: state,
                 }))}
-                value={onBoarding.medicalLicenseStates.map(license => license.state)}
+                value={onBoarding.licenseAndCertification.medicalLicenseStates.map(license => license.state)}
                 onValueChange={(values) => updateFields({
-                  medicalLicenseStates: values.map(state => ({
-                    state,
-                    licenseNumber: "",
-                    expirationDate: null
-                  }))
+                  licenseAndCertification: {
+                    ...onBoarding.licenseAndCertification,
+                    medicalLicenseStates: values.map(state => ({
+                      state,
+                      licenseNumber: "",
+                      expirationDate: null
+                    }))
+                  }
                 })}
               />
             </FormControl>
@@ -63,7 +66,7 @@ export default function LicenseInformationForm({ form }: FormStepProps) {
 
       <FormField
         control={form.control}
-        name="deaLicenseStates"
+        name="licenseAndCertification.deaLicenseStates"
         render={({ field }) => (
           <FormItem>
             <FormLabel>States with DEA License</FormLabel>
@@ -74,13 +77,16 @@ export default function LicenseInformationForm({ form }: FormStepProps) {
                   label: state,
                   value: state,
                 }))}
-                value={onBoarding.deaLicenseStates.map(license => license.state)}
+                value={onBoarding.licenseAndCertification.deaLicenseStates.map(license => license.state)}
                 onValueChange={(values) => updateFields({
-                  deaLicenseStates: values.map(state => ({
-                    state,
-                    licenseNumber: "",
-                    expirationDate: null
-                  }))
+                  licenseAndCertification: {
+                    ...onBoarding.licenseAndCertification,
+                    deaLicenseStates: values.map(state => ({
+                      state,
+                      licenseNumber: "",
+                      expirationDate: null
+                    }))
+                  }
                 })}
               />
             </FormControl>

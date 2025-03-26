@@ -28,7 +28,7 @@ export default function BackgroundCertificationsForm({
     <div className='flex flex-col gap-2'>
       <FormField
         control={form.control}
-        name="description"
+        name="backgroundCertification.description"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Professional Description</FormLabel>
@@ -36,8 +36,8 @@ export default function BackgroundCertificationsForm({
               <Textarea
                 {...field}
                 placeholder="Describe your professional background and experience..."
-                value={onBoarding.description}
-                onChange={(e) => updateFields({ description: e.target.value })}
+                value={onBoarding.backgroundCertification.description}
+                onChange={(e) => updateFields({ backgroundCertification: { ...onBoarding.backgroundCertification, description: e.target.value } })}
               />
             </FormControl>
             <FormMessage />
@@ -47,12 +47,12 @@ export default function BackgroundCertificationsForm({
 
       <FormField
         control={form.control}
-        name="boardCertification"
+        name="backgroundCertification.boardCertification"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Board Certification</FormLabel>
             <FormControl>
-              <Input {...field} value={onBoarding.boardCertification} onChange={(e) => updateFields({ boardCertification: e.target.value })} />
+              <Input {...field} value={onBoarding.backgroundCertification.boardCertification} onChange={(e) => updateFields({ backgroundCertification: { ...onBoarding.backgroundCertification, boardCertification: e.target.value } })} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -61,7 +61,7 @@ export default function BackgroundCertificationsForm({
 
       <FormField
         control={form.control}
-        name="additionalCertifications"
+        name="backgroundCertification.additionalCertifications"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Additional Certifications</FormLabel>
@@ -74,15 +74,18 @@ export default function BackgroundCertificationsForm({
                   { label: 'PALS', value: 'PALS' },
                   // Add more certification options as needed
                 ]}
-                value={onBoarding.additionalCertifications.map(cert => cert.certification)}
+                value={onBoarding.backgroundCertification.additionalCertifications.map(cert => cert.certification)}
                 onValueChange={(value) => updateFields({
-                  additionalCertifications: value.map(cert => ({
-                    certification: cert,
-                    issueDate: new Date(),
-                    expirationDate: new Date(),
-                    certificateUrl: "",
-                    certificateNumber: "",
-                  }))
+                  backgroundCertification: {
+                    ...onBoarding.backgroundCertification,
+                    additionalCertifications: value.map(cert => ({
+                      certification: cert,
+                      issueDate: new Date(),
+                      expirationDate: new Date(),
+                      certificateUrl: "",
+                      certificateNumber: "",
+                    }))
+                  }
                 })}
               />
             </FormControl>
@@ -93,12 +96,12 @@ export default function BackgroundCertificationsForm({
 
       <FormField
         control={form.control}
-        name="linkedinProfile"
+        name="backgroundCertification.linkedinProfile"
         render={({ field }) => (
           <FormItem>
             <FormLabel>LinkedIn Profile URL</FormLabel>
             <FormControl>
-              <Input {...field} placeholder="https://linkedin.com/in/..." value={onBoarding.linkedinProfile} onChange={(e) => updateFields({ linkedinProfile: e.target.value })} />
+              <Input {...field} placeholder="https://linkedin.com/in/..." value={onBoarding.backgroundCertification.linkedinProfile} onChange={(e) => updateFields({ backgroundCertification: { ...onBoarding.backgroundCertification, linkedinProfile: e.target.value } })} />
             </FormControl>
             <FormMessage />
           </FormItem>

@@ -26,12 +26,12 @@ export default function RateMatrixForm({ form }: FormStepProps) {
     <div className='flex flex-col gap-2'>
       <FormField
         control={form.control}
-        name="monthlyCollaborationRate"
+        name="rateMatrix.monthlyCollaborationRate"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Monthly Base Collaboration Rate ($)</FormLabel>
             <FormControl>
-              <Input type="number" {...field} value={onBoarding.monthlyCollaborationRate} onChange={e => updateFields({ monthlyCollaborationRate: parseFloat(e.target.value) })} />
+              <Input type="number" {...field} value={onBoarding.rateMatrix.monthlyCollaborationRate} onChange={e => updateFields({ rateMatrix: { ...onBoarding.rateMatrix, monthlyCollaborationRate: parseFloat(e.target.value) } })} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -40,12 +40,12 @@ export default function RateMatrixForm({ form }: FormStepProps) {
 
       <FormField
         control={form.control}
-        name="additionalStateFee"
+        name="rateMatrix.additionalStateFee"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Additional State Fee ($)</FormLabel>
             <FormControl>
-              <Input type="number" {...field} value={onBoarding.additionalStateFee} onChange={e => updateFields({ additionalStateFee: parseFloat(e.target.value) })} />
+              <Input type="number" {...field} value={onBoarding.rateMatrix.additionalStateFee} onChange={e => updateFields({ rateMatrix: { ...onBoarding.rateMatrix, additionalStateFee: parseFloat(e.target.value) } })} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -54,12 +54,12 @@ export default function RateMatrixForm({ form }: FormStepProps) {
 
       <FormField
         control={form.control}
-        name="additionalNPFee"
+        name="rateMatrix.additionalNPFee"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Additional Nurse Practitioner Fee ($)</FormLabel>
             <FormControl>
-              <Input type="number" {...field} value={onBoarding.additionalNPFee} onChange={e => updateFields({ additionalNPFee: parseFloat(e.target.value) })} />
+              <Input type="number" {...field} value={onBoarding.rateMatrix.additionalNPFee} onChange={e => updateFields({ rateMatrix: { ...onBoarding.rateMatrix, additionalNPFee: parseFloat(e.target.value) } })} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -68,12 +68,12 @@ export default function RateMatrixForm({ form }: FormStepProps) {
 
       <FormField
         control={form.control}
-        name="controlledSubstancesMonthlyFee"
+        name="rateMatrix.controlledSubstancesMonthlyFee"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Controlled Substances Monthly Fee ($)</FormLabel>
             <FormControl>
-              <Input type="number" {...field} value={onBoarding.controlledSubstancesMonthlyFee} onChange={e => updateFields({ controlledSubstancesMonthlyFee: parseFloat(e.target.value) })} />
+              <Input type="number" {...field} value={onBoarding.rateMatrix.controlledSubstancesMonthlyFee} onChange={e => updateFields({ rateMatrix: { ...onBoarding.rateMatrix, controlledSubstancesMonthlyFee: parseFloat(e.target.value) } })} />
             </FormControl>
             <FormMessage />
           </FormItem>

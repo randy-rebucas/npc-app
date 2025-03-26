@@ -72,7 +72,7 @@ export type Certification = {
 export interface OnboardingFormData {
     id?: string;
     // Step 1: User Information
-    userProfile: UserProfile;
+    profile: UserProfile;
     
     // Step 2: License Information
     licenseAndCertification: LicenseAndCertification;
@@ -89,9 +89,9 @@ export interface OnboardingFormData {
   
     // Step 6: Profile Photo
     profilePhotoPath: string;
-    profilePhoto: ProfilePhotoUrl;
+    profilePhotoUrl: File | null;
   
     // Step 7: Government ID
     governmentIdPath: string;
-    governmentId: GovernmentIdUrl;
+    governmentIdUrl: File | null;
 }

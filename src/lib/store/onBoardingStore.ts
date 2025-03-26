@@ -12,27 +12,35 @@ export type Actions = {
 };
 
 export const INITIAL_ON_BOARDING_DATA: OnboardingFormData = {
-  firstName: "",
-  lastName: "",
-  phone: "",
-  email: "",
-  medicalLicenseStates: [],
-  deaLicenseStates: [],
+  profile: {
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
+  },
+  licenseAndCertification: {
+    medicalLicenseStates: [],
+    deaLicenseStates: [],
+  },
   practiceTypes: [],
   npiNumber: "",
-  monthlyCollaborationRate: 0,
-  additionalStateFee: 0,
-  additionalNPFee: 0,
-  controlledSubstancesMonthlyFee: 0,
-  controlledSubstancesPerPrescriptionFee: 0,
-  description: "",
-  boardCertification: "",
-  additionalCertifications: [],
-  linkedinProfile: "",
-  profilePhotoPath: "",
+  rateMatrix: {
+    monthlyCollaborationRate: 0,
+    additionalStateFee: 0,
+    additionalNPFee: 0,
+    controlledSubstancesMonthlyFee: 0,
+    controlledSubstancesPerPrescriptionFee: 0,
+  },
+  backgroundCertification: {
+    description: "",
+    boardCertification: "",
+    additionalCertifications: [],
+    linkedinProfile: "",
+  },
   profilePhotoUrl: null,
-  governmentIdPath: "",
+  profilePhotoPath: "",
   governmentIdUrl: null,
+  governmentIdPath: "",
 };
 
 export const useOnBoardingStore = create<State & Actions>()(

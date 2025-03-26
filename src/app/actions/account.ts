@@ -7,7 +7,6 @@ export async function myAccount(): Promise<IUser> {
   const cookieStore = await cookies();
   const logtoToken = cookieStore.get("logtoToken");
 
-  console.log(logtoToken);
   if (!logtoToken?.value) {
     throw new Error("Authentication token not found");
   }
@@ -19,7 +18,7 @@ export async function myAccount(): Promise<IUser> {
     },
   });
   const data = await response.json();
-  console.log(data);
+
   return data;
 }
 

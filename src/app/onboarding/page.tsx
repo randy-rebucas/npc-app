@@ -4,7 +4,7 @@ import { useSession } from "@/providers/logto-session-provider";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Stethoscope, Syringe } from "lucide-react";
-
+import { updateUserCustomData } from "../actions/user";
 export default function OnboardingPage() {
     const { claims } = useSession();
     const router = useRouter();
@@ -17,22 +17,11 @@ export default function OnboardingPage() {
 
         setIsSubmitting(true);
         try {
-            const response = await fetch(`/api/user/${claims.sub}/onboarding`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ role: selectedRole }),
-            });
+            const response = await updateUserCustomData(claims.sub, { role: selectedRole });
+            console.log(response);
+            if (!response.role) throw new Error('Failed to update user role');
 
-            if (!response.ok) throw new Error('Failed to update user role');
-
-            // await update();
-            if (selectedRole === 'PHYSICIAN') {
-                router.push('/onboarding/physician');
-            } else if (selectedRole === 'NURSE_PRACTITIONER') {
-                router.push('/onboarding/nurse-practitioner');
-            }
+            router.push(`/onboarding/${response.role}`);
         } catch (error) {
             console.error('Error updating role:', error);
         } finally {
@@ -47,25 +36,25 @@ export default function OnboardingPage() {
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div
                             className={`relative rounded-lg border-2 p-4 cursor-pointer transition-all duration-200 ${
-                                selectedRole === 'PHYSICIAN'
+                                selectedRole === 'physician'
                                     ? 'border-primary bg-primary/10'
                                     : 'border-border hover:border-primary/50'
                             }`}
-                            onClick={() => setSelectedRole('PHYSICIAN')}
+                            onClick={() => setSelectedRole('physician')}
                         >
                             <input
                                 type="radio"
-                                id="PHYSICIAN"
+                                id="physician"
                                 name="role"
-                                value="PHYSICIAN"
-                                checked={selectedRole === 'PHYSICIAN'}
+                                value="physician"
+                                checked={selectedRole === 'physician'}
                                 onChange={(e) => setSelectedRole(e.target.value)}
                                 className="sr-only"
                             />
                             <div className="flex flex-col items-center p-4">
                                 <Stethoscope className="h-12 w-12 text-primary mb-3" />
                                 <label
-                                    htmlFor="PHYSICIAN"
+                                    htmlFor="physician"
                                     className="text-base font-medium text-foreground"
                                 >
                                     Physician
@@ -75,25 +64,25 @@ export default function OnboardingPage() {
 
                         <div
                             className={`relative rounded-lg border-2 p-4 cursor-pointer transition-all duration-200 ${
-                                selectedRole === 'NURSE_PRACTITIONER'
+                                selectedRole === 'nurse-practitioner'
                                     ? 'border-primary bg-primary/10'
                                     : 'border-border hover:border-primary/50'
                             }`}
-                            onClick={() => setSelectedRole('NURSE_PRACTITIONER')}
+                            onClick={() => setSelectedRole('nurse-practitioner')}
                         >
                             <input
                                 type="radio"
-                                id="NURSE_PRACTITIONER"
+                                id="nurse-practitioner"
                                 name="role"
-                                value="NURSE_PRACTITIONER"
-                                checked={selectedRole === 'NURSE_PRACTITIONER'}
+                                value="nurse-practitioner"
+                                checked={selectedRole === 'nurse-practitioner'}
                                 onChange={(e) => setSelectedRole(e.target.value)}
                                 className="sr-only"
                             />
                             <div className="flex flex-col items-center p-4">
                                 <Syringe className="h-12 w-12 text-primary mb-3" />
                                 <label
-                                    htmlFor="NURSE_PRACTITIONER"
+                                    htmlFor="nurse-practitioner"
                                     className="text-base font-medium text-foreground"
                                 >
                                     Nurse Practitioner

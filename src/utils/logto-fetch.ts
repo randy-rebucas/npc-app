@@ -10,11 +10,11 @@ import { cookies } from "next/headers";
 export async function logtoFetch(endpoint: string, options: RequestInit = {}) {
     const cookieStore = await cookies();
     const logtoToken = cookieStore.get("logtoToken");
-  
+
     if (!logtoToken?.value) {
       throw new Error("Authentication token not found");
     }
-  
+
     const response = await fetch(`${process.env.LOGTO_ENDPOINT}api/${endpoint}`, {
       ...options,
       headers: {
@@ -23,6 +23,8 @@ export async function logtoFetch(endpoint: string, options: RequestInit = {}) {
         ...options.headers,
       },
     });
+
+    console.log(response);
   
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

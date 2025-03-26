@@ -24,12 +24,12 @@ export default function UserInformationForm({ form }: FormStepProps) {
     <div className='flex flex-col gap-2'>
       <FormField
         control={form.control}
-        name="firstName"
+        name="profile.firstName"
         render={({ field }) => (
           <FormItem>
             <FormLabel>First Name</FormLabel>
             <FormControl>
-              <Input {...field} value={onBoarding.firstName} onChange={(e) => updateFields({ firstName: e.target.value })} />
+              <Input {...field} value={onBoarding.profile.firstName} onChange={(e) => updateFields({ profile: { ...onBoarding.profile, firstName: e.target.value } })} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -38,12 +38,12 @@ export default function UserInformationForm({ form }: FormStepProps) {
 
       <FormField
         control={form.control}
-        name="lastName"
+        name="profile.lastName"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Last Name</FormLabel>
             <FormControl>
-              <Input {...field} value={onBoarding.lastName} onChange={(e) => updateFields({ lastName: e.target.value })} />
+              <Input {...field} value={onBoarding.profile.lastName} onChange={(e) => updateFields({ profile: { ...onBoarding.profile, lastName: e.target.value } })} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -52,12 +52,12 @@ export default function UserInformationForm({ form }: FormStepProps) {
 
       <FormField
         control={form.control}
-        name="phone"
+        name="profile.phone"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Phone number</FormLabel>
             <FormControl>
-              <Input {...field} value={onBoarding.phone} onChange={(e) => updateFields({ phone: e.target.value })} />
+              <Input {...field} value={onBoarding.profile.phone} onChange={(e) => updateFields({ profile: { ...onBoarding.profile, phone: e.target.value } })} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -66,12 +66,12 @@ export default function UserInformationForm({ form }: FormStepProps) {
 
       <FormField
         control={form.control}
-        name="email"
+        name="profile.email"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Email</FormLabel>
             <FormControl>
-              <Input {...field} type="email" value={onBoarding.email} onChange={(e) => updateFields({ email: e.target.value })} readOnly />
+              <Input {...field} type="email" value={onBoarding.profile.email} onChange={(e) => updateFields({ profile: { ...onBoarding.profile, email: e.target.value } })} />
             </FormControl>
             <FormMessage />
           </FormItem>

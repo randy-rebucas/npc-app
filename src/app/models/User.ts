@@ -1,4 +1,11 @@
+import { Certification } from "@/lib/types/onboarding";
 import mongoose, { Schema } from "mongoose";
+
+export type License = {
+  state: string;
+  licenseNumber: string;
+  expirationDate: Date | null;
+}
 
 export enum UserRole {
   ADMIN = "ADMIN",
@@ -24,53 +31,66 @@ export interface IUserCustomData {
   onboardingStatus?: UserOnBoardingStatus;
   submissionStatus?: UserSubmissionStatus;
   canCreateListings?: boolean;
-  medicalLicenseStates?: string[];
-  deaLicenseStates?: string[];
-  npiNumber?: string;
   boardCertification?: string[];
-  practiceTypes?: string[];
   additionalCertifications?: string[];
-  governmentIdPath?: string;
   education?: string[];
+  profilePhotoPath?: string;
+  governmentIdPath?: string;
+  npiNumber?: string;
+  medicalLicenseStates?: License[];
+  deaLicenseStates?: License[];
+  practiceTypes?: string[];
+  rateMatrix?: {
+    monthlyCollaborationRate: number;
+    additionalStateFee: number;
+    additionalNPFee: number;
+    controlledSubstancesMonthlyFee: number;
+  };
+  backgroundCertification?: {
+    description: string;
+    boardCertification: string;
+    additionalCertifications: Certification[];
+    linkedinProfile: string;
+  };
 }
 
 export interface IUser {
-  id: string;
-  username: string;
-  primaryEmail: string;
-  primaryPhone: string;
-  name: string;
-  avatar: string | null;
-  customData: IUserCustomData;
-  identities: object;
-  lastSignInAt: number;
-  createdAt: number;
-  updatedAt: number;
-  profile: IUserProfile;
-  applicationId: string;
-  isSuspended: boolean;
-  hasPassword: boolean;
+  id?: string;
+  username?: string;
+  primaryEmail?: string;
+  primaryPhone?: string;
+  name?: string;
+  avatar?: string | null;
+  customData?: IUserCustomData;
+  identities?: object;
+  lastSignInAt?: number;
+  createdAt?: number;
+  updatedAt?: number;
+  profile?: IUserProfile;
+  applicationId?: string;
+  isSuspended?: boolean;
+  hasPassword?: boolean;
 }
 
 export interface IUserProfile {
   familyName: string;
   givenName: string;
-  middleName: string;
-  nickname: string;
-  preferredUsername: string;
-  profile: string;
-  website: string;
-  gender: string;
-  birthdate: string;
-  zoneinfo: string;
-  locale: string;
-  address: {
-    formatted: string;
-    streetAddress: string;
-    locality: string;
-    region: string;
-    postalCode: string;
-    country: string;
+  middleName?: string;
+  nickname?: string;
+  preferredUsername?: string;
+  profile?: string;
+  website?: string;
+  gender?: string;
+  birthdate?: string;
+  zoneinfo?: string;
+  locale?: string;
+  address?: {
+    formatted?: string;
+    streetAddress?: string;
+    locality?: string;
+    region?: string;
+    postalCode?: string;
+    country?: string;
   };
 }
 
