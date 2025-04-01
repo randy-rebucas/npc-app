@@ -7,7 +7,7 @@ import { useSession } from "@/providers/logto-session-provider";
 export default function Layout({ children }: { children: React.ReactNode }) {
     const { claims } = useSession();
 
-    if (claims?.role !== "NURSE_PRACTITIONER") {
+    if (claims?.customData?.role !== "nurse-practitioner") {
         redirect("/np/main");
     }
 

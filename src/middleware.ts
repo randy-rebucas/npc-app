@@ -100,7 +100,7 @@ export async function middleware(req: NextRequest) {
     const isAdminRoute = req.nextUrl.pathname.startsWith("/admin");
     const isAdmin = customClaims?.role === "admin";
 
-    if (customClaims?.hasOwnProperty("role")) {
+    if (!customClaims?.hasOwnProperty("role")) {
       // Handle route access
       if (isAdminRoute && !isAdmin) {
         console.warn(`Unauthorized admin access attempt by user ${claims.sub}`);

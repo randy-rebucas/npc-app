@@ -72,12 +72,10 @@ export async function updateUser(userId: string, userData: Partial<IUser>): Prom
   if (!userId || !userData || Object.keys(userData).length === 0) {
     throw new ValidationError("User ID and valid update data are required");
   }
-
   const data = await logtoFetch(`users/${userId}`, {
     method: 'PATCH',
     body: JSON.stringify(userData),
   });
-
   return data;
 }
 
@@ -116,11 +114,7 @@ export async function updateUserCustomData(userId: string, customData: Partial<I
   
   const data = await logtoFetch(`users/${userId}/custom-data`, {
     method: 'PATCH',
-    body: JSON.stringify({
-      customData: {
-        role: customData.role,
-      },
-    }),
+    body: JSON.stringify(customData),
   });
   
   return data;

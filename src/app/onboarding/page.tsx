@@ -4,7 +4,7 @@ import { useSession } from "@/providers/logto-session-provider";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Stethoscope, Syringe } from "lucide-react";
-import { updateUserCustomData } from "../actions/user";
+
 export default function OnboardingPage() {
     const { claims } = useSession();
     const router = useRouter();
@@ -16,17 +16,7 @@ export default function OnboardingPage() {
         if (!selectedRole || !claims?.sub) return;
 
         setIsSubmitting(true);
-        try {
-            const response = await updateUserCustomData(claims.sub, { role: selectedRole });
-            console.log(response);
-            if (!response.role) throw new Error('Failed to update user role');
-
-            router.push(`/onboarding/${response.role}`);
-        } catch (error) {
-            console.error('Error updating role:', error);
-        } finally {
-            setIsSubmitting(false);
-        }
+        router.push(`/onboarding/${selectedRole}`);
     };
 
     return (

@@ -19,6 +19,11 @@ export type ClaimProps = {
     picture?: string;
     /** Timestamp of when the user was created */
     created_at?: string;
+    /** Custom data from the user */
+    customData?: {
+        role?: string;
+        [key: string]: string | number | boolean | undefined;
+    };
 }
 
 /**

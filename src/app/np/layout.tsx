@@ -11,9 +11,6 @@ export default async function DashboardLayout({
     children: React.ReactNode;
 }>) {
     const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
-
-    console.log(claims?.sub);
-
     const user = claims?.sub ? await getUser(claims.sub) : null;
     console.log(user);
     return (

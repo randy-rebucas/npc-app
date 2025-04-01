@@ -1,4 +1,7 @@
 import { cookies } from "next/headers";
+import { EventEmitter } from 'events';
+
+EventEmitter.defaultMaxListeners = 15; // or any higher number that makes sense for your application
 
 /**
  * Makes authenticated requests to the Logto API
@@ -27,6 +30,9 @@ export async function logtoFetch(endpoint: string, options: RequestInit = {}) {
     console.log(response);
   
     if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error("Unauthorized: Your session may have expired. Please log in again.");
+      }
       throw new Error(`HTTP error! status: ${response.status}`);
     }
   

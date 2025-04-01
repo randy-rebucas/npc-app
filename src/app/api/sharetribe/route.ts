@@ -2,7 +2,7 @@ import { sdk } from "@/config/sharetribe";
 import { generatePassword } from "@/lib/utils";
 import { createEvent } from "@/app/actions/events";
 import { EventType } from "@/app/models/Event";
-import { getUser } from "@/app/actions/user";
+import { getUser, updateUserCustomData } from "@/app/actions/user";
 // import { EmailService } from "@/lib/email";
 // import Template from "@/app/models/Template";
 

@@ -5,6 +5,7 @@ import { logtoConfig } from "@/app/logto";
 import Nav from "./nav"
 
 export async function AppSidebar() {
+    
     const { claims } = await getLogtoContext(logtoConfig, { fetchUserInfo: true });
     // const user = claims?.sub ? await getUserByEmail(claims.sub) : null
     const user = {

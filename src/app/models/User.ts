@@ -28,23 +28,24 @@ export enum UserSubmissionStatus {
 
 export interface IUserCustomData {
   role: string;
-  onboardingStatus?: UserOnBoardingStatus;
-  submissionStatus?: UserSubmissionStatus;
+  onboardingStatus?: string;
+  submissionStatus?: string;
   canCreateListings?: boolean;
-  boardCertification?: string[];
-  additionalCertifications?: string[];
   education?: string[];
   profilePhotoPath?: string;
   governmentIdPath?: string;
   npiNumber?: string;
-  medicalLicenseStates?: License[];
-  deaLicenseStates?: License[];
+  licenseAndCertification?: {
+    medicalLicenseStates?: License[];
+    deaLicenseStates?: License[];
+  };
   practiceTypes?: string[];
   rateMatrix?: {
     monthlyCollaborationRate: number;
     additionalStateFee: number;
     additionalNPFee: number;
     controlledSubstancesMonthlyFee: number;
+    controlledSubstancesPerPrescriptionFee: number;
   };
   backgroundCertification?: {
     description: string;
@@ -52,6 +53,8 @@ export interface IUserCustomData {
     additionalCertifications: Certification[];
     linkedinProfile: string;
   };
+  description?: string;
+  linkedinProfile?: string;
 }
 
 export interface IUser {
@@ -62,11 +65,11 @@ export interface IUser {
   name?: string;
   avatar?: string | null;
   customData?: IUserCustomData;
+  profile?: IUserProfile;
   identities?: object;
   lastSignInAt?: number;
   createdAt?: number;
   updatedAt?: number;
-  profile?: IUserProfile;
   applicationId?: string;
   isSuspended?: boolean;
   hasPassword?: boolean;
