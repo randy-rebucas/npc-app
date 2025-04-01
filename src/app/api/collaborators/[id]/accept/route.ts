@@ -6,7 +6,7 @@ import {
 import connect from "@/lib/db";
 import User from "@/app/models/User";
 import Notification from "@/app/models/Notification";
-import { EmailService } from "@/lib/email";
+// import { EmailService } from "@/lib/email";
 import Template from "@/app/models/Template";
 
 export async function POST(
@@ -48,7 +48,7 @@ export async function POST(
       title: "Collaboration Request Accepted",
       message: "Your collaboration request has been accepted",
       link: `/collaborators/${id}`,
-    });
+    }); 
 
     // Get the default template for collaboration request accepted
     let template = await Template.findOne({ isDefault: true, type: "email", code: "collaboration-request-accepted" });
@@ -56,21 +56,21 @@ export async function POST(
       template = await Template.findOne({ type: "email", code: "collaboration-request-accepted" });
     }
 
-    // Send email to NP
-    const emailService = new EmailService();
-    await emailService.sendEmail({
-      to: { email: npUser.email },
-      subject: template?.name || "Collaboration Request Accepted",
-      htmlContent: template?.content || "<p>Your collaboration request has been accepted</p>",
-      sender: {
-        name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
-        email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
-      },
-      replyTo: {
-        name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
-        email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
-      },
-    });
+    // // Send email to NP
+    // const emailService = new EmailService();
+    // await emailService.sendEmail({
+    //   to: { email: npUser.email },
+    //   subject: template?.name || "Collaboration Request Accepted",
+    //   htmlContent: template?.content || "<p>Your collaboration request has been accepted</p>",
+    //   sender: {
+    //     name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+    //     email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
+    //   },
+    //   replyTo: {
+    //     name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+    //     email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
+    //   },
+    // });
 
     return NextResponse.json({
       success: true,

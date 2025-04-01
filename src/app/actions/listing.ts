@@ -3,7 +3,6 @@ import Listing from "@/app/models/Listing";
 import { selectedItem } from "@/lib/utils";
 import { Certification, License } from "@/lib/types/onboarding";
 import mongoose from "mongoose";
-import { revalidateTag } from "next/cache";
 import { handleAsync } from '@/lib/errorHandler';
 import { DatabaseError, NotFoundError, ValidationError } from '@/lib/errors';
 
@@ -334,7 +333,7 @@ export async function deleteListing(id: string) {
       if (!listing) {
         throw new ValidationError(`Listing with ID ${id} not found`);
       }
-      revalidateTag("listings");
+
       return { success: true };
     })()
   );
