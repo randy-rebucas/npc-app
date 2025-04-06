@@ -36,7 +36,7 @@ export default function User({ profile }: { profile: IUserProfile & { user: IUse
         resolver: zodResolver(profileSchema),
         defaultValues: {
             username: profile.user.username,
-            email: profile.user.email
+            email: profile.user.primaryEmail
         }
     });
 

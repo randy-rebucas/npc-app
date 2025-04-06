@@ -16,7 +16,7 @@ export default function FooterUser() {
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold text-foreground">{claims?.username}</span>
-                <span className="truncate text-xs text-muted-foreground">{claims?.primaryEmail}</span>
+                <span className="truncate text-xs text-muted-foreground">{claims?.email}</span>
             </div>
         </>
     );

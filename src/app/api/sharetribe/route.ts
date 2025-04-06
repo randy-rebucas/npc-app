@@ -3,8 +3,8 @@ import { generatePassword } from "@/lib/utils";
 import { createEvent } from "@/app/actions/events";
 import { EventType } from "@/app/models/Event";
 import { getUser, updateUserCustomData } from "@/app/actions/user";
-// import { EmailService } from "@/lib/email";
-// import Template from "@/app/models/Template";
+import { EmailService } from "@/lib/email";
+import Template from "@/app/models/Template";
 
 export async function POST(request: Request) {
   try {
@@ -23,8 +23,8 @@ export async function POST(request: Request) {
     const sharetribePayload = {
       email: user.primaryEmail,
       password: generatePassword(),
-      firstName: user.profile.familyName,
-      lastName: user.profile.givenName,
+      firstName: user.profile?.familyName || '',
+      lastName: user.profile?.givenName || '',
       displayName: user.username,
       protectedData: {},
       publicData: {},
@@ -50,31 +50,27 @@ export async function POST(request: Request) {
 
     // Create an event
     await createEvent({
-      user: user.id,
-      email: user.primaryEmail,
+      user: user.id || '',
+      email: user.primaryEmail || '',
       type: EventType.USER_SYNCED,
     });
 
-    // // Get the default template for account synced
-    // let template = await Template.findOne({ isDefault: true, type: "email", code: "account-synced" });
-    // if (!template) {
-    //   template = await Template.findOne({ type: "email", code: "account-synced" });
-    // }
+    // Get the default template for account synced
+    let template = await Template.findOne({ isDefault: true, type: "email", code: "account-synced" });
+    if (!template) {
+      template = await Template.findOne({ type: "email", code: "account-synced" });
+    }
 
-    // const emailService = new EmailService();
-    // await emailService.sendEmail({
-    //   to: { email: user.primaryEmail },
-    //   subject: template?.name || "Account Synced",
-    //   htmlContent: template?.content || "<p>Your account has been synced to Sharetribe</p>",
-    //   sender: {
-    //     name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
-    //     email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
-    //   },
-    //   replyTo: {
-    //     name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
-    //     email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
-    //   },
-    // });
+    const emailService = new EmailService();
+    await emailService.sendEmail({
+      to: [{ email: user.primaryEmail || "" }], 
+      subject: template?.name || "Account Synced",
+      htmlContent: template?.content || "<p>Your account has been synced to Sharetribe</p>",
+      sender: {
+        name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+        email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
+      },
+    });
 
     return Response.json({ success: true, user: sharetribeUser });
 

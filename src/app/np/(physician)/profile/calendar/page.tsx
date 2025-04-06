@@ -85,8 +85,8 @@ export default function Calendar() {
 
     useEffect(() => {
         const fetchUser = async () => {
-            const userInfo = await getUser(claims.sub);
-            if (userInfo?.submissionStatus === 'APPROVED') {
+            const userInfo = await getUser(claims.sub || '');
+            if (userInfo?.customData?.onboardingStatus === 'APPROVED') {
                 setIsApproved(true);
             }
         };

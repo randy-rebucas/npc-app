@@ -104,26 +104,19 @@ interface ListingQuery {
   monthlyBaseRate?: { $gte: number; $lte: number };
 }
 
-export async function getListings({
-  page = 1,
-  search = "",
-  limit = 10,
-  sort = "lowest_price",
-  status = "all",
-  stateLicense = "",
-  practiceType = "",
-  priceRange = "",
-}: {
-  page?: number;
-  search?: string;
-  limit?: number;
-  sort?: "lowest_price" | "highest_price" | "most_recent";
-  status?: string;
-  stateLicense?: string;
-  practiceType?: string;
-  priceRange?: string;
-}): Promise<GetListingResponse> {
-  if (page < 1 || limit < 1) {
+interface ListingFilters {
+    page: number;
+    search?: string;
+    limit: number;
+    sort: 'lowest_price' | 'highest_price' | 'most_recent';
+    status: string;
+    stateLicense?: string;
+    practiceType?: string;
+    priceRange?: string;
+}
+
+export async function getListings(filters: ListingFilters): Promise<GetListingResponse> {
+  if (filters.page < 1 || filters.limit < 1) {
     throw new ValidationError('Invalid pagination parameters');
   }
 
@@ -132,75 +125,77 @@ export async function getListings({
       await connect();
       const query: ListingQuery = {};
 
-      if (search) {
+      if (filters.search) {
         query.$or = [
-          { username: { $regex: search, $options: "i" } },
-          { email: { $regex: search, $options: "i" } },
-          { "profile.firstName": { $regex: search, $options: "i" } },
-          { "profile.lastName": { $regex: search, $options: "i" } },
+          { username: { $regex: filters.search, $options: "i" } },
+          { email: { $regex: filters.search, $options: "i" } },
+          { "profile.firstName": { $regex: filters.search, $options: "i" } },
+          { "profile.lastName": { $regex: filters.search, $options: "i" } },
         ];
       }
 
-      if (status !== "all") {
-        query.status = status;
+      if (filters.status !== "all") {
+        query.status = filters.status;
       }
 
-      if (stateLicense) {
-        const states = stateLicense.split(",").map((state) => state.trim());
+      if (filters.stateLicense) {
+        const states = filters.stateLicense.split(",").map((state) => state.trim());
         query.stateLicenses = { $in: states };
       }
 
-      if (practiceType) {
-        const practiceTypes = practiceType.split(",").map((type) => type.trim());
+      if (filters.practiceType) {
+        const practiceTypes = filters.practiceType.split(",").map((type) => type.trim());
         query.practiceTypes = { $in: practiceTypes };
       }
 
-      if (priceRange) {
-        const [min, max] = priceRange.split(",").map(Number);
+      if (filters.priceRange) {
+        const [min, max] = filters.priceRange.split(",").map(Number);
         query.monthlyBaseRate = { $gte: min, $lte: max };
       }
 
-      const skip = (page - 1) * limit;
+      const skip = (filters.page - 1) * filters.limit;
       const sortConfig = {
         lowest_price: { monthlyBaseRate: 1 },
         highest_price: { monthlyBaseRate: -1 },
         most_recent: { createdAt: -1 },
       } as const;
 
-      const [aggregatedListings, total] = await Promise.all([
-        Listing.aggregate([
-          { $lookup: { from: "users", localField: "user", foreignField: "_id", as: "user" } },
-          { $unwind: "$user" },
-          { $lookup: { from: "userprofiles", localField: "user._id", foreignField: "user", as: "profile" } },
-          { $unwind: "$profile" },
-          { $match: query },
-          { $sort: sortConfig[sort] || { monthlyBaseRate: 1 } },
-          { $skip: skip },
-          { $limit: limit },
-          {
-            $project: {
-              userId: "$user._id",
-              username: "$user.username",
-              email: "$user.email",
-              metaData: "$user.metaData",
-              profile: 1,
-              _id: "$_id",
-              title: "$title",
-              description: "$description",
-              boardCertification: "$boardCertification",
-              practiceTypes: "$practiceTypes",
-              stateLicenses: "$stateLicenses",
-              specialties: "$specialties",
-              monthlyBaseRate: "$monthlyBaseRate",
-              multipleNPFee: "$multipleNPFee",
-              additionalFeePerState: "$additionalFeePerState",
-              controlledSubstanceFee: "$controlledSubstanceFee",
-              status: "$status",
-              createdAt: "$createdAt",
-            },
+      const aggregationPipeline = [
+        { $lookup: { from: "users", localField: "user", foreignField: "_id", as: "user" } },
+        { $unwind: "$user" },
+        { $lookup: { from: "userprofiles", localField: "user._id", foreignField: "user", as: "profile" } },
+        { $unwind: "$profile" },
+        { $match: query },
+        { $sort: sortConfig[filters.sort] || { monthlyBaseRate: 1 } },
+        { $skip: skip },
+        { $limit: filters.limit },
+        {
+          $project: {
+            userId: "$user._id",
+            username: "$user.username",
+            email: "$user.email",
+            metaData: "$user.metaData",
+            profile: 1,
+            _id: "$_id",
+            title: "$title",
+            description: "$description",
+            boardCertification: "$boardCertification",
+            practiceTypes: "$practiceTypes",
+            stateLicenses: "$stateLicenses",
+            specialties: "$specialties",
+            monthlyBaseRate: "$monthlyBaseRate",
+            multipleNPFee: "$multipleNPFee",
+            additionalFeePerState: "$additionalFeePerState",
+            controlledSubstanceFee: "$controlledSubstanceFee",
+            status: "$status",
+            createdAt: "$createdAt",
           },
-        ]),
-        Listing.countDocuments(),
+        },
+      ];
+
+      const [aggregatedListings, total] = await Promise.all([
+        Listing.aggregate(aggregationPipeline).hint({ status: 1, monthlyBaseRate: 1, createdAt: -1 }),
+        Listing.countDocuments(query).hint({ status: 1 })
       ]);
 
       return {

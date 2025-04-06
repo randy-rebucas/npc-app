@@ -43,7 +43,7 @@ export default function ProfilePage() {
 
     // Memoize the setValue function
     const setValue = form.setValue;
-    
+
     useEffect(() => {
         const fetchUserProfile = async () => {
             try {
@@ -54,7 +54,7 @@ export default function ProfilePage() {
                     throw new Error(`Failed to fetch profile: ${userProfile.statusText}`);
                 }
                 const profileResponse = await userProfile.json();
-                
+
                 const profile = {
                     firstName: profileResponse?.firstName || '',
                     lastName: profileResponse?.lastName || '',
@@ -64,7 +64,7 @@ export default function ProfilePage() {
                     state: profileResponse?.state || '',
                     zip: profileResponse?.zip || '',
                 };
-                
+
                 Object.entries(profile).forEach(([key, value]) => {
                     setValue(key as keyof typeof profile, value);
                 });
@@ -80,7 +80,7 @@ export default function ProfilePage() {
         }
 
         fetchUserProfile();
-        
+
     }, [setValue, toast, claims]);
 
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
@@ -214,9 +214,9 @@ export default function ProfilePage() {
                     <label className="block text-sm font-medium text-foreground mb-1">Email</label>
                     <div className="flex items-center gap-4">
                         <input
-                            defaultValue={claims?.primaryEmail}
-                            readOnly
+                            value=""
                             className="flex-1 px-3 py-2 bg-muted border border-border rounded-md"
+                            readOnly
                         />
                         <button
                             type="button"

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import connect from "@/lib/db";
 import Listing from "@/app/models/Listing";
 import Notification from "@/app/models/Notification";
-// import { EmailService } from "@/lib/email";
+import { EmailService } from "@/lib/email";
 import Template from "@/app/models/Template";
 import { logtoConfig } from "@/app/logto";
 import { getLogtoContext } from "@logto/next/server-actions";
@@ -60,20 +60,16 @@ export async function POST(request: NextRequest) {
       template = await Template.findOne({ type: "email", code: "new-listing-created" });
     }
 
-    // const emailService = new EmailService();
-    // await emailService.sendEmail({
-    //   to: { email: session.user.email },
-    //   subject: template?.name || "New Listing Created",
-    //   htmlContent: template?.content || "<p>A new listing has been created</p>",
-    //   sender: {
-      //   name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
-      //   email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
-      // },
-      // replyTo: {
-      //   name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
-    //     email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
-    //   },
-    // });
+    const emailService = new EmailService();
+    await emailService.sendEmail({
+      to: [{ email: claims?.email || "" }],
+      subject: template?.name || "New Listing Created",
+      htmlContent: template?.content || "<p>A new listing has been created</p>",
+      sender: {
+        name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+        email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
+      },
+    });
 
     return NextResponse.json({
       success: true,

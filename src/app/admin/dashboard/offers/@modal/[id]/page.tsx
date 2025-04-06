@@ -5,18 +5,17 @@ import { format } from "date-fns";
 import { Suspense } from "react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
-interface OfferDetailModalProps {
-    params: {
-        id: string;
-    };
-}
-
-export default async function OfferDetailModal({ params }: OfferDetailModalProps) {
+export default async function OfferDetailModal({
+    params,
+}: {
+    params: Promise<{ id: string }>
+}) {
+    const { id } = await params;
     return (
         <Modal>
             <Card className="p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
                 <Suspense fallback={<LoadingSpinner />}>
-                    <OfferDetails id={params.id} />
+                    <OfferDetails id={id} />
                 </Suspense>
             </Card>
         </Modal>
@@ -33,9 +32,9 @@ async function OfferDetails({ id }: { id: string }) {
                 <h2 className="text-3xl font-bold text-gray-900">Offer Details</h2>
                 <div className="flex justify-between items-center mt-4">
                     <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold capitalize
-                        ${offer.status.toLowerCase() === 'active' ? 'bg-green-100 text-green-800' : 
-                          offer.status.toLowerCase() === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                          'bg-blue-100 text-blue-800'}`}>
+                        ${offer.status.toLowerCase() === 'active' ? 'bg-green-100 text-green-800' :
+                            offer.status.toLowerCase() === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                'bg-blue-100 text-blue-800'}`}>
                         {offer.status.toLowerCase()}
                     </span>
                     <p className="text-gray-600 font-medium">

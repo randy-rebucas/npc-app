@@ -2,13 +2,13 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
-import { getUser, UserDocument } from '@/app/actions/user';
+import { getUser } from '@/app/actions/user';
 import { useSession } from "@/providers/logto-session-provider";
-
+import { IUser } from '@/app/models/User';
 
 export default function Profile() {
     const { claims, signOut } = useSession();
-    const [userData, setUserData] = useState<Partial<UserDocument> | null>(null);
+    const [userData, setUserData] = useState<Partial<IUser> | null>(null);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -41,9 +41,9 @@ export default function Profile() {
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex items-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 p-2"
             >
-                {userData?.profile?.profilePhotoPath ? (
+                {userData?.customData?.profilePhotoPath ? (
                     <Avatar className="h-8 w-8 rounded-lg">
-                        <AvatarImage src={userData?.profile?.profilePhotoPath} alt={userData?.username} />
+                        <AvatarImage src={userData?.customData?.profilePhotoPath} alt={userData?.username} />
                         <AvatarFallback className="rounded-lg">{userData?.username?.charAt(0)}</AvatarFallback>
                     </Avatar>
                 ) : (

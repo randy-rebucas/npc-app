@@ -47,7 +47,7 @@ export default function CollaboratorRequestsPage() {
                                     <div className="w-12 h-12 bg-muted rounded-full" />
                                     <div>
                                         <h3 className="font-semibold text-foreground">{request.npUser.username}</h3>
-                                        <p className="text-sm text-muted-foreground">{request.npUser.onBoardingStatus}</p>
+                                        <p className="text-sm text-muted-foreground">{request.npUser.customData?.onboardingStatus}</p>
                                     </div>
                                 </div>
                                 <Link   

@@ -3,22 +3,27 @@ import MedicalLicenseState, { IMedicalLicenseState } from "../models/MedicalLice
 import { revalidateTag } from "next/cache";
 import { handleAsync } from '@/lib/errorHandler';
 import { DatabaseError, NotFoundError, ValidationError } from '@/lib/errors';
+import { cache } from 'react';
 
-export async function getMedicalLicenseStates() {
-  const [result, error] = await handleAsync(
-    (async () => {
-      await connect();
-      const medicalLicenseStates = await MedicalLicenseState.find({}).exec();
-      return medicalLicenseStates.filter(state => state.enabled === true).map(state => state.state);
-    })()
-  );
+export const getMedicalLicenseStates = cache(async () => {
+    const [result, error] = await handleAsync(
+        (async () => {
+            await connect();
+            const states = await MedicalLicenseState.find({ enabled: true })
+                .select('state')
+                .lean();
+            const data = states.map(state => state.state);
+            console.log(data);
+            return data;
+        })()
+    );
 
-  if (error) {
-    throw new DatabaseError('Failed to fetch medical license states');
-  }
+    if (error) {
+        throw new DatabaseError('Failed to fetch medical license states');
+    }
 
-  return result;
-}
+    return result;
+});
 
 interface GetMedicalLicenseStatesParams {
   page: number;

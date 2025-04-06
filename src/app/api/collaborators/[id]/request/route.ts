@@ -9,6 +9,7 @@ import User, { UserSubmissionStatus } from "@/app/models/User";
 import { logtoConfig } from "@/app/logto";
 import { getLogtoContext } from "@logto/next/server-actions";
 import Template from "@/app/models/Template";
+import { EmailService } from "@/lib/email";
 
 export async function POST(
   request: Request,
@@ -30,9 +31,17 @@ export async function POST(
 
     // check if the physician is approved
     const physician = await User.findById(id);
-    if (!physician || physician.submissionStatus !== UserSubmissionStatus.APPROVED) {
+    if (
+      !physician ||
+      physician.submissionStatus !== UserSubmissionStatus.APPROVED
+    ) {
       return NextResponse.json(
-        { success: false, message: "Physician is not approved. Current submission status: " + physician.submissionStatus },
+        {
+          success: false,
+          message:
+            "Physician is not approved. Current submission status: " +
+            physician.submissionStatus,
+        },
         { status: 400 }
       );
     }
@@ -66,7 +75,9 @@ export async function POST(
       );
     }
 
-    const physicianUser = await User.findById(savedCollaborationRequest.physicianUser);
+    const physicianUser = await User.findById(
+      savedCollaborationRequest.physicianUser
+    );
     if (!physicianUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
@@ -80,26 +91,30 @@ export async function POST(
     });
 
     // Get the default template for collaboration request from NP
-    let template = await Template.findOne({ isDefault: true, type: "email", code: "collaboration-request-from-np" });
+    let template = await Template.findOne({
+      isDefault: true,
+      type: "email",
+      code: "collaboration-request-from-np",
+    });
     if (!template) {
-      template = await Template.findOne({ type: "email", code: "collaboration-request-from-np" });
+      template = await Template.findOne({
+        type: "email",
+        code: "collaboration-request-from-np",
+      });
     }
 
     // Send email to NP
-    // const emailService = new EmailService();
-    // await emailService.sendEmail({
-    //   to: { email: physicianUser.email },
-    //   subject: template?.name || "Collaboration Request from NP",
-    //   htmlContent: template?.content || "<p>NP has requested collaboration</p>",
-    //   sender: {
-    //     name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
-    //     email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
-    //   },
-    //   replyTo: {
-    //     name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
-    //     email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
-    //   },
-    // });
+    const emailService = new EmailService();
+    await emailService.sendEmail({
+      to: [{ email: physicianUser.email }],
+      subject: template?.name || "Collaboration Request from NP",
+      htmlContent: template?.content || "<p>NP has requested collaboration</p>",
+      sender: {
+        name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+        email:
+          process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
+      },
+    });
 
     return NextResponse.json({
       success: true,

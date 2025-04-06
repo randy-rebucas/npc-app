@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
@@ -8,11 +8,9 @@ import { FontSizeProvider } from "@/providers/font-provider";
 import { LogtoProvider, ClaimProps } from "@/providers/logto-session-provider";
 import { ApplicationSettingsProvider } from "@/providers/application-settings-provider";
 import { NotificationsProvider } from "@/providers/notifications-provider";
-import { MessagingProvider } from "@/providers/messaging-provider";
 import { logtoConfig } from "./logto";
 import { getLogtoContext } from "@logto/next/server-actions";
 
-// import { OpenAIProvider } from "@/providers/openai-provider";
 // import ChatBot from '@/components/root/ChatBot/ChatBot';
 // import ChatComponent from "@/components/example/ChatComponent";
 
@@ -29,8 +27,9 @@ const geistMono = localFont({
 
 export async function generateMetadata(): Promise<Metadata> {
   const config = await getConfig();
-
+  
   return {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
     title: {
       default: config?.siteName || process.env.NEXT_PUBLIC_APP_NAME,
       template: `%s | ${config?.siteName || process.env.NEXT_PUBLIC_APP_NAME}`,
@@ -55,33 +54,44 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+export const viewport: Viewport = {
+  themeColor: 'black',
+}
+ 
 export default async function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-  const { isAuthenticated, claims } = await getLogtoContext(logtoConfig, { fetchUserInfo: true }); 
+}) {
+  const { isAuthenticated, claims } = await getLogtoContext(logtoConfig, { 
+    fetchUserInfo: true
+  });
 
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`} >
-        <ThemeProvider attribute="class">
+        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased min-h-screen`}
+      >
+        <ThemeProvider 
+          attribute="class" 
+          defaultTheme="system" 
+          enableSystem
+          disableTransitionOnChange
+        >
           <FontSizeProvider>
-            <LogtoProvider 
-              isAuthenticated={isAuthenticated} 
+            <LogtoProvider
+              isAuthenticated={isAuthenticated}
               claims={claims as ClaimProps}
             >
               <ApplicationSettingsProvider>
-                {/* <OpenAIProvider> */}
-                <MessagingProvider>
-                  <NotificationsProvider>
-                    {children}
-                  </NotificationsProvider>
-                </MessagingProvider>
+                <NotificationsProvider>
+                  <main>{children}</main>
+                </NotificationsProvider>
                 {/* {session && <ChatBot />}   */}
                 {/* <ChatComponent />  */}
-                {/* </OpenAIProvider> */}
               </ApplicationSettingsProvider>
             </LogtoProvider>
           </FontSizeProvider>

@@ -1,38 +1,29 @@
 import connect from "@/lib/db";
 import Notification from "@/app/models/Notification";
 import { handleAsync } from '@/lib/errorHandler';
-import { DatabaseError, ValidationError } from '@/lib/errors';
+import { DatabaseError } from '@/lib/errors';
+import { z } from 'zod';
 
-export async function createNotification({
-  userId,
-  title,
-  message,
-  link,
-}: {
-  userId: string;
-  title: string;
-  message: string;
-  link?: string;
-}) {
-  if (!userId || !title || !message) {
-    throw new ValidationError('User ID, title, and message are required');
-  }
+const NotificationSchema = z.object({
+    userId: z.string().min(1, 'User ID is required'),
+    title: z.string().min(1, 'Title is required'),
+    message: z.string().min(1, 'Message is required'),
+    link: z.string().url().optional(),
+});
 
-  const [result, error] = await handleAsync(
-    (async () => {
-      await connect();
-      return await Notification.create({
-        user: userId,
-        title,
-        message,
-        link,
-      });
-    })()
-  );
+export async function createNotification(data: z.infer<typeof NotificationSchema>) {
+    const validated = NotificationSchema.parse(data);
+    
+    const [result, error] = await handleAsync(
+        (async () => {
+            await connect();
+            return await Notification.create(validated);
+        })()
+    );
 
-  if (error) {
-    throw new DatabaseError(`Failed to create notification: ${error.message}`);
-  }
+    if (error) {
+        throw new DatabaseError(`Failed to create notification: ${error.message}`);
+    }
 
-  return result;
+    return result;
 } 

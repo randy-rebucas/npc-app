@@ -2,11 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
-import { SessionProvider, useSession } from "@/providers/logto-session-provider";
+import { useSession } from "@/providers/logto-session-provider";
 
 interface User {
-  role: "PHYSICIAN" | "NURSE_PRACTITIONER" | null;
-  onBoardingStatus: "COMPLETE" | "INCOMPLETE";
+    role: "PHYSICIAN" | "NURSE_PRACTITIONER" | null;
+    onBoardingStatus: "COMPLETE" | "INCOMPLETE";
 }
 
 function OnboardingCheck({ children }: { children: React.ReactNode }) {
@@ -20,11 +20,11 @@ function OnboardingCheck({ children }: { children: React.ReactNode }) {
                 throw new Error('Failed to fetch user data');
             }
             const user: User = await response.json();
-            
+
             if (!user.role) {
                 router.push("/onboarding");
             } else if (user.onBoardingStatus === "INCOMPLETE") {
-                const route = user.role === "PHYSICIAN" 
+                const route = user.role === "PHYSICIAN"
                     ? "/onboarding/physician"
                     : "/onboarding/nurse-practitioner";
                 router.push(route);
@@ -45,8 +45,7 @@ function OnboardingCheck({ children }: { children: React.ReactNode }) {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     return (
-        <SessionProvider>
-            <OnboardingCheck>{children}</OnboardingCheck>
-        </SessionProvider>
+
+        <OnboardingCheck>{children}</OnboardingCheck>
     );
 } 

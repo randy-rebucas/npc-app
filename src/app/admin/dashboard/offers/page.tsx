@@ -104,8 +104,8 @@ export default async function OffersPage(props: {
                                     offers.map((offer) => {
                                         return (
                                             <TableRow key={offer._id}>
-                                                <TableCell>{offer.physicianUser.email}</TableCell>
-                                                <TableCell>{offer.nursePractitionerUser.email}</TableCell>
+                                                <TableCell>{offer.physicianUser.primaryEmail}</TableCell>
+                                                <TableCell>{offer.nursePractitionerUser.primaryEmail}</TableCell>
                                                 <TableCell>{offer.offerDate.toLocaleString()}</TableCell>
                                                 <TableCell>{offer.expirationDate.toLocaleString()}</TableCell>
                                                 <TableCell>{offer.position.title}</TableCell>

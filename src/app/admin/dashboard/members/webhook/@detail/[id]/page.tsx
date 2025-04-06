@@ -4,9 +4,10 @@ import MemberDetail from "@/components/member/MemberDetail";
 export default async function DetailPage({
     params,
 }: {
-    params: { id: string };
+    params: Promise<{ id: string }>
 }) {
-    const { data: member } = await MemberstackAdminService.getMemberById(params.id);
+    const { id } = await params;
+    const { data: member } = await MemberstackAdminService.getMemberById(id);
 
     if (!member) {
         return (

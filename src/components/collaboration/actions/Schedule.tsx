@@ -4,17 +4,6 @@ import { toast } from "@/hooks/use-toast";
 import { loadCalendlyScript } from "@/lib/calendly";
 import { useEffect } from "react";
 
-// Add type definition at the top
-declare global {
-    interface Window {
-        Calendly?: {
-            initPopupWidget: (options: {
-                url: string;
-            }) => void;
-        }
-    }
-}
-
 export default function Schedule({ calendlyLink }: { calendlyLink: string }) {
     useEffect(() => {
         loadCalendlyScript();

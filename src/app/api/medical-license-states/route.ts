@@ -1,4 +1,4 @@
-import { getMedicalLicenseStates } from "@/app/actions/medicalLicenseStates";
+import { getMedicalLicenseStates } from "@/app/actions/medicallicensestates";
 import { NextResponse } from "next/server";
 
 export async function GET() {

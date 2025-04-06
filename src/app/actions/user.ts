@@ -16,12 +16,15 @@ export interface GetUsersResponse {
   primaryPhone: string;
   name: string;
   avatar: string | null;
-  customData: { role: string };
+  customData: { role: string, onboardingStatus: string, submissionStatus: string };
   identities: object;
   lastSignInAt: number;
   createdAt: number;
   updatedAt: number;
-  profile: object;
+  profile: {
+    familyName: string;
+    givenName: string;
+  };
   applicationId: string;
   isSuspended: boolean;
   hasPassword: boolean;
@@ -32,7 +35,7 @@ interface ApiResponse {
   message?: string;
 }
 
-export async function getUser(id: string): Promise<GetUsersResponse> {
+export async function getUser(id: string): Promise<IUser> {
   if (!id) {
     throw new ValidationError("User ID is required");
   }
@@ -315,3 +318,11 @@ export async function getUserRole(id: string) {
 
   return data?.role;
 }
+
+export type UserDocument = {
+    username: string;
+    profile?: {
+        profilePhotoPath?: string;
+    };
+    // ... other user fields ...
+};

@@ -59,10 +59,11 @@ export default async function FindMatch(props: {
         page: currentPage,
         search: query,
         limit: ITEMS_PER_PAGE,
-        sort: sort,
+        sort: sort || 'most_recent',
         stateLicense: stateLicense,
         practiceType: practiceType,
-        priceRange: priceRange
+        priceRange: priceRange,
+        status: 'active'
     });
 
     const totalPages = Math.ceil(total / ITEMS_PER_PAGE);

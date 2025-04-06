@@ -55,6 +55,8 @@ export interface IUserCustomData {
   };
   description?: string;
   linkedinProfile?: string;
+  accountSynced?: boolean;
+  stripeAccountId?: string;
 }
 
 export interface IUser {

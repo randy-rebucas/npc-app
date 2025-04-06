@@ -3,7 +3,7 @@
 import { Separator } from "@radix-ui/react-separator";
 import Breadcrumbs from "@/components/breadcrumbs";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { SignOut } from "@/components/signout";
+import { SignOut } from "@/components/sign-out";
 import { Chat } from "@/components/chat";
 import { Notifications } from "@/components/notifications";
 import { useTheme } from "next-themes";
@@ -29,7 +29,7 @@ export default function AdminHeader({ breadcrumbs }: { breadcrumbs: Breadcrumb[]
         <ThemeToggle theme={theme as "light" | "dark"} setTheme={setTheme} />
         <Chat />
         <Notifications /> 
-        <SignOut onSignOut={signOut} />
+        <SignOut onSignOutAction={signOut} />
       </div>
     </header>
   );

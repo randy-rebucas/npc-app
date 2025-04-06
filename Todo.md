@@ -26,3 +26,13 @@ await emailService.sendEmail({
     contentType: 'application/pdf'
   }]
 });
+
+mailjet.apiConnect(process.env.MAILJET_API_KEY, process.env.MAILJET_API_SECRET);
+
+mailjet.post("send").request({
+  "FromEmail": "contact@example.com",
+  "FromName": "John Doe",
+  "Subject": "Your email subject",
+  "Text-part": "Hello World",
+
+  default physicians

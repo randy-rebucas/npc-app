@@ -39,7 +39,7 @@ const nextConfig: NextConfig = {
     ADDITIONAL_NP_FEE: process.env.ADDITIONAL_NP_FEE,
     PLATFORM_FEE: process.env.PLATFORM_FEE,
 
-    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+    BREVO_API_KEY: process.env.BREVO_API_KEY,
   },
   images: {
     remotePatterns: [

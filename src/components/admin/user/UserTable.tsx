@@ -7,8 +7,9 @@ import { formatDistanceToNow } from "date-fns";
 import { Switch } from "@/components/ui/switch"
 import { useState } from "react"
 import { toast } from "@/hooks/use-toast";
+import { IUser } from "@/app/models/User";
 
-export default function UserTable({ users }: { users: User[] }) {
+export default function UserTable({ users }: { users: IUser[] }) {
     const [isUpdating, setIsUpdating] = useState<string | null>(null);
 
     const handleSuspendToggle = async (userId: string, currentStatus: boolean) => {
@@ -21,7 +22,7 @@ export default function UserTable({ users }: { users: User[] }) {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ isSuspended: !currentStatus }),
-            });
+            }); 
             
             if (!response.ok) {
                 throw new Error('Failed to update suspension status');
@@ -67,20 +68,20 @@ export default function UserTable({ users }: { users: User[] }) {
                         <TableCell>{user.username}</TableCell>
                         <TableCell>{user.primaryEmail}</TableCell>
                         <TableCell>{user.primaryPhone}</TableCell>
-                        <TableCell>{user.customData?.role.charAt(0).toUpperCase() + user.customData?.role.slice(1)}</TableCell>
+                        <TableCell>{user.customData?.role ? (user.customData.role.charAt(0).toUpperCase() + user.customData.role.slice(1)) : 'N/A'}</TableCell>
                         <TableCell>
-                            {user.customData?.stripeAccountId ? user.customData?.stripeAccountId : 'N/A'}
+                            {user.customData?.stripeAccountId ?? 'N/A'}
                         </TableCell>
                         <TableCell>
-                            {user.customData?.onBoardingStatus ? user.customData?.onBoardingStatus : 'N/A'}
-                            {user.customData?.onBoardingStatus === 'COMPLETED' && (
+                            {user.customData?.onboardingStatus ? user.customData?.onboardingStatus : 'N/A'}
+                            {user.customData?.onboardingStatus === 'COMPLETED' && (
                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800`}>
-                                    {user.customData?.onBoardingStatus}
+                                    {user.customData?.onboardingStatus}
                                 </span>
                             )}
-                            {user.customData?.onBoardingStatus === 'INCOMPLETE' && (
+                            {user.customData?.onboardingStatus === 'INCOMPLETE' && (
                                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                    {user.customData?.onBoardingStatus}
+                                    {user.customData?.onboardingStatus}
                                 </span>
                             )}
                         </TableCell>
@@ -88,17 +89,17 @@ export default function UserTable({ users }: { users: User[] }) {
                             {user.customData?.submissionStatus || 'N/A'}
                         </TableCell>
                         <TableCell>
-                            {user.customData?.accountSynced ? 'Yes' : 'No' || 'N/A'}
+                            {user.customData?.accountSynced ? 'Yes' : 'No'}
                         </TableCell>
                         <TableCell>
                             <Switch
                                 checked={user.isSuspended}
                                 disabled={isUpdating === user.id}
-                                onCheckedChange={() => handleSuspendToggle(user.id, user.isSuspended)}
+                                onCheckedChange={() => handleSuspendToggle(user.id || '', user.isSuspended || false)}
                             />
                         </TableCell>
                         <TableCell>
-                            {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}
+                            {formatDistanceToNow(new Date(user.createdAt || new Date()), { addSuffix: true })}
                         </TableCell>
                         <TableCell className="flex items-center justify-end gap-2 p-3">
                             <Link href={`/admin/dashboard/users/${user.id}`}>

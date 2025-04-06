@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useTheme } from "next-themes";
 import SignIn from "@/components/sign-in";
 import { handleSignIn, handleSignOut } from '@/app/actions/auth';
-import { SignOut } from "../signout";
+import { SignOut } from "../sign-out";
 import { ThemeSwitcher } from "../theme";
 import { useSession } from "@/providers/logto-session-provider";
 
@@ -36,7 +36,7 @@ export default function Header() {
                     {isAuthenticated && (
                         <>
                             <Link href="/np" className="text-foreground hover:text-muted-foreground">Dashboard</Link>
-                            <SignOut onSignOut={handleSignOut} />
+                            <SignOut onSignOutAction={handleSignOut} />
                         </>
                     )}
                     {!isAuthenticated && (

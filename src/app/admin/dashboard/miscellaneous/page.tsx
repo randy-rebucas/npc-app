@@ -1,5 +1,5 @@
-import { getPracticeTypesPaginated } from "@/app/actions/practiceTypes";
-import { getMedicalLicenseStatesPaginated } from "@/app/actions/medicalLicenseStates";
+import { getPracticeTypesPaginated } from "@/app/actions/practicetypes";
+import { getMedicalLicenseStatesPaginated } from "@/app/actions/medicallicensestates"; 
 
 import { Metadata } from "next";
 

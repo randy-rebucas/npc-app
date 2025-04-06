@@ -8,6 +8,7 @@ interface CustomClaims {
 }
 
 async function getLogtoToken() {
+  console.log("Getting Logto token...");
   const cookieStore = await cookies();
   const existingToken = cookieStore.get("logtoToken");
 
@@ -44,7 +45,7 @@ async function getLogtoToken() {
 
     const data = await tokenResponse.json();
     cookieStore.set("logtoToken", data.access_token);
-
+    console.log("Token set in cookie:", data.access_token);
     return data.access_token;
   } catch (error) {
     console.error("Error getting Logto token:", error);
@@ -57,6 +58,7 @@ async function getCustomClaims(
   logtoToken: string
 ): Promise<CustomClaims | null> {
   try {
+    console.log("Fetching custom claims...");
     const response = await fetch(
       `${process.env.LOGTO_ENDPOINT}api/users/${userId}/custom-data`,
       {
@@ -72,6 +74,7 @@ async function getCustomClaims(
     }
 
     const data = await response.json();
+    console.log("Custom claims fetched:", data);
     return data;
   } catch (error) {
     console.error("Error fetching custom claims:", error);
@@ -85,33 +88,37 @@ export async function middleware(req: NextRequest) {
 
     // Redirect unauthenticated users to home
     if (!isAuthenticated || !claims?.sub) {
-      console.warn("User not authenticated, redirecting to home");
       return NextResponse.redirect(new URL("/", req.url));
     }
 
     const logtoToken = await getLogtoToken();
-
     if (!logtoToken) {
-      console.error("Failed to obtain Logto token");
+      console.error("Failed to obtain Logto token for user:", claims.sub);
       return NextResponse.redirect(new URL("/", req.url));
     }
 
     const customClaims = await getCustomClaims(claims.sub, logtoToken);
-    const isAdminRoute = req.nextUrl.pathname.startsWith("/admin");
-    const isAdmin = customClaims?.role === "admin";
+    if (!customClaims) {
+      console.error("Failed to fetch custom claims for user:", claims.sub);
+      return NextResponse.redirect(new URL("/", req.url));
+    }
 
-    if (!customClaims?.hasOwnProperty("role")) {
-      // Handle route access
-      if (isAdminRoute && !isAdmin) {
-        console.warn(`Unauthorized admin access attempt by user ${claims.sub}`);
-        return NextResponse.redirect(new URL("/np", req.url));
-      }
-      // Only redirect to admin if coming from a non-admin route
-      if (isAdmin && !isAdminRoute) {
-        return NextResponse.redirect(new URL("/admin", req.url));
-      }
-    } else {
+    // If user hasn't completed onboarding (no role assigned)
+    if (!customClaims.hasOwnProperty("role")) {
       return NextResponse.redirect(new URL("/onboarding", req.url));
+    }
+
+    const isAdminRoute = req.nextUrl.pathname.startsWith("/admin");
+    const isAdmin = customClaims.role === "admin";
+
+    // Handle route access
+    if (isAdminRoute && !isAdmin) {
+      console.warn(`Unauthorized admin access attempt by user ${claims.sub}`);
+      return NextResponse.redirect(new URL("/np", req.url));
+    }
+
+    if (isAdmin && !isAdminRoute) {
+      return NextResponse.redirect(new URL("/admin", req.url));
     }
 
     return NextResponse.next();
@@ -121,6 +128,7 @@ export async function middleware(req: NextRequest) {
   }
 }
 
+// Define the config for the middleware
 export const config = {
   matcher: ["/admin/:path*", "/np/:path*"],
 };

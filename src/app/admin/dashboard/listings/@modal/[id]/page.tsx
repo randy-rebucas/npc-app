@@ -3,14 +3,13 @@ import { Card } from "@/components/ui/card";
 import { Suspense } from "react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
-interface ListingDetailModalProps {
-    params: {
-        id: string | null;
-    };
-}
 
-export default function ListingDetailModal({ params }: ListingDetailModalProps) {
-    const { id } = params;
+export default async function ListingDetailModal({
+    params,
+}: {
+    params: Promise<{ id: string | null }>
+}) {
+    const { id } = await params;
     console.log(id);
     return (
         <Modal>

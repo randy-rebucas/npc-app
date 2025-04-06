@@ -15,8 +15,10 @@ export type ClaimProps = {
     name?: string;
     /** Username of the user */
     username?: string;
+    /** Email of the user */
+    email?: string;
     /** URL to the user's profile picture */
-    picture?: string;
+    avatar?: string;
     /** Timestamp of when the user was created */
     created_at?: string;
     /** Custom data from the user */

@@ -4,20 +4,17 @@ import TemplateForm from "@/components/admin/forms/TemplateForm";
 import { Suspense } from "react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
-interface TemplateDetailModalProps {
-    params: {
-        id: string;
-    };
-}
-
-export default function TemplateDetailModal({
+export default async function TemplateDetailModal({
     params,
-}: TemplateDetailModalProps) {
+}: {
+    params: Promise<{ id: string }>
+}) {
+    const { id } = await params;
     return (
         <Modal>
             <Card className="p-6">
                 <Suspense fallback={<LoadingSpinner />}>
-                    <TemplateForm id={params.id} />
+                    <TemplateForm id={id} />
                 </Suspense>
             </Card>
         </Modal>

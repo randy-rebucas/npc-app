@@ -5,6 +5,8 @@ import Header from '@/components/header';
 import { useCallback, useEffect, useState } from "react";
 import { useSession } from "@/providers/logto-session-provider";
 import { getUser } from "@/app/actions/user";
+import { Certification } from "@/lib/types/onboarding";
+import { License } from "@/app/models/User";
 
 export default function AgreementPage() {
     const jotformId = process.env.NEXT_PUBLIC_JOTFORM_ID;
@@ -58,29 +60,29 @@ export default function AgreementPage() {
                 return;
             }
             console.log(userInfo.profile); 
-            // const userData = {
-            //     'first-name': userInfo.profile.firstName || '',
-            //     'last-name': userInfo.profile.lastName || '',
-            //     'email': userInfo.email || '',
-            //     'member_id': userInfo._id || '',
-            //     'npi': userInfo.profile.npiNumber || '', 
-            //     'base-rate': userInfo.profile.monthlyCollaborationRate || '',
-            //     'state-fee': userInfo.profile.additionalStateFee || '',
-            //     'background': userInfo.profile.description || '',
-            //     'control-fee': userInfo.profile.controlledSubstancesMonthlyFee || '',
-            //     'degree-type': userInfo.profile.clinicalDegree || '',
-            //     'linkedin-url': userInfo.profile.linkedinProfile || '',
-            //     'multi-np-fee': userInfo.profile.additionalNPFee || '',
-            //     'practice-types': userInfo.profile.practiceTypes || '',
-            //     'id-document-url': userInfo.profile.governmentIdPath || '',
-            //     'board-certification': userInfo.profile.boardCertification || '',
-            //     'active-license-states': userInfo.profile.medicalLicenseStates?.map((l: any) => l.state) || [],
-            //     'additional-certification': userInfo.profile.additionalCertifications?.map((c: any) => c.certification) || [],
-            //     'address': userInfo.profile.address || '',
-            //     'city': userInfo.profile.city || '',
-            //     'state': userInfo.profile.state || '',
-            //     'zip': userInfo.profile.zip || '',
-            // };
+            const userData = {
+                'first-name': userInfo.profile?.givenName || '',
+                'last-name': userInfo.profile?.familyName || '',
+                'email': userInfo.primaryEmail || '',
+                'member_id': userInfo.id || '',
+                'npi': userInfo.customData?.npiNumber || '', 
+                'base-rate': userInfo.customData?.rateMatrix?.monthlyCollaborationRate || '',
+                'state-fee': userInfo.customData?.rateMatrix?.additionalStateFee || '',
+                'background': userInfo.customData?.description || '',
+                'control-fee': userInfo.customData?.rateMatrix?.controlledSubstancesMonthlyFee || '',
+                'degree-type': userInfo.customData?.education || '',
+                'linkedin-url': userInfo.customData?.linkedinProfile || '',
+                'multi-np-fee': userInfo.customData?.rateMatrix?.additionalNPFee || '',
+                'practice-types': userInfo.customData?.practiceTypes || '',
+                'id-document-url': userInfo.customData?.governmentIdPath || '',
+                'board-certification': userInfo.customData?.backgroundCertification?.boardCertification || '',
+                'active-license-states': userInfo.customData?.licenseAndCertification?.medicalLicenseStates?.map((l: License) => l.state) || [],
+                'additional-certification': userInfo.customData?.backgroundCertification?.additionalCertifications?.map((c: Certification) => c.certification) || [],
+                'address': userInfo.profile?.address?.formatted || '',
+                'city': userInfo.profile?.address?.locality || '',
+                'state': userInfo.profile?.address?.region || '',
+                'zip': userInfo.profile?.address?.postalCode || '',
+            };
             
             fillJotformFields(userData);
         } catch (error) {

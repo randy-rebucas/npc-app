@@ -4,6 +4,7 @@ import connect from "@/lib/db";
 import NotificationSetting from "@/app/models/NotificationSetting";
 import { getLogtoContext } from "@logto/next/server-actions";
 import { logtoConfig } from "@/app/logto";
+import { EmailService } from "@/lib/email";
 
 export async function GET() {
   try {
@@ -51,36 +52,31 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // const emailService = new EmailService();
+    const emailService = new EmailService(); 
 
-    // for (const target of targetUser) {
+    for (const target of targetUser) {
 
-    //   // Create in-app notification
-    //   const notification = await Notification.create({
-    //     ...body,
-    //     user: target.user._id,
-    //     type: "in-app",
-    //   });
+      // Create in-app notification
+      const notification = await Notification.create({
+        ...body,
+        user: target.user._id,
+        type: "in-app",
+      });
 
-    //   // Check if the user has email notifications enabled
-    //   if (target.emailNotifications) {
-    //     await emailService.sendEmail({
-    //       to: { email: target.user.email! },
-    //       subject: notification.title,
-    //       htmlContent: notification.message,
-    //       sender: {
-    //         name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
-    //         email:
-    //           process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
-    //       },
-    //       replyTo: {
-    //         name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
-    //         email:
-    //           process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
-    //       },
-    //     });
-    //   }
-    // }
+      // Check if the user has email notifications enabled
+      if (target.emailNotifications) {
+        await emailService.sendEmail({
+          to: [{ email: target.user.email! }],
+          subject: notification.title,
+          htmlContent: notification.message,
+          sender: {
+            name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+            email:
+              process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
+          },
+        });
+      }
+    }
     
     return NextResponse.json({
       success: true,

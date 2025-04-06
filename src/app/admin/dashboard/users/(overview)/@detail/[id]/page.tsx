@@ -43,14 +43,14 @@ export default async function Page({
                                 {user.avatar ? (
                                     <Image
                                         src={user.avatar}
-                                        alt={user.name}
+                                        alt={user.name || ''}
                                         width={80}
                                         height={80}
                                         className="rounded-full"
                                     />
                                 ) : (
                                     <span className="text-2xl font-bold text-gray-400">
-                                        {user.name.charAt(0).toUpperCase()}
+                                        {user.name?.charAt(0).toUpperCase()}
                                     </span>
                                 )}
                             </div>
@@ -70,7 +70,7 @@ export default async function Page({
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-gray-500">Role</p>
-                                <p className="capitalize">{user.customData.role}</p>
+                                <p className="capitalize">{user.customData?.role}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -92,11 +92,11 @@ export default async function Page({
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-gray-500">Created</p>
-                                <p>{formatDistanceToNow(user.createdAt)} ago</p>
+                                <p>{formatDistanceToNow(user.createdAt || new Date())} ago</p>
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-gray-500">Last Sign In</p>
-                                <p>{formatDistanceToNow(user.lastSignInAt)} ago</p>
+                                <p>{formatDistanceToNow(user.lastSignInAt || new Date())} ago</p>
                             </div>
                             <div>
                                 <p className="text-sm font-medium text-gray-500">Password Status</p>

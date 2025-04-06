@@ -4,18 +4,17 @@ import RoleForm from "@/components/admin/forms/RoleForm";
 import { Suspense } from "react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
-interface RoleDetailModalProps {
-    params: {
-        id: string;
-    };
-}
-
-export default function RoleDetailModal({ params }: RoleDetailModalProps) {
+export default async function RoleDetailModal({
+    params,
+}: {
+    params: Promise<{ id: string }>
+}) {
+    const { id } = await params;
     return (
         <Modal>
             <Card className="p-6">
                 <Suspense fallback={<LoadingSpinner />}>
-                    <RoleForm id={params.id} />
+                    <RoleForm id={id} />
                 </Suspense>
             </Card>
         </Modal>

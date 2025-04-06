@@ -76,7 +76,7 @@ export async function getTransactions({
       return {
         transactions: (transactions as unknown as ITransaction[]).map((transaction) => ({
           _id: transaction._id.toString(),
-          user: (transaction.user as IUser).email,
+          user: (transaction.user as IUser).primaryEmail || 'unknown',
           amount: transaction.amount,
           currency: transaction.currency,
           status: transaction.status,

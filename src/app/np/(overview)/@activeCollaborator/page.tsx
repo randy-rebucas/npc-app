@@ -60,8 +60,8 @@ export default function ActiveCollaboratorPage() {
                                             {collab.npUser.username}
                                         </Link>
                                     </td>
-                                    <td className="py-3 px-4 text-foreground">{collab.npUser.email}</td>
-                                    <td className="py-3 px-4 text-foreground">{collab.npUser.onBoardingStatus}</td>
+                                    <td className="py-3 px-4 text-foreground">{collab.npUser.primaryEmail}</td>
+                                    <td className="py-3 px-4 text-foreground">{collab.npUser.customData?.onboardingStatus}</td>
                                     <td className="py-3 px-4 text-foreground">${collab.monthlyRate}</td>
                                     <td className="py-3 px-4 text-foreground">{new Date(collab.startDate).toLocaleDateString()}</td>
                                     <td className="py-3 px-4">

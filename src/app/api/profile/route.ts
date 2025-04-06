@@ -7,6 +7,7 @@ import { EventType } from "@/app/models/Event";
 import Template from "@/app/models/Template";
 import { getLogtoContext } from "@logto/next/server-actions";
 import { logtoConfig } from "@/app/logto";
+import { EmailService } from "@/lib/email";
 
 export async function POST(request: Request) {
   try {
@@ -39,20 +40,16 @@ export async function POST(request: Request) {
       template = await Template.findOne({ type: "email", code: "profile-updated" });
     }
 
-    // const emailService = new EmailService();
-    // await emailService.sendEmail({
-    //   to: { email: user.email! },
-    //   subject: template?.name || "Profile Updated",
-    //   htmlContent: template?.content || "<p>Your profile has been updated</p>",
-    //   sender: {
-    //     name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
-    //     email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
-    //   },
-    //   replyTo: {
-    //     name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
-    //     email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
-    //   },
-    // });
+    const emailService = new EmailService();
+    await emailService.sendEmail({
+      to: [{ email: user.primaryEmail || "" }],
+      subject: template?.name || "Profile Updated",
+      htmlContent: template?.content || "<p>Your profile has been updated</p>",
+      sender: {
+        name: process.env.NEXT_PUBLIC_APP_NAME || "npcollaborator",
+        email: process.env.NEXT_PUBLIC_APP_EMAIL || "noreply@npcollaborator.com",
+      },
+    });
 
     return NextResponse.json({ userProfile });
   } catch (error) {

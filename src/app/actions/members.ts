@@ -63,13 +63,6 @@ interface GetMembersParams {
   limit?: number;
 }
 
-interface MemberQuery {
-  $or?: {
-    event?: { $regex: string; $options: string } | string;
-  }[];
-  accountSynced?: string;
-}
-
 export interface MemberDocument {
   _id: string; // We'll cast this to string anyway
   event: string;
@@ -109,21 +102,22 @@ export async function getMembers({
   const [result, error] = await handleAsync(
     (async () => {
       await connect();
-      const query: MemberQuery = {};
+      const query = Member.find({})
+        .hint({ createdAt: -1 })
+        .limit(limit)
+        .skip((page - 1) * limit);
 
       if (search) {
-        query.$or = [{ event: { $regex: search, $options: "i" } }];
+        query.or([{ event: new RegExp(search, 'i') }]);
       }
 
       if (accountSynced !== "all") {
-        query.accountSynced = accountSynced;
+        query.where('accountSynced').equals(accountSynced);
       }
 
-      const skip = (page - 1) * limit;
-
       const [members, total] = await Promise.all([
-        Member.find(query).skip(skip).limit(limit).sort({ createdAt: -1 }).lean(),
-        Member.countDocuments(query),
+        query.lean().exec(),
+        Member.countDocuments(query.getQuery())
       ]);
 
       return {
