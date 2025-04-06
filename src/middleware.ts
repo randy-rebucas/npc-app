@@ -4,7 +4,7 @@ import { getLogtoContext } from "@logto/next/server-actions";
 import { cookies } from "next/headers";
 
 interface CustomClaims {
-  role?: "admin" | "user";
+  role?: "admin" | "user" | "physician" | "nurse-practitioner";
 }
 
 async function getLogtoToken() {
@@ -114,11 +114,20 @@ export async function middleware(req: NextRequest) {
     // Handle route access
     if (isAdminRoute && !isAdmin) {
       console.warn(`Unauthorized admin access attempt by user ${claims.sub}`);
-      return NextResponse.redirect(new URL("/np", req.url));
+      // if (customClaims.role === "physician") {
+      //   console.log("Redirecting physician to NP main");
+      //   return NextResponse.redirect(new URL("/np/main", req.url));
+      // } else if (customClaims.role === "nurse-practitioner") {
+      //   console.log("Redirecting NP to NP find match");
+      //   return NextResponse.redirect(new URL("/np/find-match", req.url));
+      // } else {
+        console.log("Redirecting to NP");
+        return NextResponse.redirect(new URL("/np", req.url));
+      // }
     }
 
-    if (isAdmin && !isAdminRoute) {
-      return NextResponse.redirect(new URL("/admin", req.url));
+    if (!isAdminRoute && isAdmin) {
+      return NextResponse.redirect(new URL("/admin/dashboard", req.url));
     }
 
     return NextResponse.next();

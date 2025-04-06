@@ -8,10 +8,10 @@ import Search from "@/components/ui/member/search";
 import Filter from "@/components/ui/member/filter";
 import AdminHeader from "@/components/admin/Header";
 import { formatCurrency } from "@/lib/utils";
-import { getListings } from "@/app/actions/listing";
+import { getListings, ListingDocument } from "@/app/actions/listing";
+// import { sdk } from "@/config/sharetribe";
 // import { PencilIcon, TrashIcon } from "lucide-react";
 // import Link from "next/link";
-
 
 export default async function ListingsPage({ searchParams }: {
     searchParams: SearchParams
@@ -26,21 +26,20 @@ export default async function ListingsPage({ searchParams }: {
     const practiceType = String(params?.practiceType || '');
     const priceRange = String(params?.priceRange || '');
 
-    const { listings, total } = await getListings({
+    const { listings, total } = await getListings({ 
         page: currentPage,
         search: query,
         limit: ITEMS_PER_PAGE,
-        status,
+        status: status,
         sort: "most_recent",
-        stateLicense,
-        practiceType,
-        priceRange
+        stateLicense: stateLicense,
+        practiceType: practiceType,
+        priceRange: priceRange
     });
 
     const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
     const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
     const endItem = Math.min(currentPage * ITEMS_PER_PAGE, total);
-
     return (
         <SidebarInset>
             <AdminHeader breadcrumbs={[
@@ -48,6 +47,16 @@ export default async function ListingsPage({ searchParams }: {
                 { label: 'Listings', href: '/admin/dashboard/listings', active: true },
             ]} />
 
+            {/* <div>
+                <h1>Listings</h1>
+                {listings.map((listing: Listing) => {
+                    return (
+                        <div key={listing.id.uuid}>
+                            <h2>{listing.attributes.title}</h2>
+                        </div>
+                    )
+                })}
+            </div> */}
             <div className="flex flex-1 flex-col gap-4 p-4">
                 <div className="mx-auto w-full space-y-4">
                     <div className="flex items-center justify-between">
@@ -79,9 +88,9 @@ export default async function ListingsPage({ searchParams }: {
                                     <TableHead>State License</TableHead>
                                     {/* <TableHead className="text-right">Actions</TableHead> */}
                                 </TableRow>
-                            </TableHeader>
+                            </TableHeader >
                             <TableBody>
-                                {listings.map((listing) => (
+                                {listings.map((listing: ListingDocument) => (
                                     <TableRow key={listing.id}>
                                         <TableCell>{listing.title}</TableCell>
                                         <TableCell>{listing.email}</TableCell>
@@ -106,8 +115,8 @@ export default async function ListingsPage({ searchParams }: {
                                     </TableRow>
                                 ))}
                             </TableBody>
-                        </Table>
-                    </div>
+                        </Table >
+                    </div >
 
                     <Pagination
                         startItem={startItem}
@@ -117,9 +126,9 @@ export default async function ListingsPage({ searchParams }: {
                         query={query}
                         totalPages={totalPages}
                     />
-                </div>
-            </div>
-        </SidebarInset>
+                </div >
+            </div >
+        </SidebarInset >
     );
 }
 

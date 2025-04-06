@@ -1,20 +1,15 @@
-import connect from "@/lib/db";
-import Listing from "@/app/models/Listing";
-import { selectedItem } from "@/lib/utils";
-import { Certification, License } from "@/lib/types/onboarding";
-import mongoose from "mongoose";
-import { handleAsync } from '@/lib/errorHandler';
-import { DatabaseError, NotFoundError, ValidationError } from '@/lib/errors';
-
+import { handleAsync } from "@/lib/errorHandler";
+import { DatabaseError, NotFoundError, ValidationError } from "@/lib/errors";
+import { sdk } from "@/config/sharetribe";
 
 export interface ListingDocument {
-  _id: string;
+  id: string;
   userId: string;
+  username: string;
   email: string;
   metaData: {
     calendlyLink: string;
   };
-  username: string;
   createdAt: Date;
   title: string;
   description: string;
@@ -28,36 +23,9 @@ export interface ListingDocument {
   controlledSubstanceFee: number;
   status: string;
   profile: {
-    _id: string;
-    user: string;
-    firstName: string;
-    lastName: string;
-    medicalLicenseStates: License[];
-    deaLicenseStates: License[];
-    practiceTypes: string[];
-    monthlyCollaborationRate: number;
-    additionalStateFee: number;
-    additionalNPFee: number;
-    controlledSubstancesMonthlyFee: number;
-    controlledSubstancesPerPrescriptionFee: number;
-    description: string;
-    boardCertification: string;
-    additionalCertifications: Certification[];
-    linkedinProfile: string;
-    profilePhotoPath: string;
-    governmentIdPath: string;
-    createdAt: Date;
-    updatedAt: Date;
-    address: string;
-    city: string;
-    phone: string;
-    state: string;
-    zip: string;
-    clinicalDegree: string;
-    education: string[];
-    npiNumber: string;
-    title: string;
-    publications: string;
+    firstName?: string;
+    lastName?: string;
+    profilePhotoPath?: string;
   };
 }
 
@@ -91,139 +59,153 @@ interface GetListingResponse {
   total: number;
 }
 
-interface ListingQuery {
-  $or?: {
-    username?: { $regex: string; $options: string } | string;
-    email?: { $regex: string; $options: string } | string;
-    "profile.firstName"?: { $regex: string; $options: string } | string;
-    "profile.lastName"?: { $regex: string; $options: string } | string;
-  }[];
-  status?: string;
-  stateLicenses?: { $in: string[] };
-  practiceTypes?: { $in: string[] };
-  monthlyBaseRate?: { $gte: number; $lte: number };
-}
-
 interface ListingFilters {
-    page: number;
-    search?: string;
-    limit: number;
-    sort: 'lowest_price' | 'highest_price' | 'most_recent';
-    status: string;
-    stateLicense?: string;
-    practiceType?: string;
-    priceRange?: string;
+  page: number;
+  search?: string;
+  limit: number;
+  sort: "lowest_price" | "highest_price" | "most_recent";
+  status: string;
+  stateLicense?: string;
+  practiceType?: string;
+  priceRange?: string;
 }
 
-export async function getListings(filters: ListingFilters): Promise<GetListingResponse> {
+interface SharetribeListing {
+  id: { uuid: string };
+  attributes: {
+    title: string;
+    description: string;
+    createdAt: Date;
+    state: string;
+    price: { amount: number };
+    publicData: {
+      boardCertification?: string;
+      practice_types?: string[];
+      stateLicenses?: string[];
+      Specialties?: string;
+      State: string[];
+      additionalNpFee?: object;
+      additionalStateFee?: object;
+      additional_certifications?: string;
+      base_rate?: number;
+      board_certifications?: string;
+      categoryLevel1?: string;
+      control_fee?: number;
+      controlledSubstanceFee?: object;
+      listingType?: string;
+      multi_np_fee?: number;
+      state_fee?: number;
+      transactionProcessAlias?: string;
+      unitType?: string;
+      additionalFeePerState?: number;
+    };
+    metadata: {
+      calendlyLink?: string;
+    };
+  };
+  relationships: {
+    author: {
+      data: {
+        id: { uuid: string };
+        attributes: {
+          username?: string;
+          email?: string;
+          profile?: {
+            firstName?: string;
+            lastName?: string;
+            profileImage?: {
+              url?: string;
+            };
+          };
+        };
+      };
+    };
+  };
+}
+
+export async function getListings(
+  filters: ListingFilters
+): Promise<GetListingResponse> {
   if (filters.page < 1 || filters.limit < 1) {
-    throw new ValidationError('Invalid pagination parameters');
+    throw new ValidationError("Invalid pagination parameters");
   }
 
   const [result, error] = await handleAsync(
     (async () => {
-      await connect();
-      const query: ListingQuery = {};
+      // Convert filters to Sharetribe query parameters
+      const queryParams = {
+        page: filters.page,
+        perPage: filters.limit,
+        include: ["author", "author.profileImage"],
+        "fields.listing": [
+          "title",
+          "description",
+          "price",
+          "publicData",
+          "metadata",
+          "state",
+        ],
+        sort:
+          filters.sort === "lowest_price"
+            ? "price"
+            : filters.sort === "highest_price"
+            ? "-price"
+            : "-createdAt",
+        ...(filters.search && { keywords: filters.search }),
+        ...(filters.status && { state: filters.status }),
+        ...(filters.stateLicense && {
+          pub_stateLicenses: filters.stateLicense,
+        }),
+        ...(filters.practiceType && {
+          pub_practice_types: filters.practiceType,
+        }),
+        ...(filters.priceRange && {
+          "price.gte": filters.priceRange.split("-")[0],
+          "price.lte": filters.priceRange.split("-")[1],
+        }),
+      };
 
-      if (filters.search) {
-        query.$or = [
-          { username: { $regex: filters.search, $options: "i" } },
-          { email: { $regex: filters.search, $options: "i" } },
-          { "profile.firstName": { $regex: filters.search, $options: "i" } },
-          { "profile.lastName": { $regex: filters.search, $options: "i" } },
-        ];
-      }
+      const response = await sdk.listings.query(queryParams);
 
-      if (filters.status !== "all") {
-        query.status = filters.status;
-      }
-
-      if (filters.stateLicense) {
-        const states = filters.stateLicense.split(",").map((state) => state.trim());
-        query.stateLicenses = { $in: states };
-      }
-
-      if (filters.practiceType) {
-        const practiceTypes = filters.practiceType.split(",").map((type) => type.trim());
-        query.practiceTypes = { $in: practiceTypes };
-      }
-
-      if (filters.priceRange) {
-        const [min, max] = filters.priceRange.split(",").map(Number);
-        query.monthlyBaseRate = { $gte: min, $lte: max };
-      }
-
-      const skip = (filters.page - 1) * filters.limit;
-      const sortConfig = {
-        lowest_price: { monthlyBaseRate: 1 },
-        highest_price: { monthlyBaseRate: -1 },
-        most_recent: { createdAt: -1 },
-      } as const;
-
-      const aggregationPipeline = [
-        { $lookup: { from: "users", localField: "user", foreignField: "_id", as: "user" } },
-        { $unwind: "$user" },
-        { $lookup: { from: "userprofiles", localField: "user._id", foreignField: "user", as: "profile" } },
-        { $unwind: "$profile" },
-        { $match: query },
-        { $sort: sortConfig[filters.sort] || { monthlyBaseRate: 1 } },
-        { $skip: skip },
-        { $limit: filters.limit },
-        {
-          $project: {
-            userId: "$user._id",
-            username: "$user.username",
-            email: "$user.email",
-            metaData: "$user.metaData",
-            profile: 1,
-            _id: "$_id",
-            title: "$title",
-            description: "$description",
-            boardCertification: "$boardCertification",
-            practiceTypes: "$practiceTypes",
-            stateLicenses: "$stateLicenses",
-            specialties: "$specialties",
-            monthlyBaseRate: "$monthlyBaseRate",
-            multipleNPFee: "$multipleNPFee",
-            additionalFeePerState: "$additionalFeePerState",
-            controlledSubstanceFee: "$controlledSubstanceFee",
-            status: "$status",
-            createdAt: "$createdAt",
-          },
+      // Transform Sharetribe response to match our interface
+      const listings = response.data.data.map((listing: SharetribeListing) => ({
+        id: listing.id.uuid,
+        userId: listing.relationships.author.data.id.uuid,
+        username:
+          listing.relationships.author?.data?.attributes?.username || "",
+        email: listing.relationships.author?.data?.attributes?.email || "",
+        metaData: {
+          calendlyLink: listing.attributes.metadata?.calendlyLink || "",
         },
-      ];
-
-      const [aggregatedListings, total] = await Promise.all([
-        Listing.aggregate(aggregationPipeline).hint({ status: 1, monthlyBaseRate: 1, createdAt: -1 }),
-        Listing.countDocuments(query).hint({ status: 1 })
-      ]);
+        createdAt: new Date(listing.attributes.createdAt),
+        title: listing.attributes.title,
+        description: listing.attributes.description,
+        boardCertification:
+          listing.attributes.publicData?.boardCertification || "",
+        practiceTypes: listing.attributes.publicData?.practice_types || [],
+        stateLicenses: listing.attributes.publicData?.stateLicenses || [],
+        specialties: listing.attributes.publicData?.Specialties || "",
+        monthlyBaseRate: listing.attributes.price?.amount || 0,
+        multipleNPFee: listing.attributes.publicData?.multi_np_fee || 0,
+        additionalFeePerState:
+          listing.attributes.publicData?.additionalFeePerState || 0,
+        controlledSubstanceFee:
+          listing.attributes.publicData?.controlledSubstanceFee || 0,
+        status: listing.attributes.state,
+        profile: {
+          firstName:
+            listing.relationships.author?.data?.attributes?.profile?.firstName,
+          lastName:
+            listing.relationships.author?.data?.attributes?.profile?.lastName,
+          profilePhotoPath:
+            listing.relationships.author?.data?.attributes?.profile
+              ?.profileImage?.url,
+        },
+      }));
 
       return {
-        listings: aggregatedListings.map((listing) => ({
-          id: listing._id.toString(),
-          userId: listing.userId,
-          username: listing.username,
-          email: listing.email,
-          metaData: listing.metaData,
-          createdAt: listing.createdAt,
-          title: listing.title,
-          description: listing.description,
-          boardCertification: listing.boardCertification,
-          practiceTypes: listing.practiceTypes,
-          stateLicenses: listing.stateLicenses,
-          specialties: listing.specialties,
-          monthlyBaseRate: listing.monthlyBaseRate,
-          multipleNPFee: listing.multipleNPFee,
-          additionalFeePerState: listing.additionalFeePerState,
-          controlledSubstanceFee: listing.controlledSubstanceFee,
-          status: listing.status,
-          profile: selectedItem(listing.profile, [
-            "firstName",
-            "lastName",
-            "profilePhotoPath",
-          ]),
-        })),
-        total: total || 0,
+        listings,
+        total: response.data.meta.totalItems || 0,
       };
     })()
   );
@@ -233,7 +215,7 @@ export async function getListings(filters: ListingFilters): Promise<GetListingRe
   }
 
   if (!result) {
-    throw new NotFoundError('No listings found');
+    throw new NotFoundError("No listings found");
   }
 
   return result;
@@ -241,66 +223,41 @@ export async function getListings(filters: ListingFilters): Promise<GetListingRe
 
 export async function getListingById(id: string): Promise<ListingDocument> {
   if (!id) {
-    throw new ValidationError('Listing ID is required');
+    throw new ValidationError("Listing ID is required");
   }
 
   const [result, error] = await handleAsync(
     (async () => {
-      await connect();
-      const listing = await Listing.aggregate([
-        { $match: { _id: new mongoose.Types.ObjectId(id) } },
-        { $lookup: { from: "users", localField: "user", foreignField: "_id", as: "user" } },
-        { $unwind: "$user" },
-        { $lookup: { from: "userprofiles", localField: "user._id", foreignField: "user", as: "profile" } },
-        { $unwind: "$profile" },
-        { $limit: 1 },
-        {
-          $project: {
-            userId: "$user._id",
-            username: "$user.username",
-            email: "$user.email",
-            metaData: "$user.metaData",
-            profile: 1,
-            _id: "$_id",
-            title: "$title",
-            description: "$description",
-            boardCertification: "$boardCertification",
-            practiceTypes: "$practiceTypes",
-            stateLicenses: "$stateLicenses",
-            specialties: "$specialties",
-            monthlyBaseRate: "$monthlyBaseRate",
-            multipleNPFee: "$multipleNPFee",
-            additionalFeePerState: "$additionalFeePerState",
-            controlledSubstanceFee: "$controlledSubstanceFee",
-            status: "$status",
-            createdAt: "$createdAt",
-          },
-        },
-      ]);
+      const response = await sdk.listings.show({
+        id: id,
+        include: ["author", "author.profileImage"],
+      });
 
-      if (!listing || listing.length === 0) {
-        throw new ValidationError(`Listing with ID ${id} not found`);
-      }
+      const listing = response.data.data;
 
       return {
-        _id: listing[0]._id.toString(),
-        userId: listing[0].userId.toString(),
-        email: listing[0].email,
-        metaData: listing[0].metaData,
-        username: listing[0].username,
-        createdAt: listing[0].createdAt,
-        title: listing[0].title,
-        description: listing[0].description,
-        boardCertification: listing[0].boardCertification,
-        practiceTypes: listing[0].practiceTypes,
-        stateLicenses: listing[0].stateLicenses,
-        specialties: listing[0].specialties,
-        monthlyBaseRate: listing[0].monthlyBaseRate,
-        multipleNPFee: listing[0].multipleNPFee,
-        additionalFeePerState: listing[0].additionalFeePerState,
-        controlledSubstanceFee: listing[0].controlledSubstanceFee,
-        status: listing[0].status,
-        profile: listing[0].profile,
+        id: listing.id.uuid,
+        userId: listing.relationships.author.data.id.uuid,
+        email: listing.relationships.author?.data?.attributes?.email,
+        metaData: {
+          calendlyLink: listing.attributes.metadata?.calendlyLink || "",
+        },
+        username: listing.relationships.author?.data?.attributes?.username,
+        createdAt: new Date(listing.attributes.createdAt),
+        title: listing.attributes.title,
+        description: listing.attributes.description,
+        boardCertification: listing.attributes.publicData?.boardCertification,
+        practiceTypes: listing.attributes.publicData?.practice_types || [],
+        stateLicenses: listing.attributes.publicData?.stateLicenses || [],
+        specialties: listing.attributes.publicData?.Specialties,
+        monthlyBaseRate: listing.attributes.price?.amount,
+        multipleNPFee: listing.attributes.publicData?.multi_np_fee,
+        additionalFeePerState:
+          listing.attributes.publicData?.additionalFeePerState,
+        controlledSubstanceFee:
+          listing.attributes.publicData?.controlledSubstanceFee,
+        status: listing.attributes.state,
+        profile: listing.relationships.author?.data?.attributes?.profile || {},
       };
     })()
   );
@@ -310,7 +267,7 @@ export async function getListingById(id: string): Promise<ListingDocument> {
   }
 
   if (!result) {
-    throw new NotFoundError('No listing found');
+    throw new NotFoundError("No listing found");
   }
 
   return result;
@@ -318,16 +275,14 @@ export async function getListingById(id: string): Promise<ListingDocument> {
 
 export async function deleteListing(id: string) {
   if (!id) {
-    throw new ValidationError('Listing ID is required');
+    throw new ValidationError("Listing ID is required");
   }
 
   const [result, error] = await handleAsync(
     (async () => {
-      await connect();
-      const listing = await Listing.findByIdAndDelete(id);
-      if (!listing) {
-        throw new ValidationError(`Listing with ID ${id} not found`);
-      }
+      await sdk.listings.delete({
+        id: id,
+      });
 
       return { success: true };
     })()

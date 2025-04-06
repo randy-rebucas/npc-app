@@ -36,3 +36,9 @@ mailjet.post("send").request({
   "Text-part": "Hello World",
 
   default physicians
+
+
+  Email address: rebucasrandy1986@gmail.com
+Phone number: 09179157515
+Username: randyrs
+New password: Xxrr7cPf

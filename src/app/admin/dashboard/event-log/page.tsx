@@ -88,23 +88,34 @@ export default async function EventLog(props: {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {events.map((event) => {
-                                    const Icon = getEventIcon(event.type);
-                                    return (
-                                        <TableRow key={event.id}>
-                                            <TableCell>
-                                                <div className="flex items-center gap-2">
-                                                    <div className="rounded-full p-2 bg-muted">
-                                                        <Icon className="h-4 w-4 text-muted-foreground" />
+                                {events.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={4} className="text-center py-8">
+                                            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                                                <p>No events found</p>
+                                                {query && <p className="text-sm">Try adjusting your search or filter</p>}
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    events.map((event) => {
+                                        const Icon = getEventIcon(event.type);
+                                        return (
+                                            <TableRow key={event.id}>
+                                                <TableCell>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="rounded-full p-2 bg-muted">
+                                                            <Icon className="h-4 w-4 text-muted-foreground" />
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>{event.email}</TableCell>
-                                            <TableCell>{event.type}</TableCell>
-                                            <TableCell>{formatDistanceToNow(new Date(event.createdAt), { addSuffix: true })}</TableCell>
-                                        </TableRow>
-                                    );
-                                })}
+                                                </TableCell>
+                                                <TableCell>{event.email}</TableCell>
+                                                <TableCell>{event.type}</TableCell>
+                                                <TableCell>{formatDistanceToNow(new Date(event.createdAt), { addSuffix: true })}</TableCell>
+                                            </TableRow>
+                                        );
+                                    })
+                                )}
                             </TableBody>
                         </Table>
                     </div>
