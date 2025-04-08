@@ -128,11 +128,10 @@ export async function POST(
         givenName: memberData.customFields["first-name"],
       },
     };
-    console.log(data);
-    const user = await createUser(data as Partial<IUser>);
-    console.log(user);
 
-    return NextResponse.json({ success: true });
+    const user = await createUser(data as Partial<IUser>);
+
+    return NextResponse.json({ success: true, user });
   } catch (error) {
     console.error(error);
     return NextResponse.json({
