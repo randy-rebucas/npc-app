@@ -4,6 +4,7 @@ import Event, { EventType, IEvent } from "../models/Event";
 import connect from "@/lib/db";
 import { handleAsync } from '@/lib/errorHandler';
 import { DatabaseError, NotFoundError, ValidationError } from '@/lib/errors';
+import { logtoFetch } from "@/utils/logto-fetch";
 
 export async function createEvent(event: Omit<IEvent, "createdAt">) {
   if (!event) {
@@ -31,14 +32,6 @@ interface GetEventsParams {
   limit?: number;
 }
 
-interface EventQuery {
-  $or?: {
-    user?: { $regex: string; $options: string } | string;
-    email?: { $regex: string; $options: string } | string;
-  }[];
-  type?: string;
-}
-
 export interface EventDocument {
   _id: string; // We'll cast this to string anyway
   user: string;
@@ -47,12 +40,30 @@ export interface EventDocument {
   createdAt: Date;
 }
 
+export interface IEventDocument {
+  tenantId: string; // We'll cast this to string anyway
+  id: string;
+  key: string;
+  payload: {
+    key: string;
+    result: string;
+    error: object;
+    ip: string;
+    userAgent: string;
+    userId: string;
+    applicationId: string;
+    sessionId: string;
+    params: object;
+  };
+  createdAt: Date;
+}
+
 interface GetEventsResponse {
   events: {
     id: string;
     user: string;
-    email: string;
-    type: EventType;
+    ip: string;
+    type: string;
     createdAt: Date;
   }[];
   total: number;
@@ -60,8 +71,6 @@ interface GetEventsResponse {
 
 export async function getEvents({
   page = 1,
-  search = "",
-  type = "all",
   limit = 10,
 }: GetEventsParams): Promise<GetEventsResponse> {
   if (page < 1 || limit < 1) {
@@ -70,38 +79,17 @@ export async function getEvents({
 
   const [result, error] = await handleAsync(
     (async () => {
-      await connect();
-      // Build query conditions
-      const query: EventQuery = {};
-
-      if (search) {
-        query.$or = [
-          { user: { $regex: search, $options: "i" } },
-          { email: { $regex: search, $options: "i" } },
-        ];
-      }
-
-      if (type !== "all") {
-        query.type = type;
-      }
-
-      // Execute query with pagination
-      const skip = (page - 1) * limit;
-
-      const [events, total] = await Promise.all([
-        Event.find(query).skip(skip).limit(limit).sort({ createdAt: -1 }).lean(),
-        Event.countDocuments(query),
-      ]);
+      const data = await logtoFetch(`logs?page=${page}&page_size=${limit}`);
 
       return {
-        events: (events as unknown as EventDocument[]).map((event) => ({
-          id: event._id.toString(),
-          user: event.user,
-          email: event.email,
-          type: event.type,
+        events: (data as unknown as IEventDocument[]).map((event) => ({
+          id: event.id,
+          user: event.payload.userId,
+          ip: event.payload.ip,
+          type: event.key,
           createdAt: event.createdAt,
         })),
-        total,
+        total: data.total,
       };
     })()
   );

@@ -13,14 +13,6 @@ const EVENT_ICONS: Record<EventType, React.ElementType> = {
     'member-synced': RefreshCcw
 };
 
-const EVENT_LABELS: Record<EventType, string> = {
-    'logged-in': 'Logged in',
-    'member-updated': 'Member Updated',
-    'member-created': 'Member Created',
-    'member-deleted': 'Member Deleted',
-    'member-synced': 'Member Synced'
-};
-
 export default async function AdminEventPage() {
     const getEventIcon = (type: string): React.ElementType => {
         return EVENT_ICONS[type as EventType] || LogIn;
@@ -41,7 +33,7 @@ export default async function AdminEventPage() {
                         return (
                             <EventLogItem
                                 key={event.id}
-                                email={event.email}
+                                id={event.id}
                                 type={event.type}
                                 icon={Icon}
                             />
@@ -54,21 +46,23 @@ export default async function AdminEventPage() {
 }
 
 interface EventLogItemProps {
-    email: string;
+    id: string;
     type: string;
     icon: React.ElementType;
 }
 
-function EventLogItem({ email, type, icon: Icon }: EventLogItemProps) {
+function EventLogItem({ id, type, icon: Icon }: EventLogItemProps) {
     return (
         <div className="flex items-center gap-4">
             <div className="rounded-full p-2 bg-muted">
                 <Icon className="h-4 w-4 text-muted-foreground" />
             </div>
             <div>
-                <p className="text-sm font-medium text-foreground">{email}</p>
+                <p className="text-sm font-medium text-foreground">
+                    ID: {id}
+                </p>
                 <p className="text-xs text-muted-foreground">
-                    {EVENT_LABELS[type as EventType] || 'Unknown Event'}
+                    Type: {type}
                 </p>
             </div>
         </div>

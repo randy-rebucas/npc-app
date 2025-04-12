@@ -103,7 +103,7 @@ export async function getMembers({
     (async () => {
       await connect();
       const query = Member.find({})
-        .hint({ createdAt: -1 })
+        .sort({ createdAt: -1 })
         .limit(limit)
         .skip((page - 1) * limit);
 

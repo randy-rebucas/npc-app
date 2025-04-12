@@ -7,7 +7,7 @@ import { subDays, isAfter } from 'date-fns';
 
 export default async function AdminUserPage() {
     const users = await getUsers({ page: 1, page_size: 10 })
-    
+
     const sevenDaysAgo = subDays(new Date(), 7);
     const filteredUsers = users.filter((user: GetUsersResponse) => 
         isAfter(new Date(user.createdAt), sevenDaysAgo)

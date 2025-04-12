@@ -46,7 +46,6 @@ export async function POST(
     const response = await MemberstackAdminService.getMemberById(id);
     const memberData = response.data as MemberstackMember;
 
-    console.log(memberData);
     const medicalLicenses = Array.isArray(
       splitString(memberData.customFields["active-license-states"] || "")
     )

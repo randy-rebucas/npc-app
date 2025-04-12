@@ -73,7 +73,7 @@ export default function UserTable({ users }: { users: IUser[] }) {
                             {user.customData?.stripeAccountId ?? 'N/A'}
                         </TableCell>
                         <TableCell>
-                            {user.customData?.onboardingStatus ? user.customData?.onboardingStatus : 'N/A'}
+                            {/* {user.customData?.onboardingStatus ? user.customData?.onboardingStatus : 'N/A'} */}
                             {user.customData?.onboardingStatus === 'COMPLETED' && (
                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800`}>
                                     {user.customData?.onboardingStatus}
