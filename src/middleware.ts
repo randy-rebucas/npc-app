@@ -3,25 +3,52 @@ import { logtoConfig } from "./app/logto";
 import { getLogtoContext } from "@logto/next/server-actions";
 import { cookies } from "next/headers";
 
+// Improved type definitions
+type Role = "admin" | "user" | "physician" | "nurse-practitioner";
+
 interface CustomClaims {
-  role?: "admin" | "user" | "physician" | "nurse-practitioner";
+  role?: Role;
 }
 
-async function getLogtoToken() {
-  console.log("Getting Logto token...");
-  const cookieStore = await cookies();
-  const existingToken = cookieStore.get("logtoToken");
+interface TokenResponse {
+  access_token: string;
+  // Add other token fields if needed
+}
 
-  if (existingToken) {
+// Constants
+const COOKIE_TOKEN_KEY = "logtoToken";
+const ROUTES = {
+  HOME: "/",
+  ONBOARDING: "/onboarding",
+  ADMIN_DASHBOARD: "/admin/dashboard",
+  NP_MAIN: "/np/main",
+  NP_FIND_MATCH: "/np/find-match",
+  NP: "/np",
+} as const;
+
+// Utility function to create redirect response
+const redirectTo = (req: NextRequest, path: string) => {
+  return NextResponse.redirect(new URL(path, req.url));
+};
+
+async function getLogtoToken(): Promise<string | null> {
+  const cookieStore = await cookies();
+  const existingToken = cookieStore.get(COOKIE_TOKEN_KEY);
+
+  if (existingToken?.value) {
     return existingToken.value;
   }
 
   try {
     const formData = new URLSearchParams({
       grant_type: "client_credentials",
-      resource: process.env.LOGTO_RESOURCE!,
-      scope: process.env.LOGTO_SCOPE!,
+      resource: process.env.LOGTO_RESOURCE ?? "",
+      scope: process.env.LOGTO_SCOPE ?? "",
     });
+
+    if (!process.env.LOGTO_ENDPOINT || !process.env.LOGTO_API_APP_ID || !process.env.LOGTO_API_APP_SECRET) {
+      throw new Error("Missing required Logto environment variables");
+    }
 
     const tokenResponse = await fetch(
       `${process.env.LOGTO_ENDPOINT}oidc/token`,
@@ -43,9 +70,8 @@ async function getLogtoToken() {
       );
     }
 
-    const data = await tokenResponse.json();
-    cookieStore.set("logtoToken", data.access_token);
-    console.log("Token set in cookie:", data.access_token);
+    const data = await tokenResponse.json() as TokenResponse;
+    cookieStore.set(COOKIE_TOKEN_KEY, data.access_token);
     return data.access_token;
   } catch (error) {
     console.error("Error getting Logto token:", error);
@@ -57,8 +83,12 @@ async function getCustomClaims(
   userId: string,
   logtoToken: string
 ): Promise<CustomClaims | null> {
+  if (!process.env.LOGTO_ENDPOINT) {
+    console.error("Missing LOGTO_ENDPOINT environment variable");
+    return null;
+  }
+
   try {
-    console.log("Fetching custom claims...");
     const response = await fetch(
       `${process.env.LOGTO_ENDPOINT}api/users/${userId}/custom-data`,
       {
@@ -69,16 +99,27 @@ async function getCustomClaims(
     );
 
     if (!response.ok) {
-      console.error(`API error: ${response.status} ${response.statusText}`);
-      return null;
+      throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
-    console.log("Custom claims fetched:", data);
-    return data;
+    return await response.json() as CustomClaims;
   } catch (error) {
     console.error("Error fetching custom claims:", error);
     return null;
+  }
+}
+
+// Role-based redirect logic
+function getRoleBasedRedirect(req: NextRequest, role: Role | undefined): NextResponse {
+  switch (role) {
+    case "physician":
+      return redirectTo(req, ROUTES.NP_MAIN);
+    case "nurse-practitioner":
+      return redirectTo(req, ROUTES.NP_FIND_MATCH);
+    case "admin":
+      return redirectTo(req, ROUTES.ADMIN_DASHBOARD);
+    default:
+      return redirectTo(req, ROUTES.NP);
   }
 }
 
@@ -86,26 +127,24 @@ export async function middleware(req: NextRequest) {
   try {
     const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
 
-    // Redirect unauthenticated users to home
     if (!isAuthenticated || !claims?.sub) {
-      return NextResponse.redirect(new URL("/", req.url));
+      return redirectTo(req, ROUTES.HOME);
     }
 
     const logtoToken = await getLogtoToken();
     if (!logtoToken) {
       console.error("Failed to obtain Logto token for user:", claims.sub);
-      return NextResponse.redirect(new URL("/", req.url));
+      return redirectTo(req, ROUTES.HOME);
     }
 
     const customClaims = await getCustomClaims(claims.sub, logtoToken);
     if (!customClaims) {
       console.error("Failed to fetch custom claims for user:", claims.sub);
-      return NextResponse.redirect(new URL("/", req.url));
+      return redirectTo(req, ROUTES.HOME);
     }
 
-    // If user hasn't completed onboarding (no role assigned)
-    if (!customClaims.hasOwnProperty("role")) {
-      return NextResponse.redirect(new URL("/onboarding", req.url));
+    if (!customClaims.role) {
+      return redirectTo(req, ROUTES.ONBOARDING);
     }
 
     const isAdminRoute = req.nextUrl.pathname.startsWith("/admin");
@@ -114,30 +153,20 @@ export async function middleware(req: NextRequest) {
     // Handle route access
     if (isAdminRoute && !isAdmin) {
       console.warn(`Unauthorized admin access attempt by user ${claims.sub}`);
-      // if (customClaims.role === "physician") {
-      //   console.log("Redirecting physician to NP main");
-      //   return NextResponse.redirect(new URL("/np/main", req.url));
-      // } else if (customClaims.role === "nurse-practitioner") {
-      //   console.log("Redirecting NP to NP find match");
-      //   return NextResponse.redirect(new URL("/np/find-match", req.url));
-      // } else {
-        console.log("Redirecting to NP");
-        return NextResponse.redirect(new URL("/np", req.url));
-      // }
+      return getRoleBasedRedirect(req, customClaims.role);
     }
 
     if (!isAdminRoute && isAdmin) {
-      return NextResponse.redirect(new URL("/admin/dashboard", req.url));
+      return redirectTo(req, ROUTES.ADMIN_DASHBOARD);
     }
 
     return NextResponse.next();
   } catch (error) {
     console.error("Middleware error:", error);
-    return NextResponse.redirect(new URL("/", req.url));
+    return redirectTo(req, ROUTES.HOME);
   }
 }
 
-// Define the config for the middleware
 export const config = {
   matcher: ["/admin/:path*", "/np/:path*"],
 };
