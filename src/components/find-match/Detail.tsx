@@ -1,6 +1,5 @@
 'use client'
 
-import { Certification, License } from '@/lib/types/onboarding';
 import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
 import Image from 'next/image'
 import { useEffect, useState } from 'react';
@@ -15,7 +14,7 @@ export default function FindMatchDetail({ id }: { id: string }) {
     const [listing, setListing] = useState<ListingDocument | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const { breakdown, setBreakdown, total } = useBreakdownStore(); 
+    const { breakdown, setBreakdown, total } = useBreakdownStore();     
 
 
     useEffect(() => {
@@ -39,8 +38,8 @@ export default function FindMatchDetail({ id }: { id: string }) {
         const baseRate = Number(process.env.BASE_RATE ?? 0);
         const controlledSubstancesFee = Number(process.env.CONTROLLED_SUBSTANCES_FEE ?? 0);
         const platformFee = Number(process.env.PLATFORM_FEE ?? 0);
-        const additionalStates = (listing?.profile?.medicalLicenseStates?.length || 0) * Number(process.env.ADDITIONAL_STATE_FEE ?? 0);
-        const additionalNps = (listing?.profile?.additionalNPFee ?? 0)
+        const additionalStates = (listing?.stateLicenses?.length || 0) * Number(process.env.ADDITIONAL_STATE_FEE ?? 0);
+        const additionalNps = (listing?.multipleNPFee ?? 0)
         
         const newBreakdown = new Map([
             ['Base Rate', baseRate],
@@ -96,7 +95,7 @@ export default function FindMatchDetail({ id }: { id: string }) {
                             </Avatar>
                             <div>
                                 <p className="font-semibold text-foreground">{listing?.profile?.firstName} {listing?.profile?.lastName}</p>
-                                <p className="text-muted-foreground">{listing?.profile?.boardCertification}</p>
+                                <p className="text-muted-foreground">{listing?.boardCertification}</p>
                             </div>
                         </div>
                     </div>
@@ -133,21 +132,21 @@ export default function FindMatchDetail({ id }: { id: string }) {
                         <div className="mb-6">
                             <h3 className="font-semibold mb-3 text-foreground">Medical Licenses</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {listing?.profile?.medicalLicenseStates?.map((state: License) => (
-                                    <div key={state.state} className="border border-border p-3 rounded-lg bg-card">
-                                        <p className="font-medium text-foreground">{state.state}</p>
-                                        <p className="text-sm text-muted-foreground">License: {state.licenseNumber}</p>
-                                        <p className="text-sm text-muted-foreground">Expires: {state.expirationDate ? new Date(state.expirationDate).toLocaleDateString() : 'N/A'}</p>
-                                    </div>
-                                ))}
+                                {listing?.stateLicenses?.map((state: string) => {
+                                    return (
+                                        <div key={state} className="border border-border p-3 rounded-lg bg-card">
+                                            <p className="font-medium text-foreground">{state}</p>
+                                        </div>
+                                    )
+                                })}
                             </div>
-                        </div>
+                        </div>  
 
                         {/* DEA Licenses */}
-                        <div className="mb-6">
+                        {/* <div className="mb-6">
                             <h3 className="font-semibold mb-3 text-foreground">DEA Licenses</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {listing?.profile?.deaLicenseStates?.map((state: License) => (
+                                {listing?.deaLicenseStates?.map((state: License) => (
                                     <div key={state.state} className="border border-border p-3 rounded-lg bg-card">
                                         <p className="font-medium text-foreground">{state.state}</p>
                                         <p className="text-sm text-muted-foreground">License: {state.licenseNumber}</p>
@@ -155,13 +154,13 @@ export default function FindMatchDetail({ id }: { id: string }) {
                                     </div>
                                 ))}
                             </div>
-                        </div>
+                        </div> */}
 
                         {/* Additional Certifications */}
-                        <div>
+                        {/* <div>
                             <h3 className="font-semibold mb-3 text-foreground">Additional Certifications</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {listing?.profile?.additionalCertifications?.map((cert: Certification) => (
+                                {listing?.additionalCertifications?.map((cert: Certification) => (
                                     <div key={cert.certification} className="border border-border p-3 rounded-lg bg-card">
                                         <p className="font-medium text-foreground">{cert.certification}</p>
                                         <p className="text-sm text-muted-foreground">Issued: {cert.issueDate ? new Date(cert.issueDate).toLocaleDateString() : 'N/A'}</p>
@@ -169,7 +168,7 @@ export default function FindMatchDetail({ id }: { id: string }) {
                                     </div>
                                 ))}
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
 
@@ -177,10 +176,10 @@ export default function FindMatchDetail({ id }: { id: string }) {
                 <div className="md:w-[30%] space-y-6">
                     {/* Header and Action Buttons */}
                     <div className="bg-card rounded-lg p-6 shadow-sm border border-border">
-                        <h2 className="text-2xl font-bold text-foreground mb-2">{listing?.profile?.title}</h2>
+                        <h2 className="text-2xl font-bold text-foreground mb-2">{listing?.title}</h2>
                         <p className="text-2xl font-bold text-primary mb-4">
-                            {listing?.profile?.monthlyCollaborationRate
-                                ? `$${listing.profile.monthlyCollaborationRate.toFixed(2)}`
+                            {listing?.monthlyBaseRate
+                                ? `$${listing.monthlyBaseRate.toFixed(2)}`
                                 : 'Price not available'}<span className="text-sm text-muted-foreground font-normal">/month</span>
                         </p>
                         <div className="space-y-3">
