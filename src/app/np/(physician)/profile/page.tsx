@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "@/providers/logto-session-provider";
 import { useToast } from "@/hooks/use-toast";
 import { ProfileSkeleton } from "@/components/skeletons";
+import { IUser } from "@/app/models/User";
+import { getUser } from "@/app/actions/user";
 
 const formSchema = z.object({
     firstName: z.string().min(1, "First name is required"),
@@ -26,6 +28,7 @@ export default function ProfilePage() {
     const { claims } = useSession();
     const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [user, setUser] = useState<IUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -45,43 +48,32 @@ export default function ProfilePage() {
     const setValue = form.setValue;
 
     useEffect(() => {
-        const fetchUserProfile = async () => {
+        if (!claims?.sub) return;
+
+        const getUserData = async () => {
             try {
-                setIsLoading(true);
-                const userProfile = await fetch(`/api/user/${claims.sub}/profile`);
-
-                if (!userProfile.ok) {
-                    throw new Error(`Failed to fetch profile: ${userProfile.statusText}`);
+                if (!claims.sub) return;
+                const userData = await getUser(claims.sub);
+                setUser(userData);
+                
+                // Populate form with user data
+                if (userData) {
+                    setValue('firstName', userData.profile?.familyName || '');
+                    setValue('lastName', userData.profile?.givenName || '');
+                    setValue('phone', userData.primaryPhone || '');
+                    setValue('address', userData.profile?.address?.formatted || '');
+                    setValue('city', userData.profile?.address?.locality || '');
+                    setValue('state', userData.profile?.address?.region || '');
+                    setValue('zip', userData.profile?.address?.postalCode || '');
                 }
-                const profileResponse = await userProfile.json();
-
-                const profile = {
-                    firstName: profileResponse?.firstName || '',
-                    lastName: profileResponse?.lastName || '',
-                    phone: profileResponse?.phone || '',
-                    address: profileResponse?.address || '',
-                    city: profileResponse?.city || '',
-                    state: profileResponse?.state || '',
-                    zip: profileResponse?.zip || '',
-                };
-
-                Object.entries(profile).forEach(([key, value]) => {
-                    setValue(key as keyof typeof profile, value);
-                });
             } catch (error) {
-                toast({
-                    title: "Error",
-                    description: `Failed to load profile data: ${error}`,
-                    variant: "destructive",
-                });
+                console.error('Failed to fetch user:', error);
             } finally {
                 setIsLoading(false);
             }
         }
-
-        fetchUserProfile();
-
-    }, [setValue, toast, claims]);
+        getUserData();
+    }, [claims?.sub, setValue]);
 
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         setIsSubmitting(true);
@@ -91,12 +83,18 @@ export default function ProfilePage() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify({
+                    ...data,
+                    userId: claims?.sub
+                }),
             });
 
             if (!response.ok) {
                 throw new Error('Failed to update profile');
             }
+
+            // Update local user state with new data
+            setUser(prev => prev ? { ...prev, ...data } : null);
 
             toast({
                 title: "Success!",
@@ -171,7 +169,7 @@ export default function ProfilePage() {
                     )}
                 </div>
 
-                {/* Address Section */}
+                {/* Address Section with City, State, ZIP labels */}
                 <div>
                     <label className="block text-sm font-medium text-foreground mb-1">Address</label>
                     <input
@@ -184,6 +182,7 @@ export default function ProfilePage() {
 
                 <div className="flex gap-4">
                     <div className="flex-1">
+                        <label className="block text-sm font-medium text-foreground mb-1">City</label>
                         <input
                             {...form.register("city")}
                             className="w-full px-3 py-2 bg-background border border-border rounded-md 
@@ -192,6 +191,7 @@ export default function ProfilePage() {
                         />
                     </div>
                     <div className="flex-1">
+                        <label className="block text-sm font-medium text-foreground mb-1">State</label>
                         <input
                             {...form.register("state")}
                             className="w-full px-3 py-2 bg-background border border-border rounded-md 
@@ -200,6 +200,7 @@ export default function ProfilePage() {
                         />
                     </div>
                     <div className="flex-1">
+                        <label className="block text-sm font-medium text-foreground mb-1">ZIP</label>
                         <input
                             {...form.register("zip")}
                             className="w-full px-3 py-2 bg-background border border-border rounded-md 
@@ -214,7 +215,7 @@ export default function ProfilePage() {
                     <label className="block text-sm font-medium text-foreground mb-1">Email</label>
                     <div className="flex items-center gap-4">
                         <input
-                            value=""
+                            value={user?.primaryEmail || ''}
                             className="flex-1 px-3 py-2 bg-muted border border-border rounded-md"
                             readOnly
                         />
