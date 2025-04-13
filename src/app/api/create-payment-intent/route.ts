@@ -3,9 +3,7 @@ import Stripe from "stripe";
 import { logtoConfig } from "@/app/logto";
 import { getLogtoContext } from "@logto/next/server-actions";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-01-27.acacia",
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: Request) {
   try {
