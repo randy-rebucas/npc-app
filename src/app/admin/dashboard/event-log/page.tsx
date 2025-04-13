@@ -82,7 +82,7 @@ export default async function EventLog(props: {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Event</TableHead>
-                                    <TableHead>Email</TableHead>
+                                    <TableHead>User</TableHead>
                                     <TableHead>Type</TableHead>
                                     <TableHead>Time</TableHead>
                                 </TableRow>
@@ -109,7 +109,7 @@ export default async function EventLog(props: {
                                                         </div>
                                                     </div>
                                                 </TableCell>
-                                                <TableCell>{event.email}</TableCell>
+                                                <TableCell>{event.user}</TableCell>
                                                 <TableCell>{event.type}</TableCell>
                                                 <TableCell>{formatDistanceToNow(new Date(event.createdAt), { addSuffix: true })}</TableCell>
                                             </TableRow>

@@ -1,10 +1,31 @@
-import { Metadata } from "next";
+'use client';
 
-export const metadata: Metadata = {
-    title: 'NP',
-};
+import { useSession } from "@/providers/logto-session-provider";
+import { useEffect, useState } from "react";
+import { IUser } from "@/app/models/User";
+import { getUser } from "@/app/actions/user";
+import { redirect } from "next/navigation";
 
-export default async function Dashboard() {
+export default function Dashboard() {
+    const { claims } = useSession();
+    const [user, setUser] = useState<IUser | null>(null);
+
+    useEffect(() => {
+        const getUserData = async () => {
+            const user = await getUser(claims.sub as string);
+            setUser(user);
+        }
+        getUserData();
+    }, [claims.sub]);
+
+    useEffect(() => {
+        if (user && user?.customData?.role === "nurse-practitioner") {
+            redirect("/np/find-match");
+        }
+        if (user && user?.customData?.role === "physician") {
+            redirect("/np/main");
+        }
+    }, [user]);
 
     return (
         <div className="flex items-center justify-between space-y-2">

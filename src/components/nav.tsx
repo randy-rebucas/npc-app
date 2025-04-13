@@ -5,167 +5,93 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from 'lucide-react'
 import { Key, User, HelpCircle, CreditCardIcon, FileCheck, Settings, MessageCircle, Users, Search, Heart, File } from "lucide-react"
-import { useSession } from "@/providers/logto-session-provider";
 import { useState, useEffect } from "react";
+import { IUser } from "@/app/models/User";
+import { useSession } from "@/providers/logto-session-provider";
+import { getUser } from "@/app/actions/user";
 
-// Move this to src/types/navigation.ts
 type NavItem = {
     title: string
     url: string
     icon: LucideIcon
 }
 
-function useNavigationItems() {
-    const { claims } = useSession();
-    const [items, setItems] = useState<NavItem[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        const fetchUser = async () => {
-            if (!claims?.sub) {
-                setIsLoading(false);
-                return;
-            }
-
-            try {
-                const response = await fetch(`/api/user/${claims.sub}`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch user data');
-                }
-                const userData = await response.json();
-                
-                const newItems: NavItem[] = [];
-
-                if (userData?.role === "PHYSICIAN") {
-                    newItems.push(
-                        {
-                            title: "Profile",
-                            url: "/np/profile",
-                            icon: User,
-                        },
-                        {
-                            title: "Credentials",
-                            url: "/np/credentials",
-                            icon: Key,
-                        },
-                        {
-                            title: "Settings",
-                            url: "/np/settings",
-                            icon: Settings,
-                        },
-                        {
-                            title: "Help",
-                            url: "/np/help",
-                            icon: HelpCircle,
-                        }
-                    );
-                }
-
-                if (userData?.role === "PHYSICIAN" && userData?.submissionStatus === "APPROVED") {
-                    newItems.push(
-                        {
-                            title: "Collaborators",
-                            url: "/np/collaborators",
-                            icon: Users,
-                        },
-                        {
-                            title: "Messages",
-                            url: "/np/messages",
-                            icon: MessageCircle,
-                        },
-                        {
-                            title: "Stripe",
-                            url: "/np/stripe",
-                            icon: CreditCardIcon,
-                        },
-                        {
-                            title: "Attestations",
-                            url: "/np/attestations",
-                            icon: FileCheck,
-                        }
-                    );
-                }
-
-                if (userData?.role === "NURSE_PRACTITIONER") {
-                    newItems.push(
-                        {
-                            title: "Find Match",
-                            url: "/np/find-match",
-                            icon: Search, 
-                        },
-                        {
-                            title: "Messages",
-                            url: "/np/messages",
-                            icon: MessageCircle,
-                        },
-                        {
-                            title: "Favorites",
-                            url: "/np/favorites",
-                            icon: Heart,
-                        },
-                        {
-                            title: "Settings",
-                            url: "/np/settings",
-                            icon: Settings,
-                        },
-                        {
-                            title: "Help",
-                            url: "/np/help",
-                            icon: HelpCircle,
-                        }
-                    );
-                }
-
-                if (userData?.canCreateListings) {
-                    newItems.push({
-                        title: "Listings",
-                        url: "/np/listings",  
-                        icon: File,
-                    });
-                }
-
-                setItems(newItems);
-            } catch (err) {
-                setError(err instanceof Error ? err.message : 'An error occurred');
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchUser();
-    }, [claims?.sub]);
-
-    return { items, isLoading, error };
-}
-
 export default function Nav() {
     const pathname = usePathname();
-    const { items, isLoading, error } = useNavigationItems();
+    const { claims } = useSession();
+    const [user, setUser] = useState<IUser | null>(null);
+    const [items, setItems] = useState<NavItem[]>([]);
 
-    if (error) {
-        return (
-            <nav className="flex-1 p-4">
-                <div className="text-red-500">Error loading navigation: {error}</div>
-            </nav>
-        );
-    }
+    useEffect(() => {
+        const getUserData = async () => {
+            try {
+                const user = await getUser(claims.sub as string);
+                setUser(user);
+            } catch (error) {
+                console.error('Failed to fetch user:', error);
+                // Optionally show an error toast/message to user
+            }
+        }
+        if (claims.sub) {
+            getUserData();
+        }
+    }, [claims.sub]);
 
-    if (isLoading) {
-        return (
-            <nav className="flex-1 p-4">
-                <div className="animate-pulse space-y-4">
-                    {[...Array(5)].map((_, i) => (
-                        <div key={i} className="h-12 bg-gray-200 rounded-xl dark:bg-gray-800" />
-                    ))}
-                </div>
-            </nav>
-        );
-    }
+    useEffect(() => {
+        if (!user) return;
+
+        const populateItems = () => {
+            const newItems: NavItem[] = [];
+
+            // Common items for physicians
+            if (user.customData?.role === "physician") {
+                newItems.push(
+                    { title: "Profile", url: "/np/profile", icon: User },
+                    { title: "Credentials", url: "/np/credentials", icon: Key },
+                    { title: "Settings", url: "/np/settings", icon: Settings },
+                    { title: "Help", url: "/np/help", icon: HelpCircle }
+                );
+
+                // Additional items for approved physicians
+                if (user.customData?.submissionStatus === "APPROVED") {
+                    newItems.push(
+                        { title: "Collaborators", url: "/np/collaborators", icon: Users },
+                        { title: "Messages", url: "/np/messages", icon: MessageCircle },
+                        { title: "Stripe", url: "/np/stripe", icon: CreditCardIcon },
+                        { title: "Attestations", url: "/np/attestations", icon: FileCheck }
+                    );
+                }
+            }
+
+            // Items for nurse practitioners
+            if (user.customData?.role === "nurse-practitioner") {
+                newItems.push(
+                    { title: "Find Match", url: "/np/find-match", icon: Search },
+                    { title: "Messages", url: "/np/messages", icon: MessageCircle },
+                    { title: "Favorites", url: "/np/favorites", icon: Heart },
+                    { title: "Settings", url: "/np/settings", icon: Settings },
+                    { title: "Help", url: "/np/help", icon: HelpCircle }
+                );
+            }
+
+            // Optional listing item
+            if (user.customData?.canCreateListings) {
+                newItems.push({
+                    title: "Listings",
+                    url: "/np/listings",
+                    icon: File,
+                });
+            }
+
+            setItems(newItems);
+        };
+
+        populateItems();
+    }, [user]); // Remove items from dependency array
 
     return (
-        <nav className="flex-1 space-y-6 overflow-y-auto p-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-800" 
-             aria-label="Main navigation">
+        <nav className="flex-1 space-y-6 overflow-y-auto p-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-800"
+            aria-label="Main navigation">
             <div className="space-y-1.5">
                 <h2 className="mb-4 px-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Navigation
