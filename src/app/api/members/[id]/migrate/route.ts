@@ -73,7 +73,9 @@ export async function POST(
     const practiceTypes = Array.isArray(
       splitString(memberData.customFields["practice-types"] || "")
     )
-      ? splitString(memberData.customFields["practice-types"] || "")
+      ? splitString(memberData.customFields["practice-types"] || "").map((type: string) => 
+          type.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')
+        )
       : [];
 
     const additionalCertifications = Array.isArray(
@@ -85,8 +87,8 @@ export async function POST(
           certification: certification,
           issueDate: null,
           expirationDate: null,
-          certificateUrl: null,
-          certificateNumber: null,
+          certificateUrl: "",
+          certificateNumber: "",
         }))
       : [];
     const data = {
@@ -99,15 +101,7 @@ export async function POST(
       avatar: memberData.profileImage,
       customData: {
         role: "physician",
-        onboardingStatus: UserOnBoardingStatus.COMPLETED,
-        submissionStatus: memberData.verified ? UserSubmissionStatus.APPROVED : UserSubmissionStatus.PENDING,
-        canCreateListings: false,
-        profilePhotoPath: memberData.profileImage,
-        governmentIdPath: memberData.customFields["id-document-url"],
         npiNumber: memberData.customFields["npi"],
-        medicalLicenseStates: medicalLicenses,
-        deaLicenseStates: deaLicenses,
-        practiceTypes: practiceTypes,
         rateMatrix: {
           monthlyCollaborationRate: 0,
           additionalStateFee: 0,
@@ -115,11 +109,22 @@ export async function POST(
           controlledSubstancesMonthlyFee: 0,
           controlledSubstancesPerPrescriptionFee: 0,
         },
-        backgroundCertification: memberData.customFields["background"],
-        description: memberData.customFields["background"],
-        boardCertification: memberData.customFields["board-certification"],
-        additionalCertifications: additionalCertifications,
-        linkedinProfile: memberData.customFields["linkedin-url"],
+        practiceTypes: practiceTypes,
+        governmentIdPath: memberData.customFields["id-document-url"],
+        onboardingStatus: UserOnBoardingStatus.COMPLETED,
+        submissionStatus: memberData.verified ? UserSubmissionStatus.APPROVED : UserSubmissionStatus.PENDING,
+        canCreateListings: false,
+        profilePhotoPath: memberData.profileImage,
+        licenseAndCertification: {
+          medicalLicenseStates: medicalLicenses,
+          deaLicenseStates: deaLicenses,
+        },
+        backgroundCertification: {
+          description: memberData.customFields["background"],
+          boardCertification: memberData.customFields["board-certification"],
+          additionalCertifications: additionalCertifications,
+          linkedinProfile: memberData.customFields["linkedin-url"],
+        },
         stripeAccountId: memberData.stripeCustomerId,
       },
       profile: {
