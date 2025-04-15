@@ -6,14 +6,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { GovidSkeleton } from "@/components/skeletons";
+import { IUser } from "@/app/models/User";
+import { useSession } from "@/providers/logto-session-provider";
+import { getUser } from "@/app/actions/user";
 
 const formSchema = z.object({
-  governmentId: z.instanceof(File).optional(),
-  governmentIdPath: z.string().optional(),
+    governmentId: z.instanceof(File).optional(),
+    governmentIdPath: z.string().optional(),
 });
 
 export default function GovidPage() {
+    const { claims } = useSession();
     const [govIdUrl, setGovIdUrl] = useState('');
+    const [user, setUser] = useState<IUser | null>(null);
     const [currentGovId, setCurrentGovId] = useState<{ governmentIdPath: string }>({ governmentIdPath: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -27,39 +32,26 @@ export default function GovidPage() {
     const setValue = form.setValue;
 
     useEffect(() => {
-        const fetchUserProfile = async () => {
+        const getUserData = async () => {
             try {
-                setIsLoading(true);
-                const userProfile = await fetch(`/api/profile`);
-
-                if (!userProfile.ok) {
-                    throw new Error(`Failed to fetch profile: ${userProfile.statusText}`);
+                if (!claims.sub) return;
+                const userData = await getUser(claims.sub);
+                setUser(userData);
+                if (userData) {
+                    setCurrentGovId({ governmentIdPath: userData?.customData?.governmentIdPath || "" });
                 }
-                const profileResponse = await userProfile.json();
-
-                const profile = {
-                    governmentIdPath: profileResponse?.governmentIdPath || "",
-                };
-
-                setCurrentGovId(profile);
-                setValue('governmentIdPath', profile.governmentIdPath);
             } catch (error) {
-                toast({
-                    title: "Error",
-                    description: `Failed to load profile data: ${error}`,
-                    variant: "destructive",
-                });
+                console.error('Failed to fetch user:', error);
             } finally {
                 setIsLoading(false);
             }
         }
 
-        fetchUserProfile();
-
-    }, [setValue, toast]);
+        getUserData();
+    }, [setValue, toast, claims?.sub]);
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values);
+
         setIsSubmitting(true);
 
         try {
@@ -91,15 +83,20 @@ export default function GovidPage() {
                     throw new Error('Upload failed');
                 }
                 const data = await response.json();
-                console.log(data);
+
                 setGovIdUrl(data.url);
 
                 if (data.url) {
-
+                    const formattedData = {
+                        customData: {
+                            ...user?.customData,
+                            governmentIdPath: data.url,
+                        },
+                    };
                     // Update profile photo path
                     await fetch("/api/profile", {
                         method: "POST",
-                        body: JSON.stringify({ governmentIdPath: data.url }),
+                        body: JSON.stringify(formattedData),
                     });
 
                     toast({
@@ -127,7 +124,7 @@ export default function GovidPage() {
     }
 
     if (isLoading) {
-        return <GovidSkeleton />; 
+        return <GovidSkeleton />;
     }
 
     return (
@@ -159,11 +156,11 @@ export default function GovidPage() {
                         />
                     </div>
                 </div>
-                
+
                 <div className="flex justify-between items-center">
                     <span className={`px-3 py-1 rounded-full text-sm 
-                        ${currentGovId.governmentIdPath 
-                            ? 'bg-success/20 text-success' 
+                        ${currentGovId.governmentIdPath
+                            ? 'bg-success/20 text-success'
                             : 'bg-muted text-muted-foreground'}`}>
                         {currentGovId.governmentIdPath ? 'Document Uploaded' : 'No Document'}
                     </span>

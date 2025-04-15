@@ -31,10 +31,15 @@ export interface IUserCustomData {
   onboardingStatus?: string;
   submissionStatus?: string;
   canCreateListings?: boolean;
-  education?: string[];
+  education?: {
+    undergrad?: string;
+    medical?: string;
+    residency?: string;
+  };
   profilePhotoPath?: string;
   governmentIdPath?: string;
   npiNumber?: string;
+  clinicalDegree?: string;
   licenseAndCertification?: {
     medicalLicenseStates?: License[];
     deaLicenseStates?: License[];

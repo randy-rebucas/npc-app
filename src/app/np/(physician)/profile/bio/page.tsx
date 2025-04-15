@@ -6,7 +6,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useToast } from '@/hooks/use-toast';
 import * as z from 'zod';
 import { BioSkeleton } from '@/components/skeletons';
-
+import { useSession } from "@/providers/logto-session-provider";  
+import { getUser } from '@/app/actions/user';
+import { IUser } from '@/app/models/User';
 
 const bioFormSchema = z.object({
     description: z.string().min(1, "Background is required"),
@@ -17,7 +19,9 @@ const bioFormSchema = z.object({
 type BioFormValues = z.infer<typeof bioFormSchema>;
 
 export default function Bio() {
+    const { claims } = useSession();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [user, setUser] = useState<IUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const { toast } = useToast();
 
@@ -34,46 +38,49 @@ export default function Bio() {
     const setValue = form.setValue;
 
     useEffect(() => {
-        const fetchUserProfile = async () => {
+        if (!claims?.sub) return;
+        const getUserData = async () => {
             try {
-                setIsLoading(true);
-                const userProfile = await fetch(`/api/profile`);
-
-                if (!userProfile.ok) {
-                    throw new Error(`Failed to fetch profile: ${userProfile.statusText}`);
+                if (!claims.sub) return;
+                const userData = await getUser(claims.sub);
+                setUser(userData);
+                // Populate form with user data
+                if (userData) {
+                    setValue('description', userData.customData?.backgroundCertification?.description || '');
+                    setValue('boardCertification', userData.customData?.backgroundCertification?.boardCertification || '');
+                    setValue('linkedinProfile', userData.customData?.backgroundCertification?.linkedinProfile || '');
                 }
-                const profileResponse = await userProfile.json();
-
-                const profile = {
-                    description: profileResponse?.description || '',
-                    boardCertification: profileResponse?.boardCertification || '',
-                    linkedinProfile: profileResponse?.linkedinProfile || '',
-                };
-
-                Object.entries(profile).forEach(([key, value]) => {
-                    setValue(key as keyof typeof profile, value);
-                });
             } catch (error) {
-                toast({
-                    title: "Error",
-                    description: `Failed to load profile data: ${error}`,
-                    variant: "destructive",
-                });
+                console.error('Failed to fetch user:', error);
             } finally {
                 setIsLoading(false);
             }
         }
 
-        fetchUserProfile();
-
-    }, [setValue, toast]);
+        getUserData();
+    }, [setValue, toast, claims?.sub]);
 
     async function onSubmit(data: BioFormValues) {
         setIsSubmitting(true);
+        // works
+        const formattedData = {
+            customData: {
+                ...user?.customData,
+                backgroundCertification: {
+                    description: data.description,
+                    boardCertification: data.boardCertification,
+                    linkedinProfile: data.linkedinProfile,
+                    additionalCertifications: user?.customData?.backgroundCertification?.additionalCertifications,
+                },
+            },
+        };
         try {
-            const response = await fetch('/api/profile', {
+            const response = await fetch('/api/profile/custom-data', {
                 method: 'POST',
-                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formattedData),
             });
 
             if (!response.ok) {

@@ -13,31 +13,18 @@ import { EventType } from "@/app/models/Event";
 
 export async function POST(request: Request) {
   try {
-
+    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+    if (!isAuthenticated || !claims?.sub) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const data = await request.json();
 
-    const formattedData = {
-      name: data.firstName + " " + data.lastName,
-      profile: {
-        familyName: data.lastName,
-        givenName: data.firstName,
-        address: {
-          formatted: data.address,
-          streetAddress: data.address,
-          locality: data.city,
-          region: data.state,
-          postalCode: data.zip,
-        },
-      },
-    };
+    await updateUser(claims?.sub as string, data);
 
-    await updateUser(data.userId, formattedData);
-
-    const user = await getUser(data.userId);
-    console.log(user);
+    const user = await getUser(claims?.sub as string);
 
     await createEvent({
-      user: data.userId || "",
+      user: claims?.sub as string,
       email: user.primaryEmail || "",
       type: EventType.MEMBER_UPDATED,
     });

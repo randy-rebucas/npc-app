@@ -19,12 +19,18 @@ export default function Dashboard() {
     }, [claims.sub]);
 
     useEffect(() => {
-        if (user && user?.customData?.role === "nurse-practitioner") {
-            redirect("/np/find-match");
+        if(user && user?.customData?.hasOwnProperty("role")) {
+            if (user?.customData?.role === "nurse-practitioner") {
+                redirect("/np/find-match"); 
+            } else if (user?.customData?.role === "physician") {
+                redirect("/np/main");
+            } else if (user?.customData?.role === "admin") {
+                redirect("/admin");
+            }
+        } else {
+            redirect("/onboarding");
         }
-        if (user && user?.customData?.role === "physician") {
-            redirect("/np/main");
-        }
+
     }, [user]);
 
     return (

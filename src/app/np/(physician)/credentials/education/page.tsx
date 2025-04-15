@@ -6,6 +6,9 @@ import * as z from "zod"
 import { useEffect, useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { EducationSkeleton } from "@/components/skeletons"
+import { useSession } from "@/providers/logto-session-provider";
+import { getUser } from "@/app/actions/user"
+import { IUser } from "@/app/models/User";
 
 export type Education = {
     undergrad?: string;
@@ -30,6 +33,8 @@ type PracticeType = string;
 
 export default function EducationPage() {
     const { toast } = useToast();
+    const { claims } = useSession();
+    const [user, setUser] = useState<IUser | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [practices, setPractices] = useState<PracticeType[]>([]);
@@ -51,39 +56,36 @@ export default function EducationPage() {
     const setValue = form.setValue;
 
     useEffect(() => {
-        const fetchUserProfile = async () => {
+
+        const getUserData = async () => {
             try {
-                setIsLoading(true);
-                const userProfile = await fetch(`/api/profile`);
+                if (!claims.sub) return;
+                const userData = await getUser(claims.sub);
+                setUser(userData);
+                if (userData) {
+                    const profile = {
+                        clinicalDegree: userData?.customData?.clinicalDegree || "",
+                        practiceTypes: userData?.customData?.practiceTypes || [],
+                        education: {
+                            undergrad: userData?.customData?.education?.undergrad || "",
+                            medical: userData?.customData?.education?.medical || "",
+                            residency: userData?.customData?.education?.residency || ""
+                        },
+                    };
 
-                if (!userProfile.ok) {
-                    throw new Error(`Failed to fetch profile: ${userProfile.statusText}`);
+                    Object.entries(profile).forEach(([key, value]) => {
+                        setValue(key as keyof typeof profile, value);
+                    });
                 }
-                const profileResponse = await userProfile.json();
-
-                const profile = {
-                    clinicalDegree: profileResponse?.clinicalDegree || "",
-                    practiceTypes: profileResponse?.practiceTypes || [],
-                    education: profileResponse?.education || {},
-                };
-
-                Object.entries(profile).forEach(([key, value]) => {
-                    setValue(key as keyof typeof profile, value);
-                });
             } catch (error) {
-                toast({
-                    title: "Error",
-                    description: `Failed to load profile data: ${error}`,
-                    variant: "destructive",
-                });
+                console.error('Failed to fetch user:', error);
             } finally {
                 setIsLoading(false);
             }
         }
 
-        fetchUserProfile();
-
-    }, [setValue, toast]);
+        getUserData();
+    }, [setValue, toast, claims?.sub]);
 
     useEffect(() => {
         const getPracticeTypes = async () => {
@@ -99,14 +101,23 @@ export default function EducationPage() {
 
     async function onSubmit(data: EducationFormValues) {
         setIsSubmitting(true);
+        const formattedData = {
+            customData: {
+                ...user?.customData,
+                education: {
+                    undergrad: data.education.undergrad,
+                    medical: data.education.medical,
+                    residency: data.education.residency
+                },
+                practiceTypes: data.practiceTypes,
+                clinicalDegree: data.clinicalDegree
+            }
+        };
+
         try {
-            const response = await fetch("/api/profile", {
+            const response = await fetch("/api/profile/custom-data", {
                 method: "POST",
-                body: JSON.stringify({
-                    clinicalDegree: data.clinicalDegree,
-                    education: data.education,
-                    practiceTypes: data.practiceTypes
-                }),
+                body: JSON.stringify(formattedData),
             });
 
             if (!response.ok) throw new Error("Failed to update education");

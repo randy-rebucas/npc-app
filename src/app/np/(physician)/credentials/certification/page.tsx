@@ -7,6 +7,9 @@ import { Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { CertificationSkeleton } from "@/components/skeletons";
+import { useSession } from "@/providers/logto-session-provider";
+import { IUser } from "@/app/models/User";
+import { getUser } from "@/app/actions/user";
 
 const certificationFormSchema = z.object({
     boardCertifications: z.string(),
@@ -23,6 +26,8 @@ const certificationFormSchema = z.object({
 type CertificationFormValues = z.infer<typeof certificationFormSchema>;
 
 export default function CertificationPage() {
+    const { claims } = useSession();
+    const [user, setUser] = useState<IUser | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const { toast } = useToast();
@@ -40,54 +45,55 @@ export default function CertificationPage() {
     const setValue = form.setValue;
 
     useEffect(() => {
-        const fetchUserProfile = async () => {
+        const getUserData = async () => {
             try {
-                setIsLoading(true);
-                const userProfile = await fetch(`/api/profile`);
+                if (!claims.sub) return;
+                const userData = await getUser(claims.sub);
+                setUser(userData);
+                if (userData) {
+                    const profile = {
+                        boardCertifications: userData?.customData?.backgroundCertification?.boardCertification || "",
+                        additionalCertifications: userData?.customData?.backgroundCertification?.additionalCertifications?.map(cert => ({
+                            ...cert,
+                            issueDate: cert.issueDate ? new Date(cert.issueDate).toISOString().split('T')[0] : "",
+                            expirationDate: cert.expirationDate ? new Date(cert.expirationDate).toISOString().split('T')[0] : ""
+                        })) || [],
+                        npiNumber: userData?.customData?.npiNumber || "",
+                    };
 
-                if (!userProfile.ok) {
-                    throw new Error(`Failed to fetch profile: ${userProfile.statusText}`);
+                    Object.entries(profile).forEach(([key, value]) => {
+                        setValue(key as keyof typeof profile, value);
+                    });
                 }
-                const profileResponse = await userProfile.json();
-
-                const profile = {
-                    boardCertifications: profileResponse?.boardCertifications || "",
-                    additionalCertifications: profileResponse?.additionalCertifications || [],
-                    npiNumber: profileResponse?.npiNumber || "",
-                };
-
-                Object.entries(profile).forEach(([key, value]) => {
-                    setValue(key as keyof typeof profile, value);
-                });
             } catch (error) {
-                toast({
-                    title: "Error",
-                    description: `Failed to load profile data: ${error}`,
-                    variant: "destructive",
-                });
+                console.error('Failed to fetch user:', error);
             } finally {
                 setIsLoading(false);
             }
         }
 
-        fetchUserProfile();
-
-    }, [setValue, toast]);
+        getUserData();
+    }, [setValue, toast, claims?.sub]);
 
     async function onSubmit(data: CertificationFormValues) {
         setIsSubmitting(true);
-
+        const formattedData = {
+            customData: {
+                ...user?.customData,
+                npiNumber: data.npiNumber,
+                backgroundCertification: {
+                    boardCertification: data.boardCertifications,
+                    additionalCertifications: data.additionalCertifications,
+                },
+            }
+        };
         try {
-            const response = await fetch("/api/profile", {
+            const response = await fetch("/api/profile/custom-data", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({
-                    additionalCertifications: data.additionalCertifications,
-                    npiNumber: data.npiNumber,
-                    boardCertification: data.boardCertifications
-                }),
+                body: JSON.stringify(formattedData),
             });
 
             if (!response.ok) {

@@ -63,9 +63,19 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthenticated, claims } = await getLogtoContext(logtoConfig, { 
-    fetchUserInfo: true
-  });
+  let isAuthenticated = false;
+  let claims = null;
+  
+  try {
+    const logtoContext = await getLogtoContext(logtoConfig, { 
+      fetchUserInfo: true
+    });
+    isAuthenticated = logtoContext.isAuthenticated;
+    claims = logtoContext.claims;
+  } catch (error) {
+    console.error('Logto authentication error:', error);
+    // Continue with unauthenticated state
+  }
 
   return (
     <html lang="en" suppressHydrationWarning>

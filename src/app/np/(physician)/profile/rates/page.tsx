@@ -7,6 +7,9 @@ import * as z from "zod";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { RatesSkeleton } from "@/components/skeletons";
+import { useSession } from "@/providers/logto-session-provider";
+import { IUser } from "@/app/models/User";
+import { getUser } from "@/app/actions/user";
 
 const ratesSchema = z.object({
     monthlyCollaborationRate: z.number().min(0, "Base rate must be positive"),
@@ -18,6 +21,8 @@ const ratesSchema = z.object({
 type RatesFormValues = z.infer<typeof ratesSchema>;
 
 export default function Rates() {
+    const { claims } = useSession();
+    const [user, setUser] = useState<IUser | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const { toast } = useToast();
@@ -36,40 +41,29 @@ export default function Rates() {
     const setValue = form.setValue;
 
     useEffect(() => {
-        const fetchUserProfile = async () => {
+        if (!claims?.sub) return;
+        const getUserData = async () => {
             try {
-                setIsLoading(true);
-                const userProfile = await fetch(`/api/profile`);
-
-                if (!userProfile.ok) {
-                    throw new Error(`Failed to fetch profile: ${userProfile.statusText}`);
+                if (!claims.sub) return;
+                const userData = await getUser(claims.sub);
+                setUser(userData);
+                // Populate form with user data
+                if (userData) {
+                    setValue('monthlyCollaborationRate', userData.customData?.rateMatrix?.monthlyCollaborationRate || 0);
+                    setValue('additionalStateFee', userData.customData?.rateMatrix?.additionalStateFee || 0);
+                    setValue('additionalNPFee', userData.customData?.rateMatrix?.additionalNPFee || 0);
+                    setValue('controlledSubstancesMonthlyFee', userData.customData?.rateMatrix?.controlledSubstancesMonthlyFee || 0);
                 }
-                const profileResponse = await userProfile.json();
-
-                const profile = {
-                    monthlyCollaborationRate: profileResponse?.monthlyCollaborationRate || 0,
-                    additionalStateFee: profileResponse?.additionalStateFee || 0,
-                    additionalNPFee: profileResponse?.additionalNPFee || 0,
-                    controlledSubstancesMonthlyFee: profileResponse?.controlledSubstancesMonthlyFee || 0
-                };
-
-                Object.entries(profile).forEach(([key, value]) => {
-                    setValue(key as keyof typeof profile, value);
-                });
             } catch (error) {
-                toast({
-                    title: "Error",
-                    description: `Failed to load profile data: ${error}`,
-                    variant: "destructive",
-                });
+                console.error('Failed to fetch user:', error);
             } finally {
                 setIsLoading(false);
             }
         }
 
-        fetchUserProfile();
+        getUserData();
 
-    }, [setValue, toast]);
+    }, [setValue, toast, claims?.sub]);
 
     if (isLoading) {
         return <RatesSkeleton />;
@@ -77,10 +71,22 @@ export default function Rates() {
 
     const onSubmit = async (data: RatesFormValues) => {
         setIsSubmitting(true);
+        
+        const formattedData = {
+            customData: {
+                ...user?.customData,
+                rateMatrix: {
+                    monthlyCollaborationRate: data.monthlyCollaborationRate,
+                    additionalStateFee: data.additionalStateFee,
+                    additionalNPFee: data.additionalNPFee,
+                    controlledSubstancesMonthlyFee: data.controlledSubstancesMonthlyFee,
+                },
+            },
+        };
         try {
-            const response = await fetch("/api/profile", {
+            const response = await fetch("/api/profile/custom-data", {
                 method: "POST",
-                body: JSON.stringify(data),
+                body: JSON.stringify(formattedData),
             });
 
             if (!response.ok) {

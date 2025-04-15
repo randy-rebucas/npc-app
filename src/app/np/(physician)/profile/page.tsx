@@ -55,7 +55,7 @@ export default function ProfilePage() {
                 if (!claims.sub) return;
                 const userData = await getUser(claims.sub);
                 setUser(userData);
-                
+
                 // Populate form with user data
                 if (userData) {
                     setValue('firstName', userData.profile?.familyName || '');
@@ -77,16 +77,27 @@ export default function ProfilePage() {
 
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         setIsSubmitting(true);
+        const formattedData = {
+            name: data.firstName + " " + data.lastName,
+            profile: {
+                familyName: data.lastName,
+                givenName: data.firstName,
+                address: {
+                    formatted: data.address,
+                    streetAddress: data.address,
+                    locality: data.city,
+                    region: data.state,
+                    postalCode: data.zip,
+                },
+            },
+        };
         try {
             const response = await fetch('/api/profile', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    ...data,
-                    userId: claims?.sub
-                }),
+                body: JSON.stringify(formattedData),
             });
 
             if (!response.ok) {

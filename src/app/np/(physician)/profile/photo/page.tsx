@@ -7,13 +7,18 @@ import { useToast } from '@/hooks/use-toast';
 import * as z from 'zod';
 import Image from 'next/image';
 import { PhotoSkeleton } from '@/components/skeletons';
+import { useSession } from '@/providers/logto-session-provider';
+import { getUser } from '@/app/actions/user';
+import { IUser } from '@/app/models/User';
 
 const formSchema = z.object({
     photo: z.instanceof(File).optional(),
 })
 
 export default function Photo() {
+    const { claims } = useSession();
     const [photoUrl, setPhotoUrl] = useState('');
+    const [user, setUser] = useState<IUser | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const { toast } = useToast();
@@ -26,43 +31,33 @@ export default function Photo() {
     const setValue = form.setValue;
 
     useEffect(() => {
-        const fetchUserProfile = async () => {
+        if (!claims?.sub) return;
+        const getUserData = async () => {
             try {
-                setIsLoading(true);
-                const userProfile = await fetch(`/api/profile`);
+                if (!claims.sub) return;
+                const userData = await getUser(claims.sub);
+                // Populate form with user data
+                setUser(userData);
 
-                if (!userProfile.ok) {
-                    throw new Error(`Failed to fetch profile: ${userProfile.statusText}`);
+                if (userData) {
+                    setPhotoUrl(userData?.customData?.profilePhotoPath || '');
                 }
-                const profileResponse = await userProfile.json();
-                setPhotoUrl(profileResponse?.profilePhotoPath || '');
 
-                const profile = {
-                    photo: profileResponse?.profilePhotoPath || '',
-                };
-
-                Object.entries(profile).forEach(([key, value]) => {
-                    setValue(key as keyof typeof profile, value);
-                });
             } catch (error) {
-                toast({
-                    title: "Error",
-                    description: `Failed to load profile data: ${error}`,
-                    variant: "destructive",
-                });
+                console.error('Failed to fetch user:', error);
             } finally {
                 setIsLoading(false);
             }
         }
 
-        fetchUserProfile();
+        getUserData();
 
-    }, [setValue, toast]);
+    }, [setValue, toast, claims?.sub]);
 
     if (isLoading) {
-        return <PhotoSkeleton />; 
+        return <PhotoSkeleton />;
     }
-    
+
 
     const handleUpload = async (file: File) => {
         setIsUploading(true);
@@ -96,11 +91,16 @@ export default function Photo() {
             setPhotoUrl(data.url);
 
             if (data.url) {
-
+                const formattedData = {
+                    customData: {
+                        ...user?.customData,
+                        profilePhotoPath: data.url,
+                    },
+                };
                 // Update profile photo path
                 await fetch("/api/profile", {
                     method: "POST",
-                    body: JSON.stringify({ profilePhotoPath: data.url }),
+                    body: JSON.stringify(formattedData),
                 });
 
                 toast({

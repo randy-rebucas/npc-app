@@ -7,7 +7,9 @@ import { useEffect, useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { X } from "lucide-react"
 import { CredentialsSkeleton } from "@/components/skeletons"
-
+import { useSession } from "@/providers/logto-session-provider";
+import { getUser } from "@/app/actions/user";
+import { IUser } from "@/app/models/User";
 // Add form schema
 const licenseSchema = z.object({
     medicalLicenseStates: z.array(z.object({
@@ -32,9 +34,11 @@ const licenseSchema = z.object({
 
 export default function CredentialsPage() {
     const { toast } = useToast();
+    const [user, setUser] = useState<IUser | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [states, setStates] = useState([]);
+    const { claims } = useSession();
 
     // Update the form initialization
     const form = useForm<z.infer<typeof licenseSchema>>({
@@ -49,38 +53,38 @@ export default function CredentialsPage() {
     const setValue = form.setValue;
 
     useEffect(() => {
-        const fetchUserProfile = async () => {
+
+        if (!claims?.sub) return;
+        const getUserData = async () => {
             try {
-                setIsLoading(true);
-                const userProfile = await fetch(`/api/profile`);
+                if (!claims.sub) return;
+                const userData = await getUser(claims.sub);
+                setUser(userData);
+                if (userData) {
+                    const profile = {
+                        medicalLicenseStates: userData?.customData?.licenseAndCertification?.medicalLicenseStates?.map(license => ({
+                            ...license,
+                            expirationDate: license.expirationDate ? new Date(license.expirationDate) : new Date()
+                        })) || [],
+                        deaLicenseStates: userData?.customData?.licenseAndCertification?.deaLicenseStates?.map(license => ({
+                            ...license,
+                            expirationDate: license.expirationDate ? new Date(license.expirationDate) : new Date()
+                        })) || []
+                    };
 
-                if (!userProfile.ok) {
-                    throw new Error(`Failed to fetch profile: ${userProfile.statusText}`);
+                    Object.entries(profile).forEach(([key, value]) => {
+                        setValue(key as keyof typeof profile, value);
+                    });
                 }
-                const profileResponse = await userProfile.json();
-
-                const profile = {
-                    medicalLicenseStates: profileResponse?.medicalLicenseStates || [],
-                    deaLicenseStates: profileResponse?.deaLicenseStates || [],
-                };
-
-                Object.entries(profile).forEach(([key, value]) => {
-                    setValue(key as keyof typeof profile, value);
-                });
             } catch (error) {
-                toast({
-                    title: "Error",
-                    description: `Failed to load profile data: ${error}`,
-                    variant: "destructive",
-                });
+                console.error('Failed to fetch user:', error);
             } finally {
                 setIsLoading(false);
             }
         }
 
-        fetchUserProfile();
-
-    }, [setValue, toast]);
+        getUserData();
+    }, [setValue, toast, claims?.sub]);
 
     useEffect(() => {
         const fetchStates = async () => {
@@ -96,17 +100,22 @@ export default function CredentialsPage() {
         setIsSubmitting(true);
         try {
             const formattedData = {
-                medicalLicenseStates: values.medicalLicenseStates.map(license => ({
-                    ...license,
-                    expirationDate: new Date(license.expirationDate).toISOString(),
-                })),
-                deaLicenseStates: values.deaLicenseStates.map(license => ({
-                    ...license,
-                    expirationDate: new Date(license.expirationDate).toISOString(),
-                }))
+                customData: {
+                    ...user?.customData,
+                    licenseAndCertification: {
+                        medicalLicenseStates: values.medicalLicenseStates.map(license => ({
+                            ...license,
+                            expirationDate: license.expirationDate ? new Date(license.expirationDate).toISOString() : null,
+                        })),
+                        deaLicenseStates: values.deaLicenseStates.map(license => ({
+                            ...license,
+                            expirationDate: license.expirationDate ? new Date(license.expirationDate).toISOString() : null,
+                        }))
+                    }
+                }
             };
 
-            const response = await fetch("/api/profile", {
+            const response = await fetch("/api/profile/custom-data", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -135,7 +144,7 @@ export default function CredentialsPage() {
     }
 
     if (isLoading) {
-        return <CredentialsSkeleton /> 
+        return <CredentialsSkeleton />
     }
 
     return (
@@ -174,9 +183,9 @@ export default function CredentialsPage() {
                                             const isStateSelected = form.watch("medicalLicenseStates")
                                                 .some((l, i) => i !== index && l.state === state);
                                             return (
-                                                <option 
-                                                    key={state} 
-                                                    value={state} 
+                                                <option
+                                                    key={state}
+                                                    value={state}
                                                     disabled={isStateSelected}
                                                 >
                                                     {state} {isStateSelected ? '(Already Selected)' : ''}
@@ -267,9 +276,9 @@ export default function CredentialsPage() {
                                             const isStateSelected = form.watch("deaLicenseStates")
                                                 .some((l, i) => i !== index && l.state === state);
                                             return (
-                                                <option 
-                                                    key={state} 
-                                                    value={state} 
+                                                <option
+                                                    key={state}
+                                                    value={state}
                                                     disabled={isStateSelected}
                                                 >
                                                     {state} {isStateSelected ? '(Already Selected)' : ''}

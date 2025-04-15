@@ -42,3 +42,5 @@ mailjet.post("send").request({
 Phone number: 09179157515
 Username: randyrs
 New password: Xxrr7cPf
+
+should redirect to onboarding page if user is not onboarded
