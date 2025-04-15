@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { AdminSidebar } from "@/components/admin/Sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 

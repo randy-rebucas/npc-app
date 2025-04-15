@@ -5,11 +5,11 @@ import Header from "@/components/header";
 import { useNotifications } from "@/providers/notifications-provider";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { Suspense } from "react";
 
-export default function NotificationsPage() {
-
+// Create a separate component for the notifications content
+function NotificationsContent() {
     const { notifications, markAsRead, markAllAsRead } = useNotifications();
-
     const [selectedNotifications, setSelectedNotifications] = useState<string[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -95,5 +95,14 @@ export default function NotificationsPage() {
                 </div>
             </main>
         </div>
+    );
+}
+
+// Main page component with Suspense wrapper
+export default function NotificationsPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <NotificationsContent />
+        </Suspense>
     );
 }
