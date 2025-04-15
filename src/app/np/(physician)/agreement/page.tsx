@@ -54,12 +54,12 @@ export default function AgreementPage() {
 
         try {
             const userInfo = await getUser(claims.sub);
-            console.log(userInfo);
+
             if (!userInfo) {
                 console.warn('User is not logged in or data is missing.');
                 return;
             }
-            console.log(userInfo.profile); 
+ 
             const userData = {
                 'first-name': userInfo.profile?.givenName || '',
                 'last-name': userInfo.profile?.familyName || '',
@@ -70,7 +70,9 @@ export default function AgreementPage() {
                 'state-fee': userInfo.customData?.rateMatrix?.additionalStateFee || '',
                 'background': userInfo.customData?.description || '',
                 'control-fee': userInfo.customData?.rateMatrix?.controlledSubstancesMonthlyFee || '',
-                'degree-type': userInfo.customData?.education || '',
+                'degree-type': typeof userInfo.customData?.education === 'string' 
+                    ? userInfo.customData.education 
+                    : Object.values(userInfo.customData?.education || {}).filter(Boolean).join(', '),
                 'linkedin-url': userInfo.customData?.linkedinProfile || '',
                 'multi-np-fee': userInfo.customData?.rateMatrix?.additionalNPFee || '',
                 'practice-types': userInfo.customData?.practiceTypes || '',
