@@ -67,7 +67,7 @@ export default function Nav() {
             if (user.customData?.role === "nurse-practitioner") {
                 newItems.push(
                     { title: "Find Match", url: "/np/find-match", icon: Search },
-                    { title: "Messages", url: "/np/messages", icon: MessageCircle },
+                    // { title: "Messages", url: "/np/messages", icon: MessageCircle },
                     { title: "Favorites", url: "/np/favorites", icon: Heart },
                     { title: "Settings", url: "/np/settings", icon: Settings },
                     { title: "Help", url: "/np/help", icon: HelpCircle }

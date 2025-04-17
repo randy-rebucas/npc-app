@@ -18,20 +18,21 @@ export default function Dashboard() {
         getUserData();
     }, [claims.sub]);
 
-    useEffect(() => {
-        if(user && user?.customData?.hasOwnProperty("role")) {
-            if (user?.customData?.role === "nurse-practitioner") {
-                redirect("/np/find-match"); 
-            } else if (user?.customData?.role === "physician") {
-                redirect("/np/main");
-            } else if (user?.customData?.role === "admin") {
-                redirect("/admin");
-            }
-        } else {
-            redirect("/onboarding");
-        }
+    // useEffect(() => {
+    //     console.log(user?.customData?.hasOwnProperty("role"));
+    //     if(user && user?.customData?.hasOwnProperty("role")) {
+    //         if (user?.customData?.role === "nurse-practitioner") {
+    //             redirect("/np/find-match"); 
+    //         } else if (user?.customData?.role === "physician") {
+    //             redirect("/np/main");
+    //         } else if (user?.customData?.role === "admin") {
+    //             redirect("/admin");
+    //         }
+    //     } else {
+    //         redirect("/onboarding");
+    //     }
 
-    }, [user]);
+    // }, [user]);
 
     return (
         <div className="flex items-center justify-between space-y-2">

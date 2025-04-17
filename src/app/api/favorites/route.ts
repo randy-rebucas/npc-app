@@ -3,9 +3,9 @@ import Favorite from "@/app/models/Favorite";
 import { getLogtoContext } from "@logto/next/server-actions";
 import { logtoConfig } from "@/app/logto";
 import connect from "@/lib/db";
-
+import mongoose from "mongoose";
 // Add this export to mark the route as dynamic
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,8 +23,8 @@ export async function POST(req: NextRequest) {
 
     // Check if favorite already exists
     const existingFavorite = await Favorite.findOne({
-      npUser: claims?.id,
-      physicianUser: id,
+      npUser: new mongoose.Types.ObjectId(claims?.id as string),
+      physicianUser: new mongoose.Types.ObjectId(id as string),
     });
 
     if (existingFavorite) {
@@ -38,8 +38,8 @@ export async function POST(req: NextRequest) {
       // }
     } else {
       const favorite = new Favorite({
-        npUser: claims?.id,
-        physicianUser: id,
+        npUser: new mongoose.Types.ObjectId(claims?.id as string),
+        physicianUser: new mongoose.Types.ObjectId(id as string),
       });
       const savedFavorite = await favorite.save();
 

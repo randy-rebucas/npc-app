@@ -20,7 +20,7 @@ export async function getFavorites() {
       const favorites = await Favorite.aggregate([
         {
           $match: {
-            npUser: new mongoose.Types.ObjectId(String(claims?.id)),
+            npUser: new mongoose.Types.ObjectId(claims?.id as string),
           },
         },
         {
