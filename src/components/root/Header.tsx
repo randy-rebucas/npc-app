@@ -6,7 +6,7 @@ import { useTheme } from "next-themes";
 import SignIn from "@/components/sign-in";
 import { handleSignIn, handleSignOut } from '@/app/actions/auth';
 import { SignOut } from "../sign-out";
-import { ThemeSwitcher } from "../theme";
+import { ThemeToggle } from "../theme-toggle";
 import { useSession } from "@/providers/logto-session-provider";
 
 export default function Header() {
@@ -42,7 +42,7 @@ export default function Header() {
                     {!isAuthenticated && (
                         <SignIn onSignIn={handleSignIn} />
                     )}
-                    <ThemeSwitcher />
+                    <ThemeToggle /> 
                 </nav>
             </div>
         </header>

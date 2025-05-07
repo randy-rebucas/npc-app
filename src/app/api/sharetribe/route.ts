@@ -1,7 +1,5 @@
 import { sdk } from "@/config/sharetribe";
 import { generatePassword } from "@/lib/utils";
-import { createEvent } from "@/app/actions/events";
-import { EventType } from "@/app/models/Event";
 import { getUser, updateUserCustomData } from "@/app/actions/user";
 import { EmailService } from "@/lib/email";
 import Template from "@/app/models/Template";
@@ -49,11 +47,6 @@ export async function POST(request: Request) {
     });
 
     // Create an event
-    await createEvent({
-      user: user.id || '',
-      email: user.primaryEmail || '',
-      type: EventType.USER_SYNCED,
-    });
 
     // Get the default template for account synced
     let template = await Template.findOne({ isDefault: true, type: "email", code: "account-synced" });

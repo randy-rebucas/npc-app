@@ -4,36 +4,28 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { useEffect, useState } from "react"
-import { useToast } from "@/hooks/use-toast"
 import { X } from "lucide-react"
-import { CredentialsSkeleton } from "@/components/skeletons"
 import { useSession } from "@/providers/logto-session-provider";
 import { getUser } from "@/app/actions/user";
-import { IUser } from "@/app/models/User";
+import { toast } from "sonner";
+import { CredentialsSkeleton } from "@/components/skeletons";
+import { IUser } from "@/app/models/User"
+
 // Add form schema
 const licenseSchema = z.object({
     medicalLicenseStates: z.array(z.object({
         state: z.string().min(1, "State is required"),
         licenseNumber: z.string().min(1, "License number is required"),
         expirationDate: z.string().min(1, "Expiration date is required")
-            .transform((date) => new Date(date))
-            .refine((date) => date > new Date(), {
-                message: "Expiration date must be in the future"
-            })
     })),
     deaLicenseStates: z.array(z.object({
         state: z.string().min(1, "State is required"),
         licenseNumber: z.string().min(1, "License number is required"),
         expirationDate: z.string().min(1, "Expiration date is required")
-            .transform((date) => new Date(date))
-            .refine((date) => date > new Date(), {
-                message: "Expiration date must be in the future"
-            })
     }))
 })
 
 export default function CredentialsPage() {
-    const { toast } = useToast();
     const [user, setUser] = useState<IUser | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -63,12 +55,14 @@ export default function CredentialsPage() {
                 if (userData) {
                     const profile = {
                         medicalLicenseStates: userData?.customData?.licenseAndCertification?.medicalLicenseStates?.map(license => ({
-                            ...license,
-                            expirationDate: license.expirationDate ? new Date(license.expirationDate) : new Date()
+                            state: license.state,
+                            licenseNumber: license.licenseNumber,
+                            expirationDate: license.expirationDate ? new Date(license.expirationDate).toISOString().split('T')[0] : ''
                         })) || [],
                         deaLicenseStates: userData?.customData?.licenseAndCertification?.deaLicenseStates?.map(license => ({
-                            ...license,
-                            expirationDate: license.expirationDate ? new Date(license.expirationDate) : new Date()
+                            state: license.state,
+                            licenseNumber: license.licenseNumber,
+                            expirationDate: license.expirationDate ? new Date(license.expirationDate).toISOString().split('T')[0] : ''
                         })) || []
                     };
 
@@ -84,7 +78,7 @@ export default function CredentialsPage() {
         }
 
         getUserData();
-    }, [setValue, toast, claims?.sub]);
+    }, [setValue, claims?.sub]);
 
     useEffect(() => {
         const fetchStates = async () => {
@@ -104,11 +98,13 @@ export default function CredentialsPage() {
                     ...user?.customData,
                     licenseAndCertification: {
                         medicalLicenseStates: values.medicalLicenseStates.map(license => ({
-                            ...license,
+                            state: license.state,
+                            licenseNumber: license.licenseNumber,
                             expirationDate: license.expirationDate ? new Date(license.expirationDate).toISOString() : null,
                         })),
                         deaLicenseStates: values.deaLicenseStates.map(license => ({
-                            ...license,
+                            state: license.state,
+                            licenseNumber: license.licenseNumber,
                             expirationDate: license.expirationDate ? new Date(license.expirationDate).toISOString() : null,
                         }))
                     }
@@ -127,17 +123,10 @@ export default function CredentialsPage() {
                 throw new Error(await response.text());
             }
 
-            toast({
-                title: "Success!",
-                description: "Your licenses have been updated.",
-            });
+            toast.success("Your licenses have been updated.");
         } catch (error) {
             console.error(error);
-            toast({
-                title: "Error",
-                description: error instanceof Error ? error.message : "Failed to update licenses",
-                variant: "destructive",
-            });
+            toast.error("Failed to update licenses. Please try again.");
         } finally {
             setIsSubmitting(false);
         }
@@ -242,7 +231,7 @@ export default function CredentialsPage() {
                             const currentLicenses = form.getValues("medicalLicenseStates");
                             form.setValue("medicalLicenseStates", [
                                 ...currentLicenses,
-                                { state: "", licenseNumber: "", expirationDate: new Date() }
+                                { state: "", licenseNumber: "", expirationDate: new Date().toISOString().split('T')[0] }
                             ]);
                         }}
                         className="mt-4 px-4 py-2 border rounded-md bg-card hover:bg-card/80 transition-colors"
@@ -335,7 +324,7 @@ export default function CredentialsPage() {
                             const currentLicenses = form.getValues("deaLicenseStates");
                             form.setValue("deaLicenseStates", [
                                 ...currentLicenses,
-                                { state: "", licenseNumber: "", expirationDate: new Date() }
+                                { state: "", licenseNumber: "", expirationDate: new Date().toISOString().split('T')[0] }
                             ]);
                         }}
                         className="mt-4 px-4 py-2 border rounded-md bg-card hover:bg-card/80 transition-colors"

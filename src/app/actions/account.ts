@@ -1,5 +1,5 @@
 import { ValidationError } from "@/lib/errors";
-import { IUser } from "@/app/models/User";
+import { IUser } from "../models/User";
 import { logtoFetch } from "@/utils/logto-fetch";
 import { cookies } from "next/headers";
 
@@ -33,7 +33,7 @@ export async function updateProfile(userData: Partial<IUser>): Promise<IUser> {
     throw new ValidationError("Profile data is required");
   }
 
-  const data = await logtoFetch(`my-account`, {
+  const data = await logtoFetch<IUser>(`my-account`, {
     method: "PATCH",
     body: JSON.stringify(userData),
   });
@@ -54,12 +54,16 @@ export async function updatePassword(
     throw new ValidationError("Password is required");
   }
 
-  const data = await logtoFetch(`my-account/password`, {
+  const response = await logtoFetch<{ success: boolean }>(`my-account/password`, {
     method: "POST",
     body: JSON.stringify({ password }),
   });
 
-  return data;
+  if (typeof response?.success !== 'boolean') {
+    throw new Error('Invalid response format');
+  }
+
+  return response;
 }
 
 /**
@@ -75,10 +79,14 @@ export async function updateEmail(
     throw new ValidationError("Email address is required");
   }
 
-  const data = await logtoFetch(`my-account/primary-email`, {
+  const data = await logtoFetch<{ success: boolean }>(`my-account/primary-email`, {
     method: "POST",
     body: JSON.stringify({ email }),
   });
+
+  if (typeof data?.success !== 'boolean') {
+    throw new Error('Invalid response format');
+  }
 
   return data;
 }
@@ -88,9 +96,13 @@ export async function updateEmail(
  * @returns Success response
  */
 export async function deleteEmail(): Promise<{ success: boolean }> {
-  const data = await logtoFetch(`my-account/primary-email`, {
+  const data = await logtoFetch<{ success: boolean }>(`my-account/primary-email`, {
     method: "DELETE",
   });
+
+  if (typeof data?.success !== 'boolean') {
+    throw new Error('Invalid response format');
+  }
 
   return data;
 }
@@ -101,17 +113,19 @@ export async function deleteEmail(): Promise<{ success: boolean }> {
  * @returns Success response
  * @throws {ValidationError} If phone is not provided
  */
-export async function updatePhone(
-  phone: string
-): Promise<{ success: boolean }> {
+export async function updatePhone(phone: string): Promise<{ success: boolean }> {
   if (!phone?.trim()) {
     throw new ValidationError("Phone number is required");
   }
 
-  const data = await logtoFetch(`my-account/primary-phone`, {
+  const data = await logtoFetch<{ success: boolean }>(`my-account/primary-phone`, {
     method: "POST",
     body: JSON.stringify({ phone }),
   });
+
+  if (typeof data?.success !== 'boolean') {
+    throw new Error('Invalid response format');
+  }
 
   return data;
 }
@@ -121,9 +135,13 @@ export async function updatePhone(
  * @returns Success response
  */
 export async function deletePhone(): Promise<{ success: boolean }> {
-  const data = await logtoFetch(`my-account/primary-phone`, {
+  const data = await logtoFetch<{ success: boolean }>(`my-account/primary-phone`, {
     method: "DELETE",
   });
+
+  if (typeof data?.success !== 'boolean') {
+    throw new Error('Invalid response format');
+  }
 
   return data;
 }
@@ -133,9 +151,13 @@ export async function deletePhone(): Promise<{ success: boolean }> {
  * @returns Success response
  */
 export async function deleteAccount(): Promise<{ success: boolean }> {
-  const data = await logtoFetch(`my-account`, {
+  const data = await logtoFetch<{ success: boolean }>(`my-account`, {
     method: "DELETE",
   });
+
+  if (typeof data?.success !== 'boolean') {
+    throw new Error('Invalid response format');
+  }
 
   return data;
 }

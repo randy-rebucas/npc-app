@@ -3,12 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useToast } from '@/hooks/use-toast';
 import * as z from 'zod';
 import { BioSkeleton } from '@/components/skeletons';
 import { useSession } from "@/providers/logto-session-provider";  
 import { getUser } from '@/app/actions/user';
 import { IUser } from '@/app/models/User';
+import { toast } from 'sonner';
 
 const bioFormSchema = z.object({
     description: z.string().min(1, "Background is required"),
@@ -23,7 +23,6 @@ export default function Bio() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [user, setUser] = useState<IUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const { toast } = useToast();
 
     const form = useForm<BioFormValues>({
         resolver: zodResolver(bioFormSchema),
@@ -58,7 +57,7 @@ export default function Bio() {
         }
 
         getUserData();
-    }, [setValue, toast, claims?.sub]);
+    }, [setValue, claims?.sub]);
 
     async function onSubmit(data: BioFormValues) {
         setIsSubmitting(true);
@@ -87,18 +86,10 @@ export default function Bio() {
                 throw new Error('Failed to update profile');
             }
 
-            toast({
-                title: "Success!",
-                description: "Your profile has been updated.",
-                variant: "default",
-            });
+            toast.success("Your profile has been updated.");
         } catch (error) {
             console.error('Error:', error);
-            toast({
-                title: "Error",
-                description: "Failed to update profile. Please try again.",
-                variant: "destructive",
-            });
+            toast.error("Failed to update profile. Please try again.");
         } finally {
             setIsSubmitting(false);
         }

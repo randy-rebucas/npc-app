@@ -5,10 +5,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "@/providers/logto-session-provider";
-import { useToast } from "@/hooks/use-toast";
+
 import { ProfileSkeleton } from "@/components/skeletons";
-import { IUser } from "@/app/models/User";
 import { getUser } from "@/app/actions/user";
+import { toast } from "sonner";
+import { IUser } from "@/app/models/User";
 
 const formSchema = z.object({
     firstName: z.string().min(1, "First name is required"),
@@ -26,7 +27,6 @@ const formSchema = z.object({
 
 export default function ProfilePage() {
     const { claims } = useSession();
-    const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [user, setUser] = useState<IUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -107,17 +107,10 @@ export default function ProfilePage() {
             // Update local user state with new data
             setUser(prev => prev ? { ...prev, ...data } : null);
 
-            toast({
-                title: "Success!",
-                description: "Your profile has been updated.",
-            });
+            toast.success("Your profile has been updated.");
         } catch (error) {
             console.error('Error:', error);
-            toast({
-                title: "Error",
-                description: "Failed to update profile. Please try again.",
-                variant: "destructive",
-            });
+            toast.error("Failed to update profile. Please try again.");
         } finally {
             setIsSubmitting(false);
         }
@@ -233,11 +226,7 @@ export default function ProfilePage() {
                         <button
                             type="button"
                             onClick={() => {
-                                toast({
-                                    title: "Coming Soon",
-                                    description: "Email change functionality will be available soon.",
-                                    variant: "destructive",
-                                });
+                                toast.error("Email change functionality will be available soon.");
                             }}
                             className="px-4 py-2 border border-border rounded-md hover:bg-muted transition-colors"
                         >

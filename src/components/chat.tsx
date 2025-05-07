@@ -59,9 +59,9 @@ export function Chat() {
         await fetch('/api/chat/typing', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             chatId: chat._id,
-            isCustomerTyping: isTyping 
+            isCustomerTyping: isTyping
           }),
         });
       } catch (err) {
@@ -92,7 +92,7 @@ export function Chat() {
       const response = await fetch('/api/chat/message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           chatId: chat._id,
           content: newMessage,
           isCustomerTyping: false
@@ -137,13 +137,13 @@ export function Chat() {
 
   return (
     <div className="relative">
-      <button
+      <Button
+        variant="ghost" size="icon"
         onClick={() => {
           setIsOpen(!isOpen);
           if (!isOpen) setUnreadCount(0); // Reset count when opening
         }}
         aria-label="Toggle chat"
-        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full relative"
       >
         <MessageCircle className="h-6 w-6" />
         {unreadCount > 0 && (
@@ -151,7 +151,7 @@ export function Chat() {
             {unreadCount}
           </div>
         )}
-      </button>
+      </Button>
 
       {isOpen && (
         <div
@@ -176,11 +176,10 @@ export function Chat() {
                   className={`flex ${!message.isAgent ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-lg p-2 ${
-                      !message.isAgent
+                    className={`max-w-[80%] rounded-lg p-2 ${!message.isAgent
                         ? 'bg-blue-500 text-white'
                         : 'bg-gray-100 dark:bg-gray-700'
-                    }`}
+                      }`}
                   >
                     {message.content}
                   </div>

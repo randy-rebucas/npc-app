@@ -3,13 +3,13 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useToast } from '@/hooks/use-toast';
 import * as z from 'zod';
 import Image from 'next/image';
-import { PhotoSkeleton } from '@/components/skeletons';
+import { PhotoSkeleton } from '@/components/skeletons'; 
 import { useSession } from '@/providers/logto-session-provider';
 import { getUser } from '@/app/actions/user';
 import { IUser } from '@/app/models/User';
+import { toast } from 'sonner';
 
 const formSchema = z.object({
     photo: z.instanceof(File).optional(),
@@ -21,7 +21,6 @@ export default function Photo() {
     const [user, setUser] = useState<IUser | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const { toast } = useToast();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -52,7 +51,7 @@ export default function Photo() {
 
         getUserData();
 
-    }, [setValue, toast, claims?.sub]);
+    }, [setValue, claims?.sub]);
 
     if (isLoading) {
         return <PhotoSkeleton />;
@@ -103,24 +102,13 @@ export default function Photo() {
                     body: JSON.stringify(formattedData),
                 });
 
-                toast({
-                    title: "Success!",
-                    description: "Your profile has been updated.",
-                });
+                toast.success("Your profile has been updated.");
             } else {
-                toast({
-                    title: "Error",
-                    description: "Failed to upload file. Please try again.",
-                    variant: "destructive",
-                });
+                toast.error("Failed to upload file. Please try again.");
             }
         } catch (error) {
             console.error(error);
-            toast({
-                title: "Error",
-                description: "Failed to upload file. Please try again.",
-                variant: "destructive",
-            });
+            toast.error("Failed to upload file. Please try again.");
         } finally {
             setIsUploading(false);
         }

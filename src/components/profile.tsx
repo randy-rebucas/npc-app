@@ -5,6 +5,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
 import { getUser } from '@/app/actions/user';
 import { useSession } from "@/providers/logto-session-provider";
 import { IUser } from '@/app/models/User';
+import { Button } from '@/components/ui/button';
 
 export default function Profile() {
     const { claims, signOut } = useSession();
@@ -37,9 +38,9 @@ export default function Profile() {
     }, [claims?.sub]);
     return (
         <div className="relative" ref={dropdownRef}>
-            <button
+            <Button
+                variant="ghost"
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 p-2"
             >
                 {userData?.customData?.profilePhotoPath ? (
                     <Avatar className="h-8 w-8 rounded-lg">
@@ -51,7 +52,7 @@ export default function Profile() {
                         <AvatarFallback className="rounded-lg">{userData?.username?.charAt(0)}</AvatarFallback>
                     </Avatar>
                 )}
-            </button>
+            </Button>
 
             {isOpen && (
                 <div className="absolute right-0 mt-2 w-48 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5">

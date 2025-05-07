@@ -1,8 +1,10 @@
 "use server";
 
-import { IUser, IUserCustomData, IUserProfile } from "@/app/models/User";
-import { NotFoundError, ValidationError } from "@/lib/errors";
-import { logtoFetch } from "@/utils/logto-fetch";
+
+import { NotFoundError, ValidationError } from "../../lib/errors";
+import { logtoFetch } from "../../utils/logto-fetch";
+import { IUser, IUserCustomData, IUserProfile } from "../models/User";
+
 
 interface GetUsersParams {
   page: number;
@@ -60,7 +62,7 @@ export async function deleteUser(userId: string): Promise<ApiResponse> {
     throw new ValidationError("User ID is required");
   }
 
-  const data = await logtoFetch(`users/${userId}`, { method: 'DELETE' });
+  const data = await logtoFetch<ApiResponse>(`users/${userId}`, { method: 'DELETE' });
   return data;
 }
 
@@ -94,7 +96,7 @@ export async function getUserCustomData(userId: string): Promise<IUserCustomData
     throw new ValidationError("User ID is required");
   }
 
-  const data = await logtoFetch(`users/${userId}/custom-data`);
+  const data = await logtoFetch<IUserCustomData>(`users/${userId}/custom-data`); 
   
   if (!data) {
     throw new NotFoundError(`Custom data for user ${userId} not found`);
@@ -154,7 +156,7 @@ export async function getUsers({
   page_size = 10,
 }: GetUsersParams): Promise<GetUsersResponse[]> {
   try {
-    const data = await logtoFetch(`users?page=${page}&page_size=${page_size}`);
+    const data = await logtoFetch<GetUsersResponse[]>(`users?page=${page}&page_size=${page_size}`);
     return data;
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -193,7 +195,7 @@ export async function updateUserPassword(id: string, password: string): Promise<
     throw new ValidationError("User ID and valid password are required");
   }
 
-  const data = await logtoFetch(`users/${id}/password`, {
+  const data = await logtoFetch<ApiResponse>(`users/${id}/password`, {
     method: 'PATCH',
     body: JSON.stringify({ password }),
   });
@@ -213,7 +215,7 @@ export async function verifyUserPassword(id: string, password: string): Promise<
     throw new ValidationError("User ID and password are required");
   }
 
-  const data = await logtoFetch(`users/${id}/password/verify`, {
+  const data = await logtoFetch<{ isValid: boolean }>(`users/${id}/password/verify`, {
     method: 'POST',
     body: JSON.stringify({ password }),
   });
@@ -232,7 +234,7 @@ export async function checkUserHasPassword(id: string): Promise<{ hasPassword: b
     throw new ValidationError("User ID is required");
   }
 
-  const data = await logtoFetch(`users/${id}/has-password`);
+  const data = await logtoFetch<{ hasPassword: boolean }>(`users/${id}/has-password`);
   return data;
 }
 
@@ -248,7 +250,7 @@ export async function updateUserSuspensionStatus(id: string, suspensionStatus: b
     throw new ValidationError("User ID and valid suspension status are required");
   }
 
-  const data = await logtoFetch(`users/${id}/is-suspended`, {
+  const data = await logtoFetch<ApiResponse>(`users/${id}/is-suspended`, {
     method: 'PATCH',
     body: JSON.stringify({ isSuspended: suspensionStatus }),
   });

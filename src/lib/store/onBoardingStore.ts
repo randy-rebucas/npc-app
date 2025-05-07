@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 import { OnboardingFormData } from "../types/onboarding";
 
 export type State = {
-  onBoarding: OnboardingFormData;
+  onBoarding: OnboardingFormData; 
 };
 
 export type Actions = {

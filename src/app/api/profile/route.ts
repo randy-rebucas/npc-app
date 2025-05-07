@@ -1,15 +1,12 @@
 import { NextResponse } from "next/server";
 import connect from "@/lib/db";
 import UserProfile from "@/app/models/UserProfile";
-// import { createEvent } from "@/app/actions/events";
 // import { EventType } from "@/app/models/Event";
 import Template from "@/app/models/Template";
 import { getLogtoContext } from "@logto/next/server-actions";
 import { logtoConfig } from "@/app/logto";
 // import { EmailService } from "@/lib/email";
 import { updateUser, getUser } from "@/app/actions/user";
-import { createEvent } from "@/app/actions/events";
-import { EventType } from "@/app/models/Event";
 
 export async function POST(request: Request) {
   try {
@@ -22,12 +19,6 @@ export async function POST(request: Request) {
     await updateUser(claims?.sub as string, data);
 
     const user = await getUser(claims?.sub as string);
-
-    await createEvent({
-      user: claims?.sub as string,
-      email: user.primaryEmail || "",
-      type: EventType.MEMBER_UPDATED,
-    });
 
     // Get the default template for profile updated
     let template = await Template.findOne({

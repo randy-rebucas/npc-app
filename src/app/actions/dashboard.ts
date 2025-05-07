@@ -33,7 +33,7 @@ interface ActiveUserMetrics {
  */
 export async function getTotalUserCount(): Promise<{ count: number }> {
   const data = await logtoFetch(`dashboard/users/total`);
-  return { count: data.totalUserCount };
+  return { count: data.totalUserCount as number };
 }
 
 /**
@@ -47,8 +47,8 @@ export async function getNewUserCount(): Promise<{
 }> {
   const data = await logtoFetch(`dashboard/users/new`);
   return {
-    today: data.today,
-    last7Days: data.last7Days,
+    today: data.today as MetricWithDelta,
+    last7Days: data.last7Days as MetricWithDelta,
   };
 }
 
@@ -60,10 +60,10 @@ export async function getNewUserCount(): Promise<{
 export async function getActiveUserCount(): Promise<ActiveUserMetrics> {
   const data = await logtoFetch(`dashboard/users/active`);
   return {
-    dauCurve: data.dauCurve,
-    dau: data.dau,
-    wau: data.wau,
-    mau: data.mau,
+    dauCurve: data.dauCurve as DauDataPoint[],
+    dau: data.dau as MetricWithDelta,
+    wau: data.wau as MetricWithDelta,
+    mau: data.mau as MetricWithDelta,
   };
 }
 

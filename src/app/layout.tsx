@@ -10,6 +10,7 @@ import { ApplicationSettingsProvider } from "@/providers/application-settings-pr
 import { NotificationsProvider } from "@/providers/notifications-provider";
 import { logtoConfig } from "./logto";
 import { getLogtoContext } from "@logto/next/server-actions";
+import { ClaimProvider } from "@/providers/claim-provider";
 
 // import ChatBot from '@/components/root/ChatBot/ChatBot';
 // import ChatComponent from "@/components/example/ChatComponent";
@@ -27,7 +28,7 @@ const geistMono = localFont({
 
 export async function generateMetadata(): Promise<Metadata> {
   const config = await getConfig();
-  
+
   return {
     metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
     title: {
@@ -55,9 +56,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: 'black',
+  themeColor: '#000000',
 }
- 
+
+export const dynamic = 'force-dynamic';
+
 export default async function RootLayout({
   children,
 }: {
@@ -65,16 +68,15 @@ export default async function RootLayout({
 }) {
   let isAuthenticated = false;
   let claims = null;
-  
+
   try {
-    const logtoContext = await getLogtoContext(logtoConfig, { 
+    const logtoContext = await getLogtoContext(logtoConfig, {
       fetchUserInfo: true
     });
     isAuthenticated = logtoContext.isAuthenticated;
     claims = logtoContext.claims;
   } catch (error) {
     console.error('Logto authentication error:', error);
-    // Continue with unauthenticated state
   }
 
   return (
@@ -82,9 +84,9 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased min-h-screen`}
       >
-        <ThemeProvider 
-          attribute="class" 
-          defaultTheme="system" 
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
@@ -94,11 +96,13 @@ export default async function RootLayout({
               claims={claims as ClaimProps}
             >
               <ApplicationSettingsProvider>
-                <NotificationsProvider>
-                  <main>{children}</main>
-                </NotificationsProvider>
-                {/* {session && <ChatBot />}   */}
-                {/* <ChatComponent />  */}
+                <ClaimProvider>
+                  <NotificationsProvider>
+                    <main>{children}</main>
+                  </NotificationsProvider>
+                  {/* {session && <ChatBot />}   */}
+                  {/* <ChatComponent />  */}
+                </ClaimProvider>
               </ApplicationSettingsProvider>
             </LogtoProvider>
           </FontSizeProvider>

@@ -9,10 +9,10 @@ export default async function NpLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const { isAuthenticated, claims } = await getLogtoContext(logtoConfig, { 
+    const { isAuthenticated, claims } = await getLogtoContext(logtoConfig, {
         fetchUserInfo: true
-      });
-      
+    });
+
     return (
         <LogtoProvider
             isAuthenticated={isAuthenticated}

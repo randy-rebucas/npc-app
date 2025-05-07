@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useToast } from "@/hooks/use-toast";
 import { GovidSkeleton } from "@/components/skeletons";
 import { IUser } from "@/app/models/User";
 import { useSession } from "@/providers/logto-session-provider";
 import { getUser } from "@/app/actions/user";
+import { toast } from "sonner";
 
 const formSchema = z.object({
     governmentId: z.instanceof(File).optional(),
@@ -22,7 +22,6 @@ export default function GovidPage() {
     const [currentGovId, setCurrentGovId] = useState<{ governmentIdPath: string }>({ governmentIdPath: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const { toast } = useToast();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -48,7 +47,7 @@ export default function GovidPage() {
         }
 
         getUserData();
-    }, [setValue, toast, claims?.sub]);
+    }, [setValue, claims?.sub]);
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
 
@@ -99,25 +98,14 @@ export default function GovidPage() {
                         body: JSON.stringify(formattedData),
                     });
 
-                    toast({
-                        title: "Success!",
-                        description: "Your government ID has been updated.",
-                    });
+                    toast.success("Your government ID has been updated.");
                 } else {
-                    toast({
-                        title: "Error",
-                        description: "Failed to upload file. Please try again.",
-                        variant: "destructive",
-                    });
+                    toast.error("Failed to upload file. Please try again.");
                 }
             }
         } catch (error) {
             console.error(error);
-            toast({
-                title: "Error",
-                description: "Failed to upload file. Please try again.",
-                variant: "destructive",
-            });
+            toast.error("Failed to upload file. Please try again.");
         } finally {
             setIsSubmitting(false);
         }

@@ -5,11 +5,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useToast } from "@/hooks/use-toast";
 import { CertificationSkeleton } from "@/components/skeletons";
 import { useSession } from "@/providers/logto-session-provider";
 import { IUser } from "@/app/models/User";
 import { getUser } from "@/app/actions/user";
+import { toast } from "sonner";
 
 const certificationFormSchema = z.object({
     boardCertifications: z.string(),
@@ -30,7 +30,6 @@ export default function CertificationPage() {
     const [user, setUser] = useState<IUser | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const { toast } = useToast();
 
     const form = useForm<CertificationFormValues>({
         resolver: zodResolver(certificationFormSchema),
@@ -73,7 +72,7 @@ export default function CertificationPage() {
         }
 
         getUserData();
-    }, [setValue, toast, claims?.sub]);
+    }, [setValue, claims?.sub]);
 
     async function onSubmit(data: CertificationFormValues) {
         setIsSubmitting(true);
@@ -100,17 +99,10 @@ export default function CertificationPage() {
                 throw new Error(await response.text() || "Failed to update certifications");
             }
 
-            toast({
-                title: "Success!",
-                description: "Your certifications have been updated.",
-            });
+            toast.success("Your certifications have been updated.");
         } catch (error) {
             console.error(error);
-            toast({
-                title: "Error",
-                description: "Failed to update certifications",
-                variant: "destructive",
-            });
+            toast.error("Failed to update certifications. Please try again.");
         } finally {
             setIsSubmitting(false);
         }

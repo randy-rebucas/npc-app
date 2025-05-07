@@ -4,11 +4,11 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { useEffect, useState } from "react"
-import { useToast } from "@/hooks/use-toast"
 import { EducationSkeleton } from "@/components/skeletons"
 import { useSession } from "@/providers/logto-session-provider";
 import { getUser } from "@/app/actions/user"
 import { IUser } from "@/app/models/User";
+import { toast } from "sonner";
 
 export type Education = {
     undergrad?: string;
@@ -32,7 +32,6 @@ type EducationFormValues = z.infer<typeof educationFormSchema>;
 type PracticeType = string;
 
 export default function EducationPage() {
-    const { toast } = useToast();
     const { claims } = useSession();
     const [user, setUser] = useState<IUser | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -85,7 +84,7 @@ export default function EducationPage() {
         }
 
         getUserData();
-    }, [setValue, toast, claims?.sub]);
+    }, [setValue, claims?.sub]);
 
     useEffect(() => {
         const getPracticeTypes = async () => {
@@ -122,18 +121,11 @@ export default function EducationPage() {
 
             if (!response.ok) throw new Error("Failed to update education");
 
-            toast({
-                title: "Success!",
-                description: "Your education has been updated.",
-            });
+            toast.success("Your education has been updated.");
 
         } catch (error) {
             console.error(error);
-            toast({
-                title: "Error",
-                description: "Failed to update education",
-                variant: "destructive",
-            });
+            toast.error("Failed to update education. Please try again.");
         } finally {
             setIsSubmitting(false);
         }

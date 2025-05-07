@@ -5,11 +5,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useEffect, useState } from "react";
-import { useToast } from "@/hooks/use-toast";
 import { RatesSkeleton } from "@/components/skeletons";
 import { useSession } from "@/providers/logto-session-provider";
 import { IUser } from "@/app/models/User";
 import { getUser } from "@/app/actions/user";
+import { toast } from "sonner";
 
 const ratesSchema = z.object({
     monthlyCollaborationRate: z.number().min(0, "Base rate must be positive"),
@@ -25,7 +25,6 @@ export default function Rates() {
     const [user, setUser] = useState<IUser | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const { toast } = useToast();
 
     const form = useForm<RatesFormValues>({
         resolver: zodResolver(ratesSchema),
@@ -63,7 +62,7 @@ export default function Rates() {
 
         getUserData();
 
-    }, [setValue, toast, claims?.sub]);
+    }, [setValue, claims?.sub]);
 
     if (isLoading) {
         return <RatesSkeleton />;
@@ -93,17 +92,10 @@ export default function Rates() {
                 throw new Error("Failed to update profile");
             }
 
-            toast({
-                title: "Success!",
-                description: "Your profile has been updated.",
-            });
+            toast.success("Your profile has been updated.");
         } catch (error) {
             console.error(error);
-            toast({
-                title: "Error",
-                description: "Failed to update profile. Please try again.",
-                variant: "destructive",
-            });
+            toast.error("Failed to update profile. Please try again.");
         } finally {
             setIsSubmitting(false);
         }

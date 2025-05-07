@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { CircleHelp } from 'lucide-react';
-
+import { Button } from '@/components/ui/button';
 const helpItems = [
   { name: 'Documentation', href: '/docs' },
   { name: 'FAQs', href: '/np/help/faq' },
@@ -27,12 +27,12 @@ export function HelpMenu() {
 
   return (
     <div className="relative" ref={menuRef}>
-      <button
+      <Button
+        variant="ghost" size="icon"
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full relative"
       >
         <CircleHelp className="h-6 w-6" />
-      </button>
+      </Button>
       
       {isOpen && (
         <div className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">

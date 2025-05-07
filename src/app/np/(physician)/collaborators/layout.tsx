@@ -1,28 +1,28 @@
 'use client';
 
 import Header from "@/components/header";
-import { useSession } from "@/providers/logto-session-provider";
+// import { useSession } from "@/providers/logto-session-provider";
 import Link from "next/link";
-import { redirect, usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { usePathname } from "next/navigation";
+
 
 export default function CollaboratorsLayout({ children, modal }: { children: React.ReactNode, modal: React.ReactNode }) {
     const pathname = usePathname();
     const currentTab = pathname.split('/').pop();
-    const { claims } = useSession();
+    // const { claims } = useSession();
 
-    useEffect(() => {
-        const getUserSubmissionStatus = async (id: string) => {
-            const response = await fetch(`/api/user/${id}/submission-status`);
-            const data = await response.json();
-            if (data.submissionStatus !== 'APPROVED') {
-                redirect("/not-authorized");
-            }
-        }
-        if (claims?.sub) {
-            getUserSubmissionStatus(claims.sub);
-        }
-    }, [claims?.sub]);
+    // useEffect(() => {
+    //     const getUserSubmissionStatus = async (id: string) => {
+    //         const response = await fetch(`/api/user/${id}/submission-status`);
+    //         const data = await response.json();
+    //         if (data.submissionStatus !== 'APPROVED') {
+    //             redirect("/not-authorized");
+    //         }
+    //     }
+    //     if (claims?.sub) {
+    //         getUserSubmissionStatus(claims.sub);
+    //     }
+    // }, [claims?.sub]);
 
     return (
         <div className="min-h-screen w-full bg-background">
@@ -45,21 +45,19 @@ export default function CollaboratorsLayout({ children, modal }: { children: Rea
                             <nav className="-mb-px flex space-x-8">
                                 <Link
                                     href="/np/collaborators/active"
-                                    className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium ${
-                                        currentTab === 'active'
+                                    className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium ${currentTab === 'active'
                                             ? 'border-primary text-primary'
                                             : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
-                                    }`}
+                                        }`}
                                 >
                                     Active Collaborators
                                 </Link>
                                 <Link
                                     href="/np/collaborators/request"
-                                    className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium ${
-                                        currentTab === 'request'
+                                    className={`whitespace-nowrap pb-4 px-1 border-b-2 font-medium ${currentTab === 'request'
                                             ? 'border-primary text-primary'
                                             : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
-                                    }`}
+                                        }`}
                                 >
                                     Pending Requests
                                 </Link>
