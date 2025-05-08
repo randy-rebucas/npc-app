@@ -47,6 +47,10 @@ export async function DELETE(request: NextRequest) {
 
     // public/uploads/1734755780883-photo-1633332755192-727a05c4013d.jpeg
     const uploadDir = path.join(process.cwd(), "public/uploads");
+
+    // Ensure upload directory exists
+    await fs.mkdir(uploadDir, { recursive: true });
+    
     const filepath = path.join(uploadDir, filename);
 
     // Check if file exists before attempting to delete
