@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { useToast } from '@/hooks/use-toast';
-import { IUserProfile } from '@/app/models/UserProfile';
 import { IUser } from '@/app/models/User';
 
 const profileSchema = z.object({
@@ -25,7 +24,7 @@ const profileSchema = z.object({
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
-export default function User({ profile }: { profile: IUserProfile & { user: IUser } }) {
+export default function User({ user }: { user: IUser }) {
     const { toast } = useToast();
     const {
         register,
@@ -35,8 +34,8 @@ export default function User({ profile }: { profile: IUserProfile & { user: IUse
     } = useForm<ProfileFormData>({
         resolver: zodResolver(profileSchema),
         defaultValues: {
-            username: profile.user.username,
-            email: profile.user.primaryEmail
+            username: user?.username ?? '',
+            email: user?.primaryEmail ?? ''
         }
     });
 

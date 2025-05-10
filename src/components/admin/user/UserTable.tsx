@@ -6,7 +6,7 @@ import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { Switch } from "@/components/ui/switch"
 import { useState } from "react"
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { IUser } from "@/app/models/User";
 
 export default function UserTable({ users }: { users: IUser[] }) {
@@ -27,10 +27,8 @@ export default function UserTable({ users }: { users: IUser[] }) {
             if (!response.ok) {
                 throw new Error('Failed to update suspension status');
             }
-            toast({
-                title: 'User updated',
+            toast.success('User updated', {
                 description: 'User updated',
-                variant: 'default',
             });
             // You might want to refresh the users data here or implement optimistic updates
         } catch (error) {

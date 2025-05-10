@@ -1,14 +1,13 @@
 'use client'
 
 import { IUser } from '@/app/models/User';
-import { IUserProfile } from '@/app/models/UserProfile';
 import { toast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
-export default function Picture({ profile }: { profile: IUserProfile & { user: IUser } }) { 
-    const [previewUrl, setPreviewUrl] = useState<string | null>(profile.profilePhotoPath);
-
+export default function Picture({ user }: { user: IUser }) { 
+    const [previewUrl, setPreviewUrl] = useState<string | null>(user?.customData?.profilePhotoPath ?? null);
+    console.log(user);
     const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;

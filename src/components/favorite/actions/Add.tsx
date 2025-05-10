@@ -1,6 +1,6 @@
 "use client"
 
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useCallback, useEffect, useState } from "react";
 
 export default function Add({ itemId }: { itemId: string }) {
@@ -29,15 +29,9 @@ export default function Add({ itemId }: { itemId: string }) {
         const data = await favorite.json();
         fetchFavorite();
         if (data.success) {
-            toast({
-                title: data.message,
-                variant: 'default',
-            });
+            toast.success(data.message);
         } else {
-            toast({
-                title: data.message,
-                variant: 'destructive',
-            });
+            toast.error(data.message);
         }
     }
 

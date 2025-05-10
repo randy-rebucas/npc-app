@@ -1,8 +1,8 @@
 'use client';
 
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
-export default function WithdrawOffer({ collaboratorId, refetch }: { collaboratorId: string, refetch: () => void }) {
+export default function WithdrawOffer({ collaboratorId, refetchAction }: { collaboratorId: string, refetchAction: () => void }) {
 
     const handleWithdrawOffer = async (id: string) => {
         try {
@@ -11,25 +11,19 @@ export default function WithdrawOffer({ collaboratorId, refetch }: { collaborato
             });
             const data = await response.json();
             if (data.success) {
-                toast({
-                    title: 'Offer withdrawn',
+                toast.success('Offer withdrawn', {
                     description: 'The offer has been withdrawn',
-                    variant: 'default',
                 });
-                refetch();
+                refetchAction();
             } else {
-                toast({
-                    title: 'Failed to withdraw offer',
+                toast.error('Failed to withdraw offer', {
                     description: data.message,
-                    variant: 'destructive',
                 });
             }
         } catch (err) {
             console.error('Error withdrawing offer:', err);
-            toast({
-                title: 'Failed to withdraw offer',
+            toast.error('Failed to withdraw offer', {
                 description: 'Please try again later.',
-                variant: 'destructive',
             });
         }
     };

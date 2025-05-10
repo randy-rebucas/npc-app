@@ -1,8 +1,8 @@
 'use client';
 
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
-export default function SendOffer({ collaboratorId, refetch }: { collaboratorId: string, refetch: () => void }) {
+export default function SendOffer({ collaboratorId, refetchAction }: { collaboratorId: string, refetchAction: () => void }) {
     const handleSendOffer = async (id: string) => {
         try {
             const response = await fetch(`/api/collaborators/${id}/offer`, {
@@ -10,25 +10,19 @@ export default function SendOffer({ collaboratorId, refetch }: { collaboratorId:
             });
             const data = await response.json();
             if (data.success) {
-                toast({
-                    title: 'Offer sent',
+                toast.success('Offer sent', {
                     description: 'The offer has been sent',
-                    variant: 'default',
                 });
-                refetch();
+                refetchAction();
             } else {
-                toast({
-                    title: 'Failed to send offer',
+                toast.error('Failed to send offer', {
                     description: data.message,
-                    variant: 'destructive',
                 });
             }
         } catch (err) {
             console.error('Error sending offer:', err);
-            toast({
-                title: 'Failed to send offer',
+            toast.error('Failed to send offer', {
                 description: 'Please try again later.',
-                variant: 'destructive',
             });
         }
     };

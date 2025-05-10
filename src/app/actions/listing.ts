@@ -77,8 +77,8 @@ interface SharetribeListing {
     description: string;
     createdAt: Date;
     state: string;
-    price: { amount: number };
-    publicData: {
+    price: { amount: number | null };
+    publicData: Partial<{
       boardCertification?: string;
       practice_types?: string[];
       stateLicenses?: string[];
@@ -98,7 +98,7 @@ interface SharetribeListing {
       transactionProcessAlias?: string;
       unitType?: string;
       additionalFeePerState?: number;
-    };
+    }>;
     metadata: {
       calendlyLink?: string;
     };
@@ -107,7 +107,7 @@ interface SharetribeListing {
     author: {
       data: {
         id: { uuid: string };
-        attributes: {
+        attributes?: {
           username?: string;
           email?: string;
           profile?: {

@@ -5,6 +5,7 @@ import Enquiry from "../models/Enquiry";
 import connect from "@/lib/db";
 import { handleAsync } from '@/lib/errorHandler';
 import { DatabaseError, NotFoundError, ValidationError } from '@/lib/errors';
+import sanitize from 'mongo-sanitize';
 
 interface GetEnquiriesParams {
   page: number;
@@ -51,6 +52,10 @@ export async function getEnquiries({
   if (page < 1 || limit < 1) {
     throw new ValidationError('Invalid pagination parameters');
   }
+
+  // Sanitize inputs
+  search = sanitize(search.trim());
+  status = sanitize(status.trim());
 
   const [result, error] = await handleAsync(
     (async () => {

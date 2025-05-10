@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { RefreshCcw } from "lucide-react";
 import { useState } from "react";
 
@@ -25,24 +25,18 @@ export default function Sync({ id }: SyncProps) {
             const data = await response.json();
 
             if (data.success) {
-                toast({
-                    title: 'User synced to Sharetribe',
+                toast.success('User synced to Sharetribe', {
                     description: 'User synced to Sharetribe',
-                    variant: 'default',
                 });
             } else {
-                toast({
-                    title: 'Failed to sync user to Sharetribe',
+                toast.error('Failed to sync user to Sharetribe', {
                     description: data.message,
-                    variant: 'destructive',
                 });
             }
         } catch (error) {
             console.error('Error syncing user to Sharetribe:', error);
-            toast({
-                title: 'Failed to sync user to Sharetribe',
+            toast.error('Failed to sync user to Sharetribe', {
                 description: 'Please try again later.',
-                variant: 'destructive',
             });
         } finally {
             setIsLoading(false);

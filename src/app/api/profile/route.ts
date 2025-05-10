@@ -57,11 +57,11 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
-    const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
-    if (!isAuthenticated) {
+    const { claims } = await getLogtoContext(logtoConfig);
+    if (!claims?.sub) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const user = await getUser(claims?.id as string);
+    const user = await getUser(claims?.sub as string);
     return NextResponse.json(user);
   } catch (error) {
     console.error(error);

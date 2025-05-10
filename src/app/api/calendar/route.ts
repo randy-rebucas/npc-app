@@ -1,25 +1,25 @@
-import connect from "@/lib/db";
-import CalendarAccessToken from "@/app/models/CalendatAccessToken";
 import { NextResponse } from "next/server";
+import { getUser, updateUserCustomData } from "@/app/actions/user";
+import { IUserCustomData } from "@/app/models/User";
 
 export async function POST(req: Request) {
   try {
     const { access_token, user_id } = await req.json();
-    await connect();
 
-    const accessToken = await CalendarAccessToken.findOne({ user: user_id });
-    if (accessToken) {
+    const userData = await getUser(user_id);
+    if (userData.customData?.googleCalendarAccessToken) {
       return NextResponse.json(
         { error: "Access token already exists" },
         { status: 400 }
       );
     }
-    const newAccessToken = await CalendarAccessToken.create({
-      access_token,
-      user: user_id,
-    });
+    await updateUserCustomData(user_id, {
+      ...userData.customData,
+      googleCalendarAccessToken: access_token,
+    } as IUserCustomData);
+
     return NextResponse.json(
-      { access_token: newAccessToken.access_token },
+      { message: "Access token updated successfully" },
       { status: 200 }
     );
   } catch (error) {

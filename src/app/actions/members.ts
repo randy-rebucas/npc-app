@@ -95,7 +95,10 @@ export async function getMembers({
   accountSynced = "all",
   limit = 10,
 }: GetMembersParams): Promise<GetMembersResponse> {
-  if (page < 1 || limit < 1) {
+  page = Math.max(1, Math.floor(Number(page)));
+  limit = Math.min(100, Math.max(1, Math.floor(Number(limit))));
+
+  if (isNaN(page) || isNaN(limit)) {
     throw new ValidationError('Invalid pagination parameters');
   }
 

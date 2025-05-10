@@ -1,9 +1,9 @@
 'use client';
 
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 
-export default function CancelOffer({ collaboratorId, refetch }: { collaboratorId: string, refetch: () => void }) {
+export default function CancelOffer({ collaboratorId, refetchAction }: { collaboratorId: string, refetchAction: () => void }) {
 
     const handleCancelOffer = async (id: string) => {
         try {
@@ -12,25 +12,19 @@ export default function CancelOffer({ collaboratorId, refetch }: { collaboratorI
             });
             const data = await response.json();
             if (data.success) {
-                toast({
-                    title: 'Offer cancelled',
+                toast.success('Offer cancelled', {
                     description: 'The offer has been cancelled',
-                    variant: 'default',
                 });
-                refetch();
+                refetchAction();
             } else {
-                toast({
-                    title: 'Failed to cancel offer',
+                toast.error('Failed to cancel offer', {
                     description: data.message,
-                    variant: 'destructive',
                 });
             }
         } catch (err) {
             console.error('Error cancelling offer:', err);
-            toast({
-                title: 'Failed to cancel offer',
+            toast.error('Failed to cancel offer', {
                 description: 'Please try again later.',
-                variant: 'destructive',
             });
         }
     };

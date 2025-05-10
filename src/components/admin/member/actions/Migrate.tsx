@@ -1,9 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
-
+import { toast } from "sonner";
 
 export default function Migrate({ id }: { id: string }) {
     // Add loading state
@@ -18,24 +17,18 @@ export default function Migrate({ id }: { id: string }) {
             });
             const data = await response.json();
             if (data.success) {
-                toast({
-                    title: 'Member migrated',
+                toast.success('Member migrated', {
                     description: 'The member has been migrated',
-                    variant: 'default',
                 });
             } else {
-                toast({
-                    title: 'Failed to migrate member',
+                toast.error('Failed to migrate member', {
                     description: data.message,
-                    variant: 'destructive',
                 });
             }
         } catch (error) {
             console.error(error);
-            toast({
-                title: 'Failed to migrate member',
+            toast.error('Failed to migrate member', {
                 description: 'An unexpected error occurred',
-                variant: 'destructive',
             });
         } finally {
             setIsLoading(false);

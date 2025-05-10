@@ -37,7 +37,7 @@ export default function Photo() {
                 const userData = await getUser(claims.sub);
                 // Populate form with user data
                 setUser(userData);
-
+                console.log(userData);
                 if (userData) {
                     setPhotoUrl(userData?.customData?.profilePhotoPath || '');
                 }

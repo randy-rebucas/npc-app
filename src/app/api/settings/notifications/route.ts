@@ -8,19 +8,19 @@ export async function GET() {
     try {
         await connect();
 
-        const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
+        const { claims } = await getLogtoContext(logtoConfig);
 
-        if (!isAuthenticated) {
+        if (!claims?.sub) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         let settings = await NotificationSetting.findOne({
-            user: claims?.id,
+            user: claims?.sub,
         });
 
         if (!settings) {
             const newSettings = new NotificationSetting({
-                user: claims?.id,
+                user: claims?.sub,
                 emailNotifications: false,
                 pushNotifications: false,
                 notificationTypes: {
@@ -33,7 +33,6 @@ export async function GET() {
             await newSettings.save();
             settings = newSettings;
         }
-        console.log(settings);
 
         return NextResponse.json(settings);
     } catch (error) {
@@ -48,8 +47,8 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
     try {
-        const { claims, isAuthenticated } = await getLogtoContext(logtoConfig);
-        if (!isAuthenticated) {
+        const { claims } = await getLogtoContext(logtoConfig);
+        if (!claims?.sub) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -57,7 +56,7 @@ export async function PATCH(request: Request) {
         await connect();
         
         const settings = await NotificationSetting.findOneAndUpdate(
-            { user: claims?.id },
+            { user: claims?.sub },
             {
                 $set: {
                     [type]: value,

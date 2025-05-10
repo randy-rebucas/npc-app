@@ -1,10 +1,10 @@
 'use client';
 
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useState } from "react";
 
 
-export default function Decline({ collaboratorId, refetch }: { collaboratorId: string, refetch: () => void }) {
+export default function Decline({ collaboratorId, refetchAction }: { collaboratorId: string, refetchAction: () => void }) {
     const [dialog, setDialog] = useState({
         isOpen: false,
         title: '',
@@ -24,25 +24,19 @@ export default function Decline({ collaboratorId, refetch }: { collaboratorId: s
                     });
                     const data = await response.json();
                     if (data.success) { 
-                        toast({
-                            title: 'Collaboration request declined',
+                        toast.success('Collaboration request declined', {
                             description: 'The collaboration request has been declined',
-                            variant: 'destructive',
                         });
-                        refetch();
+                        refetchAction();
                     } else {
-                        toast({
-                            title: 'Failed to decline collaborator',
+                        toast.error('Failed to decline collaborator', {
                             description: data.message,
-                            variant: 'destructive',
                         });
                     }
                 } catch (err) {
                     console.error('Error declining collaborator:', err);
-                    toast({
-                        title: 'Failed to decline collaborator',
+                    toast.error('Failed to decline collaborator', {
                         description: 'Please try again later.',
-                        variant: 'destructive',
                     });
                 }
                 setDialog(prev => ({ ...prev, isOpen: false }));

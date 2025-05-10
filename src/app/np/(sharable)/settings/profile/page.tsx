@@ -3,13 +3,12 @@
 import { useEffect, useState } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { IUser } from '@/app/models/User';
-import { IUserProfile } from '@/app/models/UserProfile';
 import Picture from '@/components/user/forms/Picture';
 import Profile from '@/components/user/forms/Profile';
 import User from '@/components/user/forms/User';
 
 export default function ProfilePage() {
-    const [profile, setProfile] = useState<IUserProfile & { user: IUser } | null>(null); 
+    const [user, setUser] = useState< IUser | null>(null); 
 
     useEffect(() => {
         const getUser = async () => {
@@ -25,7 +24,8 @@ export default function ProfilePage() {
                     return;
                 }
                 const responseData = await response.json();
-                setProfile(responseData);
+                console.log(responseData);
+                setUser(responseData);
             } catch (error) {
                 console.error(error);
                 toast({
@@ -39,14 +39,14 @@ export default function ProfilePage() {
         };
         getUser();
     }, []);
-
+    console.log(user);
     return (
         <div className="max-w-2xl mx-auto space-y-6">
-            {profile && (
+            {user && (
                 <>
                     {/* User Picture */}
                     <div className="rounded-lg border bg-card p-4">
-                        <Picture profile={profile} />
+                        <Picture user={user} />
                     </div>
 
                     {/* User Information Section */}
@@ -55,7 +55,7 @@ export default function ProfilePage() {
                             User Information
                         </summary>
                         <div className="mt-4">
-                            <User profile={profile} />
+                            <User user={user} />
                         </div>
                     </details>
 
@@ -65,7 +65,7 @@ export default function ProfilePage() {
                             Profile Information
                         </summary>
                         <div className="mt-4">
-                            <Profile profile={profile} />
+                            <Profile user={user} />
                         </div>
                     </details>
                 </>

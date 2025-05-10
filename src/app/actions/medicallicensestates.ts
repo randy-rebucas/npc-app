@@ -11,7 +11,8 @@ export const getMedicalLicenseStates = cache(async () => {
             await connect();
             const states = await MedicalLicenseState.find({ enabled: true })
                 .select('state')
-                .lean();
+                .lean()
+                .sort({ createdAt: -1 });
             const data = states.map(state => state.state);
             console.log(data);
             return data;

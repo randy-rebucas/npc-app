@@ -16,9 +16,14 @@ export async function myAccount(): Promise<IUser> {
       Authorization: `Bearer ${logtoToken.value}`,
       "Content-Type": "application/json",
     },
+    signal: AbortSignal.timeout(5000)
   });
-  const data = await response.json();
 
+  if (!response.ok) {
+    throw new Error(`Failed to fetch account: ${response.statusText}`);
+  }
+
+  const data = await response.json();
   return data;
 }
 

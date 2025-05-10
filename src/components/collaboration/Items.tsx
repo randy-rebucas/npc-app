@@ -7,7 +7,7 @@ import SendOffer from "./actions/offer/SendOffer";
 import Remove from "./actions/Remove";
 import Decline from "./actions/Decline";    
 import Image from "next/image";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useEffect, useCallback } from "react";
 import { useState } from "react";
 import { CollaborationSkeleton } from "../skeletons";
@@ -50,10 +50,8 @@ export default function Items({ type }: { type: 'active' | 'request' }) {
             setCollaborators(data);
         } catch (err) {
             console.error('Error fetching user:', err);
-            toast({
-                title: 'Failed to load collaborators',
+            toast.error('Failed to load collaborators', {
                 description: 'Please try again later.',
-                variant: 'destructive',
             });
         } finally {
             setIsLoading(false);
@@ -109,25 +107,25 @@ export default function Items({ type }: { type: 'active' | 'request' }) {
                                     <button className="flex-1 bg-white text-gray-700 border border-gray-300 rounded-md py-2 px-4 text-sm font-medium hover:bg-gray-50">
                                         Message
                                     </button>
-                                    <Remove collaboratorId={collaborator.id} refetch={fetchCollaborators} />
+                                    <Remove collaboratorId={collaborator.id} refetchAction={fetchCollaborators} />
                                 </>
                             ) : collaborator.status === 'pending' ? (
                                 <>
-                                    <Accept collaboratorId={collaborator.id} refetch={fetchCollaborators} />
-                                    <Decline collaboratorId={collaborator.id} refetch={fetchCollaborators} />
+                                    <Accept collaboratorId={collaborator.id} refetchAction={fetchCollaborators} />
+                                    <Decline collaboratorId={collaborator.id} refetchAction={fetchCollaborators} />
                                 </>
                             ) : collaborator.status === 'offered' ? (
                                 <>
-                                    <WithdrawOffer collaboratorId={collaborator.id} refetch={fetchCollaborators} />
-                                    <CancelOffer collaboratorId={collaborator.id} refetch={fetchCollaborators} />
+                                    <WithdrawOffer collaboratorId={collaborator.id} refetchAction={fetchCollaborators} />
+                                    <CancelOffer collaboratorId={collaborator.id} refetchAction={fetchCollaborators} />
                                 </>
                             ) : collaborator.status === 'accepted' ? (
                                 <>
-                                    <SendOffer collaboratorId={collaborator.id} refetch={fetchCollaborators} />
+                                    <SendOffer collaboratorId={collaborator.id} refetchAction={fetchCollaborators} />
                                 </>
                             ) : collaborator.status === 'declined' || collaborator.status === 'cancelled' || collaborator.status === 'withdrawn' ? (
                                 <>
-                                    <Remove collaboratorId={collaborator.id} refetch={fetchCollaborators} />
+                                    <Remove collaboratorId={collaborator.id} refetchAction={fetchCollaborators} />
                                 </>
                             ) : null}
                         </div>

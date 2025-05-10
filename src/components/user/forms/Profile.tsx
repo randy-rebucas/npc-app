@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { useToast } from '@/hooks/use-toast';
-import { IUserProfile } from '@/app/models/UserProfile';
 import { IUser } from '@/app/models/User';
 import { useEffect, useState } from 'react';
 
@@ -19,9 +18,9 @@ export const profileSchema = z.object({
         required_error: 'Please select a start date',
     }),
     npi: z.string().regex(/^\d{10}$/, 'NPI must be a 10-digit number'),
-    controlledSubstances: z.enum(['yes', 'no'], {
-        required_error: 'Please select yes or no',
-    }),
+    // controlledSubstances: z.enum(['yes', 'no'], {
+    //     required_error: 'Please select yes or no',
+    // }),
 });
 
 export type ProfileFormData = z.infer<typeof profileSchema>;
@@ -44,8 +43,7 @@ const calculateStartDate = (period: string): Date => {
     }
 };
 
-export default function Profile({ profile }: { profile: IUserProfile & { user: IUser } }) {
-    console.log(profile);
+export default function Profile({ user }: { user: IUser }) {
     const { toast } = useToast();
     const [practiceTypes, setPracticeTypes] = useState<string[]>([]);
     const [states, setStates] = useState<string[]>([]);
@@ -66,15 +64,15 @@ export default function Profile({ profile }: { profile: IUserProfile & { user: I
     } = useForm<ProfileFormData>({
         resolver: zodResolver(profileSchema),
         defaultValues: {
-            description: profile.description,
-            firstName: profile.firstName,
-            lastName: profile.lastName,
-            practiceType: profile.practiceTypes || [],
-            primaryStateOfPractice: profile.medicalLicenseStates[0].state,
-            professionalDesignation: profile.title,
+            description: user?.customData?.description ?? '',
+            firstName: user?.profile?.givenName ?? '',
+            lastName: user?.profile?.familyName ?? '',
+            practiceType: user?.customData?.practiceTypes ?? [],
+            primaryStateOfPractice: user?.customData?.licenseAndCertification?.medicalLicenseStates?.[0]?.state ?? '',
+            professionalDesignation: user?.customData?.clinicalDegree ?? '',
+            npi: user?.customData?.npiNumber ?? '',
             // startDate: calculateStartDate(profile.startDate),
-            npi: profile.npiNumber,
-            controlledSubstances: profile.controlledSubstances ? 'yes' : 'no',
+            // controlledSubstances: profile?.user?.customData?.controlledSubstances ? 'yes' : 'no',
         }
     });
     //[less than 1 week, 1-2 weeks, 3-4 weeks, 1-2 months, 2+ months]
@@ -317,7 +315,7 @@ export default function Profile({ profile }: { profile: IUserProfile & { user: I
             </div>
 
             {/* Controlled Substances */}
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
                 <label htmlFor="controlledSubstances" className="block text-sm font-medium text-gray-700">
                     Controlled Substances
                 </label>
@@ -333,7 +331,7 @@ export default function Profile({ profile }: { profile: IUserProfile & { user: I
                 {errors.controlledSubstances && (
                     <p className="text-red-500 text-sm mt-1">{errors.controlledSubstances.message}</p>
                 )}
-            </div>
+            </div> */}
 
             {/* Save Changes */}
             <button

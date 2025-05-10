@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from "react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
-export default function Remove({ collaboratorId, refetch }: { collaboratorId: string, refetch: () => void }) {
+export default function Remove({ collaboratorId, refetchAction }: { collaboratorId: string, refetchAction: () => void }) {
     const [dialog, setDialog] = useState({
         isOpen: false,
         title: '',
@@ -23,25 +23,19 @@ export default function Remove({ collaboratorId, refetch }: { collaboratorId: st
                     });
                     const data = await response.json();
                     if (data.success) {
-                        toast({
-                            title: 'Collaborator removed',
+                        toast.success('Collaborator removed', {
                             description: 'The collaborator has been removed',
-                            variant: 'destructive',
                         });
-                        refetch();
+                        refetchAction();
                     } else {
-                        toast({
-                            title: 'Failed to remove collaborator',
+                        toast.error('Failed to remove collaborator', {
                             description: data.message,
-                            variant: 'destructive',
                         });
                     }
                 } catch (err) {
                     console.error('Error removing collaborator:', err);
-                    toast({
-                        title: 'Failed to remove collaborator',
+                    toast.error('Failed to remove collaborator', {
                         description: 'Please try again later.',
-                        variant: 'destructive',
                     });
                 }
                 setDialog(prev => ({ ...prev, isOpen: false }));

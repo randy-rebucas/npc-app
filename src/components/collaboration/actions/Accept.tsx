@@ -1,25 +1,21 @@
 'use client';
 
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
-export default function Accept({ collaboratorId, refetch }: { collaboratorId: string, refetch: () => void }) {
+export default function Accept({ collaboratorId, refetchAction }: { collaboratorId: string, refetchAction: () => void }) {
     const handleAccept = async (id: string) => {
         const response = await fetch(`/api/collaborators/${id}/accept`, {
             method: 'POST',
         });
         const data = await response.json();
         if (data.success) {
-            toast({
-                title: 'Collaborator accepted',
+            toast.success('Collaborator accepted', {
                 description: 'The collaborator has been accepted',
-                variant: 'default',
             });
-            refetch();
+            refetchAction();
         } else {
-            toast({
-                title: 'Failed to accept collaborator',
+            toast.error('Failed to accept collaborator', {
                 description: data.message,
-                variant: 'destructive',
             });
         }
     };

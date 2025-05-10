@@ -53,13 +53,19 @@ const SessionContext = createContext<SessionContextType | undefined>(undefined);
  * @throws {Error} If used outside of LogtoProvider
  * @returns {SessionContextType} The session context value
  */
-export function useSession() {
+export function useSession(): SessionContextType {
     const context = React.useContext(SessionContext);
     if (context === undefined) {
         throw new Error('useSession must be used within a LogtoProvider');
     }
     return context;
 }
+
+type LogtoProviderProps = {
+    children: React.ReactNode;
+    isAuthenticated: boolean;
+    claims: ClaimProps;
+};
 
 /**
  * Provider component for managing authentication state
@@ -70,15 +76,7 @@ export function useSession() {
  * @param {Object} props.claims - User claims from authentication
  * @returns {JSX.Element} Provider component with authentication context
  */
-export function LogtoProvider({
-    children,
-    isAuthenticated,
-    claims
-}: {
-    children: React.ReactNode;
-    isAuthenticated: boolean;
-    claims: ClaimProps
-}) {
+export function LogtoProvider({ children, isAuthenticated, claims }: LogtoProviderProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [sessionData, setSessionData] = useState<Omit<SessionContextType, 'isLoading' | 'signIn' | 'signOut'>>({
         isAuthenticated,

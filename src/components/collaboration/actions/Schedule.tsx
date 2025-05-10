@@ -1,6 +1,6 @@
 'use client'
 
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { loadCalendlyScript } from "@/lib/calendly";
 import { useEffect } from "react";
 
@@ -13,9 +13,8 @@ export default function Schedule({ calendlyLink }: { calendlyLink: string }) {
         console.log('calendlyLink', calendlyLink);
         if (window.Calendly) {
             if (calendlyLink === '' || calendlyLink === null) {
-                toast({
-                    title: 'Calendly link is not setup',
-                    variant: 'destructive',
+                toast.error('Calendly link is not setup', {
+                    description: 'Please contact the administrator to setup the calendly link',
                 });
             } else {
                 window.Calendly.initPopupWidget({

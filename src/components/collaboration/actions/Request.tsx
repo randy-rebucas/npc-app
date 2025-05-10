@@ -1,6 +1,6 @@
 'use client'
 
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export default function Request({ id }: { id: string }) {
     
@@ -10,16 +10,12 @@ export default function Request({ id }: { id: string }) {
         });
         const data = await response.json();
         if (data.success) {
-            toast({
-                title: 'Collaboration requested',
+            toast.success('Collaboration requested', {
                 description: 'The collaborator has been requested',
-                variant: 'default',
             });
         } else {
-            toast({
-                title: 'Failed to request collaboration',
+            toast.error('Failed to request collaboration', {
                 description: data.message,
-                variant: 'destructive',
             });
         }
     };

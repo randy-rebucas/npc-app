@@ -62,6 +62,7 @@ export interface IUserCustomData {
   linkedinProfile?: string;
   accountSynced?: boolean;
   stripeAccountId?: string;
+  googleCalendarAccessToken?: string;
 }
 
 export interface IUser {

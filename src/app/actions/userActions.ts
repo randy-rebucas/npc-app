@@ -10,6 +10,7 @@ interface IUser extends Document {
 
 class UserActions extends BaseActions<IUser> { 
     protected model = UserModel;
+    protected resourceName = 'user';
 }
 
-export default UserActions;
+export default UserActions; 
