@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from 'lucide-react'
-import { Key, User, HelpCircle, CreditCardIcon, FileCheck, Settings, MessageCircle, Users, Search, Heart, File } from "lucide-react"
+import { Key, User, HelpCircle, CreditCardIcon, FileCheck, Settings, Users, Search, Heart, File } from "lucide-react"
 import { useState, useEffect } from "react";
 import { IUser } from "@/app/models/User";
 import { useSession } from "@/providers/logto-session-provider";
@@ -56,7 +56,7 @@ export default function Nav() {
                 if (user.customData?.submissionStatus === "APPROVED") {
                     newItems.push(
                         { title: "Collaborators", url: "/np/collaborators", icon: Users },
-                        { title: "Messages", url: "/np/messages", icon: MessageCircle },
+                        // { title: "Messages", url: "/np/messages", icon: MessageCircle },
                         { title: "Stripe", url: "/np/stripe", icon: CreditCardIcon },
                         { title: "Attestations", url: "/np/attestations", icon: FileCheck }
                     );
