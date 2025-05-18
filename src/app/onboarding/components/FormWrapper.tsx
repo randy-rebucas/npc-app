@@ -12,7 +12,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useOnBoardingStore } from '@/lib/store/onBoardingStore';
 import { useRouter } from 'next/navigation';
-import { useSession } from "@/providers/logto-session-provider";
+import { useAuth } from "@/middleware/AuthProvider";
 import { checkFileType } from '@/lib/utils';
 import * as z from 'zod';
 import { updateUser } from '@/app/actions/user';
@@ -21,7 +21,7 @@ export default function FormWrapper({ type }: { type: string }) {
     const [currentStep, setCurrentStep] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const { claims } = useSession();
+    const { user } = useAuth();
     const router = useRouter();
 
     // Get the onboarding state from the store
@@ -30,10 +30,10 @@ export default function FormWrapper({ type }: { type: string }) {
 
     // Update the onboarding state with the user's email if they are logged in
     useEffect(() => {
-        if (claims?.sub) {
+        if (user?.id) {
             // updateFields({ email: user.email });
         }
-    }, [claims?.sub, updateFields]);
+    }, [user?.id, updateFields]);
 
     // Define the maximum file size for uploads
     const MAX_FILE_SIZE = 5000000;
@@ -238,14 +238,14 @@ export default function FormWrapper({ type }: { type: string }) {
             return;
         }
 
-        if (!claims?.sub) return;
+        if (!user?.id) return;
 
         try {
             setIsSubmitting(true);
             const finalData = useOnBoardingStore.getState().onBoarding;
 
             // First submit the JSON data
-            const response = await updateUser(claims.sub, {
+            const response = await updateUser(user.id, {
                 customData: {
                     role: type,
                     onboardingStatus: "COMPLETED",

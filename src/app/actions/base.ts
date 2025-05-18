@@ -3,6 +3,8 @@ import { logtoConfig } from "../logto";
 import { Model, Document, FilterQuery, PopulateOptions } from 'mongoose';
 import { AppError, handleAsync } from '@/lib/errorHandler';
 import logger from "@/lib/logger";
+import mongoose from 'mongoose';
+import { ValidationError, DatabaseError } from '@/lib/errorHandler';
 
 
 export interface PaginationParams {
@@ -120,16 +122,32 @@ abstract class BaseActions<T extends Document> {
         }
     }
 
-    protected handleError(operation: string, error: unknown): Error {
-        if (error instanceof Error) {
-            return new AppError(`Failed to ${operation} document: ${error.message}`);
+    protected async handleError(operation: string, error: unknown): Promise<never> {
+        logger.error({ error, operation, resource: this.resourceName }, `${operation} operation failed`);
+        
+        if (error instanceof mongoose.Error.ValidationError) {
+            throw new ValidationError(`Invalid ${this.resourceName} data: ${error.message}`);
         }
-        return new AppError(`Failed to ${operation} document: ${String(error)}`);
+        
+        if (error instanceof mongoose.Error.CastError) {
+            throw new ValidationError(`Invalid ${this.resourceName} ID`);
+        }
+
+        if (error instanceof AppError) {
+            throw error;
+        }
+
+        throw new DatabaseError(
+            `Failed to ${operation} ${this.resourceName}: ${error instanceof Error ? error.message : String(error)}`
+        );
     }
 
     protected async validateDocument(document: T): Promise<void> {
-        // No-op: Override in child classes for custom validation
-        void document; // Prevents unused parameter warning
+        try {
+            await document.validate();
+        } catch (error) {
+            throw this.handleError('validate', error);
+        }
     }
 
     protected async read(id: string): Promise<T | null> {
@@ -193,6 +211,33 @@ abstract class BaseActions<T extends Document> {
                 throw new Error(`Failed to fetch documents: ${error}`);
             }
         }
+    }
+
+    // Add rate limiting and caching support
+    protected async withCache<R>(
+        key: string,
+        operation: () => Promise<R>,
+        options: { ttl?: number; staleWhileRevalidate?: boolean } = { ttl: 3600 }
+    ): Promise<R> {
+        // TODO: Implement proper caching with Redis/Memcached
+        const cached = await this.getCacheValue(key);
+        if (cached && (!options.staleWhileRevalidate || Date.now() < cached.expiry)) {
+            return cached.value as R;
+        }
+        const result = await operation();
+        await this.setCacheValue(key, result, options.ttl);
+        return result;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    protected async getCacheValue(_key: string): Promise<{ value: unknown; expiry: number } | null> {
+        // TODO: Implement with actual cache store
+        return null;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    protected async setCacheValue(_key: string, _value: unknown, _ttl = 3600): Promise<void> {
+        // TODO: Implement with actual cache store
     }
 }
 

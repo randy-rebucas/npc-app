@@ -3,23 +3,23 @@
 
 import { useState } from "react";
 import { useEffect } from "react";
-import { useSession } from "@/providers/logto-session-provider";
+import { useAuth } from "@/middleware/AuthProvider";
 import { IChat } from "@/app/models/Chat";
 
 export default function ChatPage() {
-    const { claims } = useSession();
+    const { user } = useAuth();
     const [chats, setChats] = useState<IChat[]>([]);
     const [activeChat, setActiveChat] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!claims?.sub) return;
+        if (!user?.id) return;
 
         const loadData = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('/api/chat/history?chatId=' + claims.sub);
+                const response = await fetch('/api/chat/history?chatId=' + user.id);
                 if (!response.ok) throw new Error('Failed to fetch chat history');
                 const data = await response.json();
                 setChats(data);
@@ -32,7 +32,7 @@ export default function ChatPage() {
         };
 
         loadData();
-    }, [claims?.sub]);
+    }, [user?.id]);
 
     // Helper function to format date
     // const formatDate = (date: Date) => {

@@ -1,28 +1,28 @@
 'use client'
 
 import { ThemeProvider } from "next-themes";
-import { useSession } from "@/providers/logto-session-provider";
 import { useState, useEffect } from "react";
 import { getUser } from "@/app/actions/user";
 import { redirect } from "next/navigation";
 import { IUser } from "@/app/models/User";
+import { useAuth } from "@/middleware/AuthProvider";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-    const { claims } = useSession();
-    const [user, setUser] = useState<IUser | null>(null);
+    const { user } = useAuth();
+    const [userData, setUserData] = useState<IUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        if (!claims?.sub) {
-            redirect('/login'); // Redirect to login if no claims
+        if (!user?.id) {
+            // redirect('/login'); // Redirect to login if no claims
             return;
         }
 
         const getUserData = async () => {
             try {
-                if (!claims.sub) return;
-                const userData = await getUser(claims.sub);
-                setUser(userData);
+                if (!user?.id) return;
+                const userData = await getUser(user.id);
+                setUserData(userData);
             } catch (error) {
                 console.error('Failed to fetch user:', error);
             } finally {
@@ -30,13 +30,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             }
         }
         getUserData();
-    }, [claims?.sub]);
+    }, [user?.id]);
 
     useEffect(() => {
-        if (!isLoading && user?.customData?.role !== "physician") { 
+        if (!isLoading && userData?.customData?.role !== "physician") { 
             redirect("/np/find-match"); // Redirect to home if not a physician
         }
-    }, [user, isLoading]);
+    }, [userData, isLoading]);
 
     if (isLoading) {
         return <div>Loading...</div>; // Or your loading component

@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { GovidSkeleton } from "@/components/skeletons";
 import { IUser } from "@/app/models/User";
-import { useSession } from "@/providers/logto-session-provider";
+import { useAuth } from "@/middleware/AuthProvider";
 import { getUser } from "@/app/actions/user";
 import { toast } from "sonner";
 
@@ -16,9 +16,9 @@ const formSchema = z.object({
 });
 
 export default function GovidPage() {
-    const { claims } = useSession();
+    const { user } = useAuth();
     const [govIdUrl, setGovIdUrl] = useState('');
-    const [user, setUser] = useState<IUser | null>(null);
+    const [userData, setUserData] = useState<IUser | null>(null);
     const [currentGovId, setCurrentGovId] = useState<{ governmentIdPath: string }>({ governmentIdPath: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -33,9 +33,9 @@ export default function GovidPage() {
     useEffect(() => {
         const getUserData = async () => {
             try {
-                if (!claims.sub) return;
-                const userData = await getUser(claims.sub);
-                setUser(userData);
+                if (!user?.id) return;
+                const userData = await getUser(user.id);
+                setUserData(userData);
                 if (userData) {
                     setCurrentGovId({ governmentIdPath: userData?.customData?.governmentIdPath || "" });
                 }
@@ -47,7 +47,7 @@ export default function GovidPage() {
         }
 
         getUserData();
-    }, [setValue, claims?.sub]);
+    }, [setValue, user?.id]);
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
 
@@ -88,7 +88,7 @@ export default function GovidPage() {
                 if (data.url) {
                     const formattedData = {
                         customData: {
-                            ...user?.customData,
+                            ...userData?.customData,
                             governmentIdPath: data.url,
                         },
                     };

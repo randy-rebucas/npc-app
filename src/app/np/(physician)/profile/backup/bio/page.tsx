@@ -6,10 +6,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useToast } from '@/hooks/use-toast';
 import * as z from 'zod';
 import { BioSkeleton } from '@/components/skeletons';
-import { useSession } from "@/providers/logto-session-provider";  
 import { getUser } from '@/app/actions/user';
 import { IUser } from '@/app/models/User';
-
+import { useAuth } from '@/middleware/AuthProvider';
 const bioFormSchema = z.object({
     description: z.string().min(1, "Background is required"),
     boardCertification: z.string().min(1, "Board certifications are required"),
@@ -19,9 +18,9 @@ const bioFormSchema = z.object({
 type BioFormValues = z.infer<typeof bioFormSchema>;
 
 export default function Bio() {
-    const { claims } = useSession();
+    const { user } = useAuth();
+    const [userData, setUserData] = useState<IUser | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [user, setUser] = useState<IUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const { toast } = useToast();
 
@@ -38,12 +37,12 @@ export default function Bio() {
     const setValue = form.setValue;
 
     useEffect(() => {
-        if (!claims?.sub) return;
+        if (!user?.id) return;
         const getUserData = async () => {
             try {
-                if (!claims.sub) return;
-                const userData = await getUser(claims.sub);
-                setUser(userData);
+                if (!user?.id) return;
+                const userData = await getUser(user.id);
+                setUserData(userData);
                 // Populate form with user data
                 if (userData) {
                     setValue('description', userData.customData?.backgroundCertification?.description || '');
@@ -58,19 +57,19 @@ export default function Bio() {
         }
 
         getUserData();
-    }, [setValue, toast, claims?.sub]);
+    }, [setValue, toast, user?.id]);
 
     async function onSubmit(data: BioFormValues) {
         setIsSubmitting(true);
         // works
         const formattedData = {
             customData: {
-                ...user?.customData,
+                ...userData?.customData,
                 backgroundCertification: {
                     description: data.description,
                     boardCertification: data.boardCertification,
                     linkedinProfile: data.linkedinProfile,
-                    additionalCertifications: user?.customData?.backgroundCertification?.additionalCertifications,
+                    additionalCertifications: userData?.customData?.backgroundCertification?.additionalCertifications,
                 },
             },
         };

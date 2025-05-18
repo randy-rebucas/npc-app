@@ -1,9 +1,8 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { useSession } from "@/providers/logto-session-provider";
 import { INotification } from "@/app/models/Notification";
-
+import { useAuth } from "@/middleware/AuthProvider";
 interface NotificationsContextType {
   notifications: INotification[];
   unreadCount: number;
@@ -15,12 +14,12 @@ interface NotificationsContextType {
 const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
 
 export function NotificationsProvider({ children }: { children: React.ReactNode }) {
-  const { claims } = useSession();
+  const { isAuthenticated, user } = useAuth();
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
   const fetchNotifications = useCallback(async () => {
-    if (!claims?.sub) return;
+    if (!isAuthenticated || !user?.id) return;
     
     try {
       const response = await fetch('/api/notifications');
@@ -33,15 +32,15 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
     }
-  }, [claims?.sub]);
+  }, [isAuthenticated, user?.id]);
 
   useEffect(() => {
-    if (claims?.sub) {
+    if (isAuthenticated && user?.id) {
       fetchNotifications();
       const interval = setInterval(fetchNotifications, 30000); // Poll every 30 seconds
       return () => clearInterval(interval);
     }
-  }, [claims?.sub, fetchNotifications]);
+  }, [isAuthenticated, user?.id, fetchNotifications]);
 
   const markAsRead = useCallback(async (id: string) => {
     try {

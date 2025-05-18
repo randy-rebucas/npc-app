@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import Image from 'next/image';
 import { PhotoSkeleton } from '@/components/skeletons'; 
-import { useSession } from '@/providers/logto-session-provider';
+import { useAuth } from '@/middleware/AuthProvider';
 import { getUser } from '@/app/actions/user';
 import { IUser } from '@/app/models/User';
 import { toast } from 'sonner';
@@ -16,9 +16,9 @@ const formSchema = z.object({
 })
 
 export default function Photo() {
-    const { claims } = useSession();
+    const { user } = useAuth();
     const [photoUrl, setPhotoUrl] = useState('');
-    const [user, setUser] = useState<IUser | null>(null);
+    const [userData, setUserData] = useState<IUser | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -30,13 +30,13 @@ export default function Photo() {
     const setValue = form.setValue;
 
     useEffect(() => {
-        if (!claims?.sub) return;
+        if (!user?.id) return;
         const getUserData = async () => {
             try {
-                if (!claims.sub) return;
-                const userData = await getUser(claims.sub);
+                if (!user?.id) return;
+                const userData = await getUser(user.id);
                 // Populate form with user data
-                setUser(userData);
+                setUserData(userData);
                 console.log(userData);
                 if (userData) {
                     setPhotoUrl(userData?.customData?.profilePhotoPath || '');
@@ -51,7 +51,7 @@ export default function Photo() {
 
         getUserData();
 
-    }, [setValue, claims?.sub]);
+    }, [setValue, user?.id]);
 
     if (isLoading) {
         return <PhotoSkeleton />;
@@ -92,7 +92,7 @@ export default function Photo() {
             if (data.url) {
                 const formattedData = {
                     customData: {
-                        ...user?.customData,
+                        ...userData?.customData,
                         profilePhotoPath: data.url,
                     },
                 };

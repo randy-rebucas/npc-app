@@ -5,12 +5,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { getConfig } from "@/app/actions/config"
 import { ThemeProvider } from "next-themes";
 import { FontSizeProvider } from "@/providers/font-provider";
-import { LogtoProvider, ClaimProps } from "@/providers/logto-session-provider";
 import { ApplicationSettingsProvider } from "@/providers/application-settings-provider";
 import { NotificationsProvider } from "@/providers/notifications-provider";
-import { logtoConfig } from "./logto";
-import { getLogtoContext } from "@logto/next/server-actions";
 import { ClaimProvider } from "@/providers/claim-provider";
+import { AuthProvider } from "@/middleware/AuthProvider";
 
 // import ChatBot from '@/components/root/ChatBot/ChatBot';
 // import ChatComponent from "@/components/example/ChatComponent";
@@ -66,18 +64,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  let isAuthenticated = false;
-  let claims = null;
-
-  try {
-    const logtoContext = await getLogtoContext(logtoConfig, {
-      fetchUserInfo: true
-    });
-    isAuthenticated = logtoContext.isAuthenticated;
-    claims = logtoContext.claims;
-  } catch (error) {
-    console.error('Logto authentication error:', error);
-  }
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -108,11 +94,8 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <FontSizeProvider>
-            <LogtoProvider
-              isAuthenticated={isAuthenticated}
-              claims={claims as ClaimProps}
-            >
+          <AuthProvider>
+            <FontSizeProvider>
               <ApplicationSettingsProvider>
                 <ClaimProvider>
                   <NotificationsProvider>
@@ -122,8 +105,8 @@ export default async function RootLayout({
                   {/* <ChatComponent />  */}
                 </ClaimProvider>
               </ApplicationSettingsProvider>
-            </LogtoProvider>
-          </FontSizeProvider>
+            </FontSizeProvider>
+          </AuthProvider>
         </ThemeProvider>
         <Toaster />
       </body>

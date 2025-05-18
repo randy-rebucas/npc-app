@@ -5,12 +5,11 @@ import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { useEffect, useState } from "react"
 import { X } from "lucide-react"
-import { useSession } from "@/providers/logto-session-provider";
 import { getUser } from "@/app/actions/user";
 import { toast } from "sonner";
 import { CredentialsSkeleton } from "@/components/skeletons";
 import { IUser } from "@/app/models/User"
-
+import { useAuth } from "@/middleware/AuthProvider";
 // Add form schema
 const licenseSchema = z.object({
     medicalLicenseStates: z.array(z.object({
@@ -26,11 +25,11 @@ const licenseSchema = z.object({
 })
 
 export default function CredentialsPage() {
-    const [user, setUser] = useState<IUser | null>(null);
+    const { user } = useAuth();
+    const [userData, setUserData] = useState<IUser | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [states, setStates] = useState([]);
-    const { claims } = useSession();
 
     // Update the form initialization
     const form = useForm<z.infer<typeof licenseSchema>>({
@@ -46,12 +45,12 @@ export default function CredentialsPage() {
 
     useEffect(() => {
 
-        if (!claims?.sub) return;
+        if (!user?.id) return;
         const getUserData = async () => {
             try {
-                if (!claims.sub) return;
-                const userData = await getUser(claims.sub);
-                setUser(userData);
+                if (!user?.id) return;
+                const userData = await getUser(user.id);
+                setUserData(userData);
                 if (userData) {
                     const profile = {
                         medicalLicenseStates: userData?.customData?.licenseAndCertification?.medicalLicenseStates?.map(license => ({
@@ -78,7 +77,7 @@ export default function CredentialsPage() {
         }
 
         getUserData();
-    }, [setValue, claims?.sub]);
+    }, [setValue, user?.id]);
 
     useEffect(() => {
         const fetchStates = async () => {
@@ -95,7 +94,7 @@ export default function CredentialsPage() {
         try {
             const formattedData = {
                 customData: {
-                    ...user?.customData,
+                    ...userData?.customData,
                     licenseAndCertification: {
                         medicalLicenseStates: values.medicalLicenseStates.map(license => ({
                             state: license.state,

@@ -66,4 +66,16 @@ export function handleError(error: unknown): AppError {
   }
   
   return new AppError('An unknown error occurred', 500);
+}
+
+export class DatabaseError extends AppError {
+    constructor(message: string) {
+        super(message, 500, 'DATABASE_ERROR');
+    }
+}
+
+export class ValidationError extends AppError {
+    constructor(message: string) {
+        super(message, 400, 'VALIDATION_ERROR');
+    }
 } 

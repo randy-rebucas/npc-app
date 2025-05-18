@@ -7,7 +7,7 @@ import { Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { CertificationSkeleton } from "@/components/skeletons";
-import { useSession } from "@/providers/logto-session-provider";
+import { useAuth } from "@/middleware/AuthProvider";
 import { IUser } from "@/app/models/User";
 import { getUser } from "@/app/actions/user";
 
@@ -26,8 +26,8 @@ const certificationFormSchema = z.object({
 type CertificationFormValues = z.infer<typeof certificationFormSchema>;
 
 export default function CertificationPage() {
-    const { claims } = useSession();
-    const [user, setUser] = useState<IUser | null>(null);
+    const { user } = useAuth();
+    const [userData, setUserData] = useState<IUser | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const { toast } = useToast();
@@ -47,9 +47,9 @@ export default function CertificationPage() {
     useEffect(() => {
         const getUserData = async () => {
             try {
-                if (!claims.sub) return;
-                const userData = await getUser(claims.sub);
-                setUser(userData);
+                if (!user?.id) return;
+                const userData = await getUser(user.id);
+                setUserData(userData);
                 if (userData) {
                     const profile = {
                         boardCertifications: userData?.customData?.backgroundCertification?.boardCertification || "",
@@ -73,13 +73,13 @@ export default function CertificationPage() {
         }
 
         getUserData();
-    }, [setValue, toast, claims?.sub]);
+    }, [setValue, toast, user?.id]);
 
     async function onSubmit(data: CertificationFormValues) {
         setIsSubmitting(true);
         const formattedData = {
             customData: {
-                ...user?.customData,
+                ...userData?.customData,
                 npiNumber: data.npiNumber,
                 backgroundCertification: {
                     boardCertification: data.boardCertifications,

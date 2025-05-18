@@ -2,11 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
-import { useSession } from "@/providers/logto-session-provider";
 import { getUserCustomData } from "@/app/actions/user";
+import { useAuth } from "@/middleware/AuthProvider";
 
 function LogtoClaimsCheck({ children }: { children: React.ReactNode }) {
-    const { claims } = useSession();
+    const { user } = useAuth();
     const router = useRouter();
 
     const fetchUser = useCallback(async (userId: string) => {
@@ -39,10 +39,10 @@ function LogtoClaimsCheck({ children }: { children: React.ReactNode }) {
     }, [router]);
 
     useEffect(() => {
-        if (claims?.sub) {
-            fetchUser(claims.sub);
+        if (user?.id) {
+            fetchUser(user?.id);
         }
-    }, [claims?.sub, fetchUser]);
+    }, [user?.id, fetchUser]);
 
     return <>{children}</>;
 }

@@ -7,7 +7,7 @@ import type { LucideIcon } from 'lucide-react'
 import { Key, User, HelpCircle, CreditCardIcon, FileCheck, Settings, Users, Search, Heart, File } from "lucide-react"
 import { useState, useEffect } from "react";
 import { IUser } from "@/app/models/User";
-import { useSession } from "@/providers/logto-session-provider";
+import { useAuth } from "@/middleware/AuthProvider";
 import { getUser } from "@/app/actions/user";
 
 type NavItem = {
@@ -18,33 +18,33 @@ type NavItem = {
 
 export default function Nav() {
     const pathname = usePathname();
-    const { claims } = useSession();
-    const [user, setUser] = useState<IUser | null>(null);
+    const { user } = useAuth(); 
+    const [userData, setUserData] = useState<IUser | null>(null);
     const [items, setItems] = useState<NavItem[]>([]);
 
     useEffect(() => {
-        const getUserData = async () => {
+        const getUserData = async (userId: string) => {
             try {
-                const user = await getUser(claims.sub as string);
-                setUser(user);
+                const user = await getUser(userId);
+                setUserData(user);
             } catch (error) {
                 console.error('Failed to fetch user:', error);
                 // Optionally show an error toast/message to user
             }
         }
-        if (claims.sub) {
-            getUserData();
+        if (user?.id) {
+            getUserData(user.id);
         }
-    }, [claims.sub]);
+    }, [user?.id]);
 
     useEffect(() => {
-        if (!user) return;
+        if (!userData) return;
 
         const populateItems = () => {
             const newItems: NavItem[] = [];
 
             // Common items for physicians
-            if (user.customData?.role === "physician") {
+            if (userData?.customData?.role === "physician") {
                 newItems.push(
                     { title: "Profile", url: "/np/profile", icon: User },
                     { title: "Credentials", url: "/np/credentials", icon: Key },
@@ -53,7 +53,7 @@ export default function Nav() {
                 );
 
                 // Additional items for approved physicians
-                if (user.customData?.submissionStatus === "APPROVED") {
+                if (userData?.customData?.submissionStatus === "APPROVED") {
                     newItems.push(
                         { title: "Collaborators", url: "/np/collaborators", icon: Users },
                         // { title: "Messages", url: "/np/messages", icon: MessageCircle },
@@ -64,7 +64,7 @@ export default function Nav() {
             }
 
             // Items for nurse practitioners
-            if (user.customData?.role === "nurse-practitioner") {
+            if (userData?.customData?.role === "nurse-practitioner") {
                 newItems.push(
                     { title: "Find Match", url: "/np/find-match", icon: Search },
                     // { title: "Messages", url: "/np/messages", icon: MessageCircle },
@@ -75,7 +75,7 @@ export default function Nav() {
             }
 
             // Optional listing item
-            if (user.customData?.canCreateListings) {
+            if (userData?.customData?.canCreateListings) {
                 newItems.push({
                     title: "Listings",
                     url: "/np/listings",
@@ -87,7 +87,7 @@ export default function Nav() {
         };
 
         populateItems();
-    }, [user]); // Remove items from dependency array
+    }, [userData]); // Remove items from dependency array
 
     return (
         <nav className="flex-1 space-y-6 overflow-y-auto p-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-800"

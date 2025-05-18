@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { useEffect, useState } from "react"
 import { EducationSkeleton } from "@/components/skeletons"
-import { useSession } from "@/providers/logto-session-provider";
+import { useAuth } from "@/middleware/AuthProvider";
 import { getUser } from "@/app/actions/user"
 import { IUser } from "@/app/models/User";
 import { toast } from "sonner";
@@ -32,8 +32,8 @@ type EducationFormValues = z.infer<typeof educationFormSchema>;
 type PracticeType = string;
 
 export default function EducationPage() {
-    const { claims } = useSession();
-    const [user, setUser] = useState<IUser | null>(null);
+    const { user } = useAuth();
+    const [userData, setUserData] = useState<IUser | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [practices, setPractices] = useState<PracticeType[]>([]);
@@ -58,9 +58,9 @@ export default function EducationPage() {
 
         const getUserData = async () => {
             try {
-                if (!claims.sub) return;
-                const userData = await getUser(claims.sub);
-                setUser(userData);
+                if (!user?.id) return;
+                const userData = await getUser(user.id);
+                setUserData(userData);
                 if (userData) {
                     const profile = {
                         clinicalDegree: userData?.customData?.clinicalDegree || "",
@@ -84,7 +84,7 @@ export default function EducationPage() {
         }
 
         getUserData();
-    }, [setValue, claims?.sub]);
+    }, [setValue, user?.id]);
 
     useEffect(() => {
         const getPracticeTypes = async () => {
@@ -102,7 +102,7 @@ export default function EducationPage() {
         setIsSubmitting(true);
         const formattedData = {
             customData: {
-                ...user?.customData,
+                ...userData?.customData,
                 education: {
                     undergrad: data.education.undergrad,
                     medical: data.education.medical,

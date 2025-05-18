@@ -4,13 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import SignIn from "@/components/sign-in";
-import { handleSignIn, handleSignOut } from '@/app/actions/auth';
 import { SignOut } from "../sign-out";
 import { ThemeToggle } from "../theme-toggle";
-import { useSession } from "@/providers/logto-session-provider";
+import { useAuth } from "@/middleware/AuthProvider";
 
 export default function Header() {
-    const { isAuthenticated } = useSession();
+    const { isAuthenticated, handleLogout, handleSignIn } = useAuth();
     const { theme } = useTheme();
 
     return (
@@ -36,13 +35,13 @@ export default function Header() {
                     {isAuthenticated && (
                         <>
                             <Link href="/np" className="text-foreground hover:text-muted-foreground">Dashboard</Link>
-                            <SignOut onSignOutAction={handleSignOut} />
+                            <SignOut onSignOutAction={handleLogout} />
                         </>
                     )}
                     {!isAuthenticated && (
                         <SignIn onSignIn={handleSignIn} />
                     )}
-                    <ThemeToggle /> 
+                    <ThemeToggle />
                 </nav>
             </div>
         </header>

@@ -21,7 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
-import { useSession } from "@/providers/logto-session-provider";
+import { useAuth } from "@/middleware/AuthProvider";
 
 const profileFormSchema = z.object({
   username: z
@@ -50,7 +50,7 @@ const profileFormSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export default function Profile() {
-  const { claims } = useSession();
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -64,9 +64,9 @@ export default function Profile() {
   });
 
   useEffect(() => {
-    if (claims?.sub) {
+    if (user?.id) {
       const fetchUser = async () => {
-        const response = await fetch(`/api/user/${claims.sub}`, {
+        const response = await fetch(`/api/user/${user.id}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -78,13 +78,13 @@ export default function Profile() {
       }
       fetchUser();
     }
-  }, [form, claims]);
+  }, [form, user?.id]);
 
   const onSubmit = async (data: ProfileFormValues) => {
     setIsLoading(true);
     try {
-
-      const response = await fetch(`/api/user/${claims.sub}`, {
+      if (!user?.id) return;
+      const response = await fetch(`/api/user/${user.id}`, {
         method: "PUT",
         body: JSON.stringify(data),
         headers: {
