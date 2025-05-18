@@ -2,14 +2,16 @@ export const dynamic = 'force-dynamic';
 
 import { AdminSidebar } from "@/components/admin/Sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-
+import { AuthProvider } from "@/middleware/AuthProvider";
 
 export default async function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
 
     return (
-        <SidebarProvider>
-            <AdminSidebar/>
-            {children}
-        </SidebarProvider>
+        <AuthProvider>
+            <SidebarProvider>
+                <AdminSidebar/>
+                {children}
+            </SidebarProvider>
+        </AuthProvider>
     );
 }

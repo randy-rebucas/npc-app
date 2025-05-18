@@ -3,16 +3,15 @@
 import Script from "next/script";
 import Header from '@/components/header';
 import { useCallback, useEffect, useState } from "react";
-import { useSession } from "@/providers/logto-session-provider";
 import { getUser } from "@/app/actions/user";
 import { Certification } from "@/lib/types/onboarding";
 import { License } from "@/app/models/User";
-
+import { useAuth } from "@/middleware/AuthProvider";
 export default function AgreementPage() {
     const jotformId = process.env.NEXT_PUBLIC_JOTFORM_ID;
     const [jotformUrl, setJotformUrl] = useState(`https://form.jotform.com/${jotformId}`);
     const [formFilled, setFormFilled] = useState(false);
-    const { claims } = useSession();
+    const { user } = useAuth();
 
     // Improve iframe handling
     useEffect(() => {
@@ -47,13 +46,13 @@ export default function AgreementPage() {
     }, [jotformId, formFilled]);
 
     const checkMemberstackAlternative = useCallback(async () => {
-        if (!claims?.sub) {
+        if (!user?.id) {
             console.warn('User is not logged in');
             return;
         }
 
         try {
-            const userInfo = await getUser(claims.sub);
+            const userInfo = await getUser(user.id);
 
             if (!userInfo) {
                 console.warn('User is not logged in or data is missing.');
@@ -90,7 +89,7 @@ export default function AgreementPage() {
         } catch (error) {
             console.error('Error getting current member:', error);
         }
-    }, [fillJotformFields, claims?.sub]);
+    }, [fillJotformFields, user?.id]);
 
     // Initial check
     useEffect(() => {

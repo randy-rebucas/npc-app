@@ -5,7 +5,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { MessageCircle, Send, Loader2 } from 'lucide-react';
 // import Link from 'next/link';
-import { useSession } from "@/providers/logto-session-provider";
+import { useAuth } from '@/middleware/AuthProvider';
 
 interface Message {
   sender: string;
@@ -26,7 +26,7 @@ interface Chat {
 }
 
 export function Chat() {
-  const { claims } = useSession();
+  const { user } = useAuth(); 
   const [isOpen, setIsOpen] = useState(false);
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -38,7 +38,7 @@ export function Chat() {
   useEffect(() => {
     const loadChat = async () => {
       try {
-        const response = await fetch(`/api/chat/session?chatId=${claims?.sub}`);
+        const response = await fetch(`/api/chat/session?chatId=${user?.id}`);
         const data = await response.json();
         setChat(data.chat);
       } catch (err) {
@@ -46,10 +46,10 @@ export function Chat() {
       }
     };
 
-    if (isOpen && claims?.sub) {
+    if (isOpen && user?.id) {
       loadChat();
     }
-  }, [isOpen, claims?.sub]);
+  }, [isOpen, user?.id]);
 
   // Updated typing indicator logic
   useEffect(() => {

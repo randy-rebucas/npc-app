@@ -1,7 +1,7 @@
 'use client';
 
 import Header from "@/components/header";
-// import { useSession } from "@/providers/logto-session-provider";
+import { useAuth } from "@/middleware/AuthProvider";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -9,20 +9,8 @@ import { usePathname } from "next/navigation";
 export default function CollaboratorsLayout({ children, modal }: { children: React.ReactNode, modal: React.ReactNode }) {
     const pathname = usePathname();
     const currentTab = pathname.split('/').pop();
-    // const { claims } = useSession();
-
-    // useEffect(() => {
-    //     const getUserSubmissionStatus = async (id: string) => {
-    //         const response = await fetch(`/api/user/${id}/submission-status`);
-    //         const data = await response.json();
-    //         if (data.submissionStatus !== 'APPROVED') {
-    //             redirect("/not-authorized");
-    //         }
-    //     }
-    //     if (claims?.sub) {
-    //         getUserSubmissionStatus(claims.sub);
-    //     }
-    // }, [claims?.sub]);
+    const { user } = useAuth();
+    console.log(user);
 
     return (
         <div className="min-h-screen w-full bg-background">

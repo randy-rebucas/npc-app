@@ -1,51 +1,52 @@
 'use client';
 
-import { IAttestation } from '@/app/models/Attestation';
+// import { IAttestation } from '@/app/models/AttestationBack';
 import Header from '@/components/header';
-import Link from 'next/link';
+// import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import Attestation from '@/components/Attestation';
 
 export default function AttestationsPage() {
     const [searchTerm, setSearchTerm] = useState('');
-    const [attestations, setAttestations] = useState<IAttestation[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    // const [attestations, setAttestations] = useState<IAttestation[]>([]);
+    // const [loading, setLoading] = useState(true);
+    // const [error, setError] = useState<string | null>(null);
 
     // Add data fetching
     useEffect(() => {
         const fetchAttestations = async () => {
-            try {
-                const response = await fetch('/api/attestations');
-                if (!response.ok) throw new Error('Failed to fetch attestations');
-                const data = await response.json();
-                console.log(data);
-                setAttestations(data);
-            } catch (err) {
-                setError(err instanceof Error ? err.message : 'An error occurred');
-            } finally {
-                setLoading(false);
-            }
+            // try {
+            //     const response = await fetch('/api/attestations');
+            //     if (!response.ok) throw new Error('Failed to fetch attestations');
+            //     const data = await response.json();
+            //     console.log(data);
+            //     // setAttestations(data);
+            // } catch (err) {
+            //     setError(err instanceof Error ? err.message : 'An error occurred');
+            // } finally {
+            //     setLoading(false);
+            // }
         };
 
         fetchAttestations();
     }, []);
 
     // Add search filter
-    const filteredAttestations = attestations.filter((attestation) =>
-        Object.values(attestation).some((value) =>
-            value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-        )
-    );
+    // const filteredAttestations = attestations.filter((attestation) =>
+    //     Object.values(attestation).some((value) =>
+    //         value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    //     )
+    // );
 
     // Add loading state
-    if (loading) {
-        return <div className="flex justify-center p-8">Loading attestations...</div>;
-    }
+    // if (loading) {
+    //     return <div className="flex justify-center p-8">Loading attestations...</div>;
+    // }
 
     // Add error handling
-    if (error) {
-        return <div className="text-red-500 p-8">Error: {error}</div>;
-    }
+    // if (error) {
+    //     return <div className="text-red-500 p-8">Error: {error}</div>;
+    // }
 
     return (
         <div className="min-h-screen w-full bg-background">
@@ -62,8 +63,9 @@ export default function AttestationsPage() {
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
+                        <Attestation type="physician" />
 
-                        <div className="rounded-md border border-border">
+                        {/* <div className="rounded-md border border-border">
                             <table className="w-full">
                                 <thead className="border-b border-border bg-muted">
                                     <tr>
@@ -111,7 +113,7 @@ export default function AttestationsPage() {
                                             </td>
                                         </tr>
                                     ))}
-                                    {/* Empty state */}
+                                
                                     {filteredAttestations.length === 0 && (
                                         <tr>
                                             <td colSpan={6} className="px-6 py-16 text-center">
@@ -133,7 +135,7 @@ export default function AttestationsPage() {
                                     )}
                                 </tbody>
                             </table>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </main>

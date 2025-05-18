@@ -1,19 +1,19 @@
 "use client";
 
-import { useSession } from "@/providers/logto-session-provider";
+import { useAuth } from "@/middleware/AuthProvider";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Stethoscope, Syringe } from "lucide-react";
 
 export default function OnboardingPage() {
-    const { claims } = useSession();
+    const { user } = useAuth();
     const router = useRouter();
     const [selectedRole, setSelectedRole] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!selectedRole || !claims?.sub) return;
+        if (!selectedRole || !user?.id) return;
 
         setIsSubmitting(true);
         router.push(`/onboarding/${selectedRole}`);

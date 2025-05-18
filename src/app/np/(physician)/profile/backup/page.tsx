@@ -4,12 +4,11 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSession } from "@/providers/logto-session-provider";
 import { useToast } from "@/hooks/use-toast";
 import { ProfileSkeleton } from "@/components/skeletons";
 import { IUser } from "@/app/models/User";
 import { getUser } from "@/app/actions/user";
-
+import { useAuth } from "@/middleware/AuthProvider";
 const formSchema = z.object({
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "Last name is required"),
@@ -25,10 +24,10 @@ const formSchema = z.object({
 
 
 export default function ProfilePage() {
-    const { claims } = useSession();
+    const { user } = useAuth();
+    const [userData, setUserData] = useState<IUser | null>(null);
     const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [user, setUser] = useState<IUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -48,13 +47,13 @@ export default function ProfilePage() {
     const setValue = form.setValue;
 
     useEffect(() => {
-        if (!claims?.sub) return;
+        if (!user?.id) return;
 
         const getUserData = async () => {
             try {
-                if (!claims.sub) return;
-                const userData = await getUser(claims.sub);
-                setUser(userData);
+                if (!user?.id) return;
+                const userData = await getUser(user.id);
+                setUserData(userData);
 
                 // Populate form with user data
                 if (userData) {
@@ -73,7 +72,7 @@ export default function ProfilePage() {
             }
         }
         getUserData();
-    }, [claims?.sub, setValue]);
+    }, [user?.id, setValue]);
 
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         setIsSubmitting(true);
@@ -105,7 +104,7 @@ export default function ProfilePage() {
             }
 
             // Update local user state with new data
-            setUser(prev => prev ? { ...prev, ...data } : null);
+            setUserData(prev => prev ? { ...prev, ...data } : null);
 
             toast({
                 title: "Success!",
@@ -226,7 +225,7 @@ export default function ProfilePage() {
                     <label className="block text-sm font-medium text-foreground mb-1">Email</label>
                     <div className="flex items-center gap-4">
                         <input
-                            value={user?.primaryEmail || ''}
+                            value={userData?.primaryEmail || ''}
                             className="flex-1 px-3 py-2 bg-muted border border-border rounded-md"
                             readOnly
                         />

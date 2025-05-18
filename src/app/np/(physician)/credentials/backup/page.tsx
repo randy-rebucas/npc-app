@@ -7,7 +7,7 @@ import { useEffect, useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { X } from "lucide-react"
 import { CredentialsSkeleton } from "@/components/skeletons"
-import { useSession } from "@/providers/logto-session-provider";
+import { useAuth } from "@/middleware/AuthProvider";
 import { getUser } from "@/app/actions/user";
 import { IUser } from "@/app/models/User";
 // Add form schema
@@ -34,11 +34,11 @@ const licenseSchema = z.object({
 
 export default function CredentialsPage() {
     const { toast } = useToast();
-    const [user, setUser] = useState<IUser | null>(null);
+    const { user } = useAuth();
+    const [userData, setUserData] = useState<IUser | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [states, setStates] = useState([]);
-    const { claims } = useSession();
 
     // Update the form initialization
     const form = useForm<z.infer<typeof licenseSchema>>({
@@ -54,12 +54,11 @@ export default function CredentialsPage() {
 
     useEffect(() => {
 
-        if (!claims?.sub) return;
+        if (!user?.id) return;
         const getUserData = async () => {
             try {
-                if (!claims.sub) return;
-                const userData = await getUser(claims.sub);
-                setUser(userData);
+                const userData = await getUser(user.id);
+                setUserData(userData);
                 if (userData) {
                     const profile = {
                         medicalLicenseStates: userData?.customData?.licenseAndCertification?.medicalLicenseStates?.map(license => ({
@@ -84,7 +83,7 @@ export default function CredentialsPage() {
         }
 
         getUserData();
-    }, [setValue, toast, claims?.sub]);
+    }, [setValue, toast, user?.id]);
 
     useEffect(() => {
         const fetchStates = async () => {
@@ -101,7 +100,7 @@ export default function CredentialsPage() {
         try {
             const formattedData = {
                 customData: {
-                    ...user?.customData,
+                    ...userData?.customData,
                     licenseAndCertification: {
                         medicalLicenseStates: values.medicalLicenseStates.map(license => ({
                             ...license,

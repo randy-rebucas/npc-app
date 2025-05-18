@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import Attestation from '@/app/models/Attestation';
+import Attestation from '@/app/models/AttestationBack';
 import connect from "@/lib/db";
 
 export async function GET() {

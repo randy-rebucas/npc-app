@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useEffect, useState } from "react";
 import { RatesSkeleton } from "@/components/skeletons";
-import { useSession } from "@/providers/logto-session-provider";
+import { useAuth } from "@/middleware/AuthProvider";
 import { IUser } from "@/app/models/User";
 import { getUser } from "@/app/actions/user";
 import { toast } from "sonner";
@@ -21,8 +21,8 @@ const ratesSchema = z.object({
 type RatesFormValues = z.infer<typeof ratesSchema>;
 
 export default function Rates() {
-    const { claims } = useSession();
-    const [user, setUser] = useState<IUser | null>(null);
+    const { user } = useAuth();
+    const [userData, setUserData] = useState<IUser | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -40,12 +40,12 @@ export default function Rates() {
     const setValue = form.setValue;
 
     useEffect(() => {
-        if (!claims?.sub) return;
+        if (!user?.id) return;
         const getUserData = async () => {
             try {
-                if (!claims.sub) return;
-                const userData = await getUser(claims.sub);
-                setUser(userData);
+                if (!user?.id) return;
+                const userData = await getUser(user.id);
+                setUserData(userData);
                 // Populate form with user data
                 if (userData) {
                     setValue('monthlyCollaborationRate', userData.customData?.rateMatrix?.monthlyCollaborationRate || 0);
@@ -62,7 +62,7 @@ export default function Rates() {
 
         getUserData();
 
-    }, [setValue, claims?.sub]);
+    }, [setValue, user?.id]);
 
     if (isLoading) {
         return <RatesSkeleton />;
@@ -73,7 +73,7 @@ export default function Rates() {
         
         const formattedData = {
             customData: {
-                ...user?.customData,
+                ...userData?.customData,
                 rateMatrix: {
                     monthlyCollaborationRate: data.monthlyCollaborationRate,
                     additionalStateFee: data.additionalStateFee,
