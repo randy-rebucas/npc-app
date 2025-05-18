@@ -13,11 +13,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        if (!user?.id) {
-            // redirect('/login'); // Redirect to login if no claims
-            return;
-        }
-
         const getUserData = async () => {
             try {
                 if (!user?.id) return;

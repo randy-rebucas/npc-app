@@ -6,8 +6,8 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { SignOut } from "@/components/sign-out";
 import { Chat } from "@/components/chat";
 import { Notifications } from "@/components/notifications";
-import { handleSignOut } from '@/app/actions/auth';
 import ThemeToggle from "../theme-toggle";
+import { useAuth } from "@/providers/AuthProvider";
 
 interface Breadcrumb {
   label: string;
@@ -16,7 +16,8 @@ interface Breadcrumb {
 }
 
 export default function AdminHeader({ breadcrumbs }: { breadcrumbs: Breadcrumb[] }) {
-
+  const { handleLogout } = useAuth(); 
+  
   return (
     <header className="flex sticky top-0 bg-background h-16 shrink-0 items-center gap-2 border-b px-4">
       <SidebarTrigger className="-ml-1" />
@@ -27,7 +28,7 @@ export default function AdminHeader({ breadcrumbs }: { breadcrumbs: Breadcrumb[]
         <ThemeToggle /> 
         <Chat />
         <Notifications />
-        <SignOut onSignOutAction={handleSignOut} />
+        <SignOut onSignOutAction={() => handleLogout()} />
       </div>
     </header>
   );

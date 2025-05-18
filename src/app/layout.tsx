@@ -26,30 +26,51 @@ const geistMono = localFont({
 
 export async function generateMetadata(): Promise<Metadata> {
   const config = await getConfig();
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
   return {
-    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+    metadataBase: new URL(baseUrl),
     title: {
-      default: config?.siteName || process.env.NEXT_PUBLIC_APP_NAME,
-      template: `%s | ${config?.siteName || process.env.NEXT_PUBLIC_APP_NAME}`,
+      default: config?.siteName ?? process.env.NEXT_PUBLIC_APP_NAME ?? 'App',
+      template: `%s | ${config?.siteName ?? process.env.NEXT_PUBLIC_APP_NAME ?? 'App'}`,
     },
-    description: config?.siteDescription || process.env.NEXT_PUBLIC_APP_DESCRIPTION,
-    keywords: config?.keywords || process.env.NEXT_PUBLIC_APP_KEYWORDS,
+    description: config?.siteDescription ?? process.env.NEXT_PUBLIC_APP_DESCRIPTION ?? 'Welcome to our application',
+    keywords: config?.keywords ?? process.env.NEXT_PUBLIC_APP_KEYWORDS ?? '',
     authors: [
       {
-        name: config?.author || process.env.NEXT_PUBLIC_APP_AUTHOR,
-        url: config?.authorUrl || process.env.NEXT_PUBLIC_APP_AUTHOR_URL,
+        name: config?.author ?? process.env.NEXT_PUBLIC_APP_AUTHOR ?? 'Developer',
+        url: config?.authorUrl ?? process.env.NEXT_PUBLIC_APP_AUTHOR_URL ?? baseUrl,
       },
     ],
-    creator: config?.author || process.env.NEXT_PUBLIC_APP_AUTHOR,
+    creator: config?.author ?? process.env.NEXT_PUBLIC_APP_AUTHOR ?? 'Developer',
     openGraph: {
       type: "website",
       locale: "en_US",
-      url: config?.siteUrl || process.env.NEXT_PUBLIC_APP_URL,
-      title: config?.siteName || process.env.NEXT_PUBLIC_APP_NAME,
-      description: config?.siteDescription || process.env.NEXT_PUBLIC_APP_DESCRIPTION,
-      siteName: config?.siteName || process.env.NEXT_PUBLIC_APP_NAME,
+      url: config?.siteUrl ?? baseUrl,
+      title: config?.siteName ?? process.env.NEXT_PUBLIC_APP_NAME ?? 'App',
+      description: config?.siteDescription ?? process.env.NEXT_PUBLIC_APP_DESCRIPTION ?? 'Welcome to our application',
+      siteName: config?.siteName ?? process.env.NEXT_PUBLIC_APP_NAME ?? 'App',
+      images: [
+        {
+          url: `${baseUrl}/og-image.jpg`,
+          width: 1200,
+          height: 630,
+          alt: config?.siteName ?? process.env.NEXT_PUBLIC_APP_NAME ?? 'App',
+        },
+      ],
     },
+    twitter: {
+      card: 'summary_large_image',
+      title: config?.siteName ?? process.env.NEXT_PUBLIC_APP_NAME ?? 'App',
+      description: config?.siteDescription ?? process.env.NEXT_PUBLIC_APP_DESCRIPTION ?? 'Welcome to our application',
+      images: [`${baseUrl}/og-image.jpg`],
+    },
+    icons: {
+      icon: '/favicon.ico',
+      shortcut: '/favicon-16x16.png',
+      apple: '/apple-touch-icon.png',
+    },
+    manifest: '/manifest.json',
   };
 }
 
