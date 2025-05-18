@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 
 interface Message {
     id: string;

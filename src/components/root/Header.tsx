@@ -6,7 +6,7 @@ import { useTheme } from "next-themes";
 import SignIn from "@/components/sign-in";
 import { SignOut } from "../sign-out";
 import { ThemeToggle } from "../theme-toggle";
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function Header() {
     const { isAuthenticated, handleLogout, handleSignIn } = useAuth();

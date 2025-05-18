@@ -1,4 +1,4 @@
-import { AuthProvider } from "@/middleware/AuthProvider";
+import { AuthProvider } from "@/providers/AuthProvider";
 import Footer from "@/components/root/Footer";
 import Header from "@/components/root/Header";
 import { ThemeProvider } from "next-themes";

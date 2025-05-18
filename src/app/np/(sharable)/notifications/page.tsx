@@ -2,7 +2,7 @@
 
 import { INotification } from "@/app/models/Notification";
 import Header from "@/components/header";
-import { useNotifications } from "@/providers/notifications-provider";
+import { useNotifications } from "@/providers/NotificationsProvider";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Suspense } from "react";

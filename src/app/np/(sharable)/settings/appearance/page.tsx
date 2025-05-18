@@ -2,7 +2,7 @@
 
 import { useState, FormEvent, useEffect } from 'react';
 import { useTheme } from 'next-themes';
-import { useFontSize } from '@/providers/font-provider';
+import { useFontSize } from '@/providers/FontSizeProvider';
 
 
 export default function AppearancePage() {

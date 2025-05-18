@@ -5,7 +5,7 @@ import Link from "next/link";
 import { IActiveCollaboration } from "@/app/models/Collaboration";
 import { IUser } from "@/app/models/User";
 import { IUserProfile } from "@/app/models/UserProfile";
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 export default function ActiveCollaboratorPage() {
 
     const { user } = useAuth();

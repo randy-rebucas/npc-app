@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Stethoscope, Syringe } from "lucide-react";

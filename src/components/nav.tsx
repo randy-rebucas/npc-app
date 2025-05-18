@@ -7,7 +7,7 @@ import type { LucideIcon } from 'lucide-react'
 import { Key, User, HelpCircle, CreditCardIcon, FileCheck, Settings, Users, Search, Heart, File } from "lucide-react"
 import { useState, useEffect } from "react";
 import { IUser } from "@/app/models/User";
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { getUser } from "@/app/actions/user";
 
 type NavItem = {

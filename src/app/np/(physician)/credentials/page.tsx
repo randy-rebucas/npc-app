@@ -9,7 +9,7 @@ import { getUser } from "@/app/actions/user";
 import { toast } from "sonner";
 import { CredentialsSkeleton } from "@/components/skeletons";
 import { IUser } from "@/app/models/User"
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 // Add form schema
 const licenseSchema = z.object({
     medicalLicenseStates: z.array(z.object({

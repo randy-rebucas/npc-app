@@ -5,7 +5,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
 import { getUser } from '@/app/actions/user';
 import { IUser } from '@/app/models/User';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/middleware/AuthProvider';
+import { useAuth } from '@/providers/AuthProvider';
 
 export default function Profile() {
     const { loading: authLoading, user, handleLogout } = useAuth(); 

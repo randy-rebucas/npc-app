@@ -1,7 +1,7 @@
 'use client';
 
 import Header from "@/components/header";
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 

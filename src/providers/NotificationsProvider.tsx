@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { INotification } from "@/app/models/Notification";
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 interface NotificationsContextType {
   notifications: INotification[];
   unreadCount: number;

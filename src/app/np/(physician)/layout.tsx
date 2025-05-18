@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { getUser } from "@/app/actions/user";
 import { redirect } from "next/navigation";
 import { IUser } from "@/app/models/User";
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     const { user } = useAuth();
@@ -13,11 +13,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        if (!user?.id) {
-            // redirect('/login'); // Redirect to login if no claims
-            return;
-        }
-
         const getUserData = async () => {
             try {
                 if (!user?.id) return;

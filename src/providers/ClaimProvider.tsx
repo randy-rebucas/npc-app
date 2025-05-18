@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
 import { getUserCustomData } from "@/app/actions/user";
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 
 function LogtoClaimsCheck({ children }: { children: React.ReactNode }) {
     const { user } = useAuth();

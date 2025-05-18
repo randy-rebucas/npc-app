@@ -7,7 +7,7 @@ import { useEffect, useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { X } from "lucide-react"
 import { CredentialsSkeleton } from "@/components/skeletons"
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { getUser } from "@/app/actions/user";
 import { IUser } from "@/app/models/User";
 // Add form schema

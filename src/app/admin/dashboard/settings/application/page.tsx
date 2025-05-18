@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { useApplicationSettings } from "@/providers/application-settings-provider";
+import { useApplicationSettings } from "@/providers/ApplicationSettingsProvider";
 
 type ValidationConfig =
   | { type: "url"; message: string }

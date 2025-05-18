@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ProfileSkeleton } from "@/components/skeletons";
 import { IUser } from "@/app/models/User";
 import { getUser } from "@/app/actions/user";
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 const formSchema = z.object({
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "Last name is required"),

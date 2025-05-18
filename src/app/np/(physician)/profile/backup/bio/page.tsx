@@ -8,7 +8,7 @@ import * as z from 'zod';
 import { BioSkeleton } from '@/components/skeletons';
 import { getUser } from '@/app/actions/user';
 import { IUser } from '@/app/models/User';
-import { useAuth } from '@/middleware/AuthProvider';
+import { useAuth } from '@/providers/AuthProvider';
 const bioFormSchema = z.object({
     description: z.string().min(1, "Background is required"),
     boardCertification: z.string().min(1, "Board certifications are required"),

@@ -4,11 +4,11 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { getConfig } from "@/app/actions/config"
 import { ThemeProvider } from "next-themes";
-import { FontSizeProvider } from "@/providers/font-provider";
-import { ApplicationSettingsProvider } from "@/providers/application-settings-provider";
-import { NotificationsProvider } from "@/providers/notifications-provider";
-import { ClaimProvider } from "@/providers/claim-provider";
-import { AuthProvider } from "@/middleware/AuthProvider";
+import { FontSizeProvider } from "@/providers/FontSizeProvider";
+import { ApplicationSettingsProvider } from "@/providers/ApplicationSettingsProvider";
+import { NotificationsProvider } from "@/providers/NotificationsProvider";
+import { ClaimProvider } from "@/providers/ClaimProvider";
+import { AuthProvider } from "@/providers/AuthProvider";
 
 // import ChatBot from '@/components/root/ChatBot/ChatBot';
 // import ChatComponent from "@/components/example/ChatComponent";

@@ -3,7 +3,7 @@
 import { ICollaborationRequest } from "@/app/models/Collaboration";
 import { IUserProfile } from "@/app/models/UserProfile";
 import { IUser } from "@/app/models/User";
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 

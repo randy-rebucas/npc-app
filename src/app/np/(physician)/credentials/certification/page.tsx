@@ -6,7 +6,7 @@ import * as z from "zod";
 import { Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CertificationSkeleton } from "@/components/skeletons";
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { IUser } from "@/app/models/User";
 import { getUser } from "@/app/actions/user";
 import { toast } from "sonner";

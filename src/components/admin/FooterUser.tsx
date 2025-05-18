@@ -1,7 +1,7 @@
 'use client';
 
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { useEffect, useState } from "react";
 import { getUser } from "@/app/actions/user";
 import { IUser } from "@/app/models/User";

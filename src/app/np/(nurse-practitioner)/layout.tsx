@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { getUser } from "@/app/actions/user";
 import { redirect } from "next/navigation";
 import { IUser } from "@/app/models/User";
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     const { user } = useAuth();

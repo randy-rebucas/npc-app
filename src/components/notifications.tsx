@@ -1,9 +1,9 @@
-import { useNotifications } from '@/providers/notifications-provider';
+import { useNotifications } from '@/providers/NotificationsProvider';
 import React, { useEffect, useState } from 'react';
 import { Button } from './ui/button';
 import { Bell } from 'lucide-react';
 import Link from 'next/link';
-import { NotificationsProvider } from '@/providers/notifications-provider';
+import { NotificationsProvider } from '@/providers/NotificationsProvider';
 
 interface Notification {
   _id: string;

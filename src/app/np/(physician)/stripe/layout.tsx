@@ -3,7 +3,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import Header from '@/components/header';
 import { useEffect, useState } from "react";
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { redirect } from "next/navigation";
 
 export default function PaymentLayout({

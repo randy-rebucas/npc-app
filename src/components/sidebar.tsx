@@ -4,7 +4,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import Nav from "./nav"
 import { getUser } from "@/app/actions/user";
 import { useEffect, useState } from "react";
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { IUser } from "@/app/models/User";
 
 export function AppSidebar() {

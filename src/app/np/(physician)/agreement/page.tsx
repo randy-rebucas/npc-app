@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { getUser } from "@/app/actions/user";
 import { Certification } from "@/lib/types/onboarding";
 import { License } from "@/app/models/User";
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 export default function AgreementPage() {
     const jotformId = process.env.NEXT_PUBLIC_JOTFORM_ID;
     const [jotformUrl, setJotformUrl] = useState(`https://form.jotform.com/${jotformId}`);

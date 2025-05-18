@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { useEffect, useState } from "react"
 import { EducationSkeleton } from "@/components/skeletons"
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { getUser } from "@/app/actions/user"
 import { IUser } from "@/app/models/User";
 import { toast } from "sonner";

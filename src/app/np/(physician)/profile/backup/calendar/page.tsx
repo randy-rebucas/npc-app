@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Script from "next/script";
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { getUser } from "@/app/actions/user";
 import { cn } from "@/lib/utils";
 import { BadgeInfo } from "lucide-react";

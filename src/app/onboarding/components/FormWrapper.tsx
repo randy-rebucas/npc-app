@@ -12,7 +12,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useOnBoardingStore } from '@/lib/store/onBoardingStore';
 import { useRouter } from 'next/navigation';
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { checkFileType } from '@/lib/utils';
 import * as z from 'zod';
 import { updateUser } from '@/app/actions/user';

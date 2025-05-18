@@ -5,7 +5,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { MessageCircle, Send, Loader2 } from 'lucide-react';
 // import Link from 'next/link';
-import { useAuth } from '@/middleware/AuthProvider';
+import { useAuth } from '@/providers/AuthProvider';
 
 interface Message {
   sender: string;

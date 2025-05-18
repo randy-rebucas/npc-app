@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { useEffect } from "react";
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { IChat } from "@/app/models/Chat";
 
 export default function ChatPage() {

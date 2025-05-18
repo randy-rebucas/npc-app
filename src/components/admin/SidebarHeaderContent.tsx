@@ -1,6 +1,6 @@
 "use client"
 
-import { useApplicationSettings } from "@/providers/application-settings-provider";
+import { useApplicationSettings } from "@/providers/ApplicationSettingsProvider";
 import { GalleryVerticalEnd } from "lucide-react";
 import { SidebarMenuItem } from "../ui/sidebar";
 import { SidebarMenuButton } from "../ui/sidebar";

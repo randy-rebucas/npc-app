@@ -7,7 +7,7 @@ import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { GovidSkeleton } from "@/components/skeletons";
 import { IUser } from "@/app/models/User";
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { getUser } from "@/app/actions/user";
 
 const formSchema = z.object({

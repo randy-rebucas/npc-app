@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { RatesSkeleton } from "@/components/skeletons";
 import { IUser } from "@/app/models/User";
 import { getUser } from "@/app/actions/user";
-import { useAuth } from "@/middleware/AuthProvider";
+import { useAuth } from "@/providers/AuthProvider";
 const ratesSchema = z.object({
     monthlyCollaborationRate: z.number().min(0, "Base rate must be positive"),
     additionalStateFee: z.number().min(0, "State rate must be positive"),
